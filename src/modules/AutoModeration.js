@@ -23,7 +23,7 @@ module.exports = (client, message, member) => {
             if (!strat) return resolve(false);
             const duration = g.moderation('warnActionExpiresOn');
             const reason = 'Auto Moderation';
-            const dm = await target.createDM();
+            const dm = await member.user.createDM();
             await dm.send(new MessageEmbed()
                 .setTimestamp()
                 .setTitle(`You have been ${action} from ${message.guild.name}`)
