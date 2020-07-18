@@ -54,18 +54,17 @@ class Client extends DiscordClient {
         }
         this.permission = new PermissionManager(this);
     }
-    forceSweep(coverage = 25) {
-        const c1 = this.users.cache.sweep(() => (Math.random() * 100) <= coverage);
-        this.logger.info(`${c1} users sweeped!`);
-        const c3 = this.database.users.cache.sweep(() => (Math.random() * 100) <= coverage);
-        this.logger.info(`${c3} user data sweeped!`);
-        const c4 = this.database.guilds.cache.sweep(() => (Math.random() * 100) <= coverage);
-        this.logger.info(`${c4} guild data sweeped!`);
+    async forceSweep(coverage = 25) {
+        const max = Math.floor((await this.getCount('users')) * .25);
+        if (this.users.cache.size >= max) {
+            const c1 = this.users.cache.sweep(() => (Math.random() * 100) <= coverage);
+            this.logger.info(`${c1} users sweeped!`);
+        }
     }
     startSweepInterval() {
         this.setInterval(() => {
-            this.forceSweep();
-        }, 60000 * 5);
+            this.forceSweep(70);
+        }, 60000 * 10);
     }
     /**
      * @returns {Promise<User>|null}
