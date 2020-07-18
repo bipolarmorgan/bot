@@ -12,6 +12,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client) {
         await client.wait(5000);
+        client.forceSweep(70);
         client.startSweepInterval();
     }
 }

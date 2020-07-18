@@ -23,6 +23,6 @@ module.exports = class extends BaseCommand {
      */
     async run(client, message, args) {
         message.channel.send(`Sweeping...`);
-        client.startSweepInterval(true);
+        client.forceSweep(!isNaN(args[0]) ? Number(args[0]) : 25);
     }
 }
