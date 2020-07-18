@@ -20,7 +20,7 @@ Manager.on('shardCreate', (shard) => {
         Logger.info(`Shard[${shard.id}] is now ready!`, 'Shard');
     });
     shard.on('death', (child) => {
-        Logger.error(`Shard[${shard.id}][${child.pid}] Death`, 'Shard');
+        Logger.error(`Shard[${shard.id}][Process ${child.pid}] Death`, 'Shard');
     });
     shard.on('disconnect', () => {
         Logger.error(`Shard[${shard.id}] Disconnection`, 'Shard');
@@ -32,7 +32,7 @@ Manager.on('shardCreate', (shard) => {
         Logger.info(`Shard[${shard.id}] reconnecting...`, 'Shard');
     });
     shard.on('spawn', (child) => {
-        Logger.info(`Shard[${shard.id}][${child.pid}] has been spawned!`, 'Shard');
+        Logger.info(`Shard[${shard.id}][Process ${child.pid}] has been spawned!`, 'Shard');
     });
 });
 

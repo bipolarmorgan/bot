@@ -6,7 +6,7 @@ Use this section to tell people about which versions of your project are current
 
 | Version | Supported |
 | :--- | :--- |
-| 1.2.x | :white\_check\_mark: |
+| 1.2.x | yes |
 
 ## Reporting a Vulnerability
 

@@ -11,6 +11,12 @@ module.exports = class extends BaseEvent {
      * @param {Client} client 
      */
     async run(client) {
-        client.logger.info(`${client.user.tag}/${client.user.id} ${client.shard.count} ready!`);
+        await client.wait(5000);
+        client.setInterval(() => {
+            const c1 = client.users.cache.sweep(() => Math.random() < .90);
+            client.logger.info(`${c1} users sweeped!`);
+            const c2 = client.emojis.cache.sweep((e) => e.guild.id !== process.env.BOT_SERVER_ID && e.guild.id !== '603558917087428618');
+            client.logger.info(`${c2} emojis sweeped!`);
+        }, 60000 * 10);
     }
 }
