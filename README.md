@@ -1,6 +1,5 @@
-# README
 
-## Unicron Bot
+# Unicron Bot
 
 A Powerful multipurpose open source Discord Bot with over than 100+ commands!
 
