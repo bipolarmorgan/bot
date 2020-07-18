@@ -26,6 +26,7 @@ module.exports = class extends BaseEvent {
     async run(client, message, triggerCommand = true) {
 
         if (message.partial) await message.fetch();
+        if (message.author.partial) await message.author.fetch();
         if (message.author.bot) return;
 
         if (await Blacklist(client, message.author.id, message.guild.id)) return;
