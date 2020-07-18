@@ -37,6 +37,8 @@ module.exports = class POSTManager {
             }
             const count = await this.server.manager.broadcastEval(`this.users.cache.sweep(() => Math.random() < .65)`).catch(() => { });
             this.server.logger.info(`${count.reduce((acc, cur) => acc + cur, 0)} users sweeped!`);
+            const ememe = await this.server.manager.broadcastEval(`this.emojis.cache.sweep((e) => e.guild.id !== ${process.env.BOT_SERVER_ID} && e.guild.id !== 603558917087428618)`);
+            this.server.logger.info(`${ememe.reduce((acc, cur) => acc + cur, 0)} emojis sweeped!`);
         }, 60000 * 30);
     }
 
