@@ -39,12 +39,10 @@ module.exports = class extends BaseCommand {
             const channel = response1.guild.channels.cache.get(response1.content);
             if (!channel || channel.type !== 'category') return message.channel.send(`Invalid channel category... Exiting setup...Try again...`);
             if (!channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES', 'MANAGE_CHANNELS', 'VIEW_CHANNEL'])) return message.channel.send('Unicron doesn\'t have permissions to that channel, please give Unicron access to that channel for this to work and try again...Exiting Setup');
-
             const model = message.guild.db.ticket(true);
             model.category = channel.id;
             model.enabled = true;
             await model.save();
-
             message.channel.send('Setup complete!');
         }
         if (message.flags.includes('enable') || message.flags.includes('disable') || message.flags.includes('category')) {
@@ -66,15 +64,14 @@ module.exports = class extends BaseCommand {
                     await model.save();
                     return message.channel.send(`Ticket System has been \`${stat ? 'enabled' : 'disabled'}\`.`);
                 }
-                default: {
-                    return message.channel.send(new Discord.MessageEmbed()
-                        .setColor('RED')
-                        .setTimestamp()
-                        .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
-                        .setDescription('Error: Invalid Key provided, Please try again.')
-                    );
-                }
             }
         }
+        return message.channel.send(new Discord.MessageEmbed()
+            .setColor('RED')
+            .setTimestamp()
+            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+            .setDescription('Error: Invalid Key provided, Please try again.')
+        );
+
     }
 }
