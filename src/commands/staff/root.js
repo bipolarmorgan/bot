@@ -33,7 +33,7 @@ const evaluation = async function (client, message, [key, ...value]) {
                 const status = key;
                 const type = value.shift().toUpperCase();
                 const message = value.join(' ');
-                client.presence(status, type, message).catch(console.error);
+                await client.presence(status, type, message);
                 return;
             }
             case 'codes': {

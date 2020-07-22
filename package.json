@@ -1,11 +1,12 @@
 {
     "name": "unicron-bot",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "description": "Multipurpose discord bot :)",
     "main": "src/index.js",
     "dependencies": {
         "bufferutil": "^4.0.1",
         "chalk": "^4.0.0",
+        "dbots": "^5.0.3",
         "discord.js": "^12.2.0",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",

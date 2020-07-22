@@ -58,7 +58,6 @@ module.exports = class POSTManager {
                 headers: {
                     Authorization: options.service.token,
                     'Content-type': 'application/json',
-                    'User-Agent': 'Unicron LLC'
                 },
                 body: JSON.stringify(options.service.parse(options.server_count, options.shard_count, options.member_count)),
             }).catch(() => { });
