@@ -15,7 +15,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client, voter) {
         let data = await UserProfile.findOne({ where: { user_id: voter.id } });
-        if (!user) data = await UserProfile.create({ user_id: voter.id });
+        if (!data) data = await UserProfile.create({ user_id: voter.id });
         const db = new User(voter.id, data);
         await db.badges.add('voter');
         await db.inventory.add('votebox');

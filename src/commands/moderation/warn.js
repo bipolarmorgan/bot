@@ -12,12 +12,12 @@ module.exports = class extends BaseCommand {
         super({
             config: {
                 name: 'warn',
-                description: 'Warns the specified user. If warning threshold reaches for a user some action, specified by the `warnTresholdAction` configuration, is taken.',
+                description: 'Warns the specified user. If warning threshold reaches for a user some action, specified by the `warnTresholdAction` configuration, is taken. This command requires kick_members, ban_members, manage_roles, manage_channels permission(s) for the `warnTresholdAction` to work so the bot may have it or not',
                 permission: 'Server Moderator',
             },
             options: {
                 aliases: [],
-                clientPermissions: ['BAN_MEMBERS', 'KICK_MEMBERS', 'MANAGE_ROLES', 'MANAGE_CHANNELS'],
+                clientPermissions: [],
                 cooldown: 10,
                 nsfwCommand: false,
                 args: true,

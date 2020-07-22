@@ -105,6 +105,10 @@ module.exports = class Server extends EventEmitter {
      * @param {string} dir 
      */
     async registerEndpoints(dir) {
+        this.app.use((req, res, next) => {
+            console.log(`${req.ip} ${req.method} ${req.path}`);
+            next();
+        });
         const filePath = path.join(__dirname, dir);
         const files = await fs.readdir(filePath);
         for await (const file of files) {

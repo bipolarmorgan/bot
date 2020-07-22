@@ -6,6 +6,12 @@ class Webhook extends Endpoint {
     constructor(app) {
         super('/api/v1/webhook', app);
         this.parseJSON = {
+            topgg: function (body) {
+                return {
+                    id: body.user,
+                    site: 'Top.gg'
+                }
+            },
             discordboats: function (body) {
                 return {
                     id: body.user.id,
