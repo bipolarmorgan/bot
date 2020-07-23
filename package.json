@@ -1,6 +1,6 @@
 {
     "name": "unicron-bot",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "description": "Multipurpose discord bot :)",
     "main": "src/index.js",
     "dependencies": {
@@ -33,6 +33,7 @@
     "devDependencies": {},
     "scripts": {
         "start": "node .",
+        "nodemon": "nodemon -e ejs,js,css,json",
         "dbInit": "node . --database --reset --all"
     },
     "engines": {

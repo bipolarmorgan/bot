@@ -12,10 +12,24 @@
             A Powerful multi-purpose Discord Bot with over than 100+ commands that comes with many features!
         </p>
         <div style="text-align:center">
-            <a class="btn btn-outline-primary" target="_blank"
-                href="https://discord.com/oauth2/authorize?client_id=634908645896880128&scope=bot&permissions=285599830">
+            <a class="btn btn-outline-primary" href="/invite">
                 Add to Discord
             </a>
+            <% if (user) { %>
+
+                <a class="btn btn-outline-primary" href="/dashboard">
+                    Manage Servers
+                </a>
+
+            <% } else { %>
+
+                <a class="btn btn-outline-primary" href="/login">
+                    <img class="rounded"
+                    style="max-width: 1.35rem; max-height: 1.35rem;"
+                    src='https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png'> Login
+                </a>
+
+            <% } %>
         </div>
         <p>&nbsp;</p>
         <div class="card-deck">

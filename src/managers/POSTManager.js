@@ -1,4 +1,4 @@
-const Server = require('../api/classes/Server');
+const Server = require('../server/classes/Server');
 const fetch = require('node-fetch');
 const { BotLists } = require('../utils/Constants');
 
@@ -47,8 +47,7 @@ module.exports = class POSTManager {
     async post(options) {
         if (!options.service || !options.service.token) return;
         try {
-            const url = options.service.endpoint.replace(/:id/g, this.server.id);
-            const response = await fetch.default(url, {
+            await fetch.default(options.service.endpoint.replace(/:id/g, this.server.id), {
                 method: 'POST',
                 headers: {
                     Authorization: options.service.token,
@@ -56,7 +55,6 @@ module.exports = class POSTManager {
                 },
                 body: JSON.stringify(options.service.parse(options.server_count, options.shard_count, options.member_count)),
             }).catch(() => { });
-            this.server.logger.info(`${options.service.endpoint} - ${response.status}`);
         } catch (e) { }
     }
 }

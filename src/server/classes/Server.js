@@ -25,15 +25,11 @@ passport.deserializeUser((obj, done) => {
 passport.use(new Strategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: 'http://localhost:4200/callback',
+    callbackURL: process.env.CALLBACK_URI,
     scope: ['identify', 'guilds']
 }, (accessToken, refreshToken, profile, done) => {
     process.nextTick(() => done(null, profile));
 }));
-
-
-
-
 module.exports = class Server extends EventEmitter {
     /**
      * 
@@ -50,6 +46,7 @@ module.exports = class Server extends EventEmitter {
             guilds: new GuildManager(this, {}),
         }
         this.poster = new POSTManager(this, {});
+        this.id = process.env.CLIENT_ID;
     }
     /**
      * @returns {Promise<number>}
@@ -128,22 +125,15 @@ module.exports = class Server extends EventEmitter {
         this.app.get('/', (req, res) => {
             this.renderTemplate(req, res, 'index.ejs');
         });
-        this.app.get('/403', (req, res) => {
-            this.renderTemplate(req, res, '403.ejs');
-        });
-        this.app.get('/404', (req, res) => {
-            this.renderTemplate(req, res, '404.ejs');
-        });
-        this.app.get('/500', (req, res) => {
-            this.renderTemplate(req, res, '500.ejs');
-        });
         this.app.get('/callback', passport.authenticate('discord', { failureRedirect: '/500' }), (req, res) => {
-            res.redirect('/');
+            this.logger.info(`(${req.user.username}#${req.user.discriminator}/${req.user.id}) has been authenticated!`);
+            res.redirect('/dashboard');
         });
         this.app.get('/login', (req, res, next) => {
             next();
         }, passport.authenticate('discord', { failureRedirect: '/500' }));
-        this.app.get('/logout', function (req, res) {
+        this.app.get('/logout', (req, res) => {
+            this.logger.info(`(${req.user.username}#${req.user.discriminator}/${req.user.id}) has been logout!`);
             req.session.destroy(() => {
                 req.logout();
                 res.redirect('/');
@@ -162,7 +152,7 @@ module.exports = class Server extends EventEmitter {
             }
         }
         this.app.use((req, res) => {
-            res.redirect(404, '/404');
+            res.redirect('/404');
         });
     }
     /**
@@ -175,9 +165,19 @@ module.exports = class Server extends EventEmitter {
     renderTemplate(req, res, template, data = {}) {
         const baseData = {
             path: req.path,
-            user: req.isAuthenticated() ? req.user : null
+            user: req.isAuthenticated() ? req.user : null,
         };
         res.render(template, Object.assign(baseData, data));
+    }
+    /**
+     * 
+     * @param {express.request} req 
+     * @param {express.response} res 
+     * @param {function} next
+     */
+    Authentication(req, res, next) {
+        if (req.isAuthenticated()) return next();
+        res.redirect('/login');
     }
     /**
      * 
@@ -208,9 +208,6 @@ module.exports = class Server extends EventEmitter {
                 this.app.listen(port, () => {
                     this.logger.info(`API Server Running on port ${this.port}`);
                 });
-                await this.wait(20000);
-                const ids = await this.manager.broadcastEval(`this.user.id`);
-                this.id = ids.shift();
                 this.poster.startInterval();
                 return resolve(port);
             } catch (e) {

@@ -22,8 +22,17 @@ class Client extends DiscordClient {
             messageCacheMaxSize: 100,
             messageSweepInterval: 30,
         });
+        /**
+         * @type {Collection<string, BaseCommand}
+         */
         this.commands = new Collection();
+        /**
+         * @type {Collection<string, BaseItem}
+         */
         this.shopitems = new Collection();
+        /**
+         * @type {Collection<string, Emoji}
+         */
         this.botEmojis = new Collection();
         this.unicron = {
             owner: process.env.BOT_OWNER_ID,

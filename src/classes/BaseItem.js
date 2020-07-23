@@ -1,6 +1,6 @@
 const Client = require('./Unicron');
 const { Message } = require('discord.js');
-module.exports = class {
+module.exports = class Item {
     /**
      * 
      * @param {Object} props 
