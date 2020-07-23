@@ -59,8 +59,8 @@ class Client extends DiscordClient {
     }
     startSweepInterval() {
         this.setInterval(() => {
-            this.forceSweep(70);
-        }, 60000 * 10);
+            this.forceSweep(99);
+        }, 60000 * 5);
     }
     /**
      * @returns {Promise<User>|null}

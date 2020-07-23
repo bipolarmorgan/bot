@@ -44,19 +44,6 @@ module.exports = {
                 }
             }
         },
-        mythicalbots: {
-            token: process.env.MYTHICAL_TOKEN,
-            endpoint: 'http://mythicalbots.xyz/api/bot/:id',
-            /**
-             * 
-             * @param {number} a
-             */
-            parse: function (a) {
-                return {
-                    server_count: a,
-                }
-            }
-        },
         listmybots: {
             token: process.env.LMB_TOKEN,
             endpoint: 'http://listmybots.com/api/bot/:id',
@@ -107,48 +94,6 @@ module.exports = {
             parse: function (a) {
                 return {
                     server_count: a,
-                }
-            }
-        },
-        botsondiscord: {
-            token: process.env.BOD_TOKEN,
-            endpoint: 'http://bots.ondiscord.xyz/bot-api/bot/:id/guilds',
-            /**
-             * 
-             * @param {number} a
-             */
-            parse: function (a) {
-                return {
-                    guildCount: a,
-                }
-            }
-        },
-        discordbotsgg: {
-            token: process.env.DBG_TOKEN,
-            endpoint: 'http://discord.bots.gg/api/v1/bots/:id/stats',
-            /**
-             * 
-             * @param {number} a
-             * @param {number} b
-             */
-            parse: function (a, b) {
-                return {
-                    guildCount: a,
-                    shardCount: b,
-                }
-            }
-
-        },
-        discordbotlist: {
-            token: process.env.DBL_TOKEN,
-            endpoint: 'http://discordbotlist.com/api/v1/bots/:id/stats',
-            /**
-             * 
-             * @param {number} a
-             */
-            parse: function (a) {
-                return {
-                    guilds: a,
                 }
             }
         },

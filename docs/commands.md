@@ -52,7 +52,7 @@ Fully **Customizable** Configurations. including simplistic interactive configur
 Which allows users to create their own text/voice Channels to enhance your community environment as your users continue to meet new people.
 
 > You can also have a role named `Dynamic Mod` so whoevers has that role has full access to all dynamic channels. like a Moderator ;\)
->
+
 > | Name | Description | Usage |  |  |  |
 > | :--- | :--- | :--- | :--- | :--- | :--- |
 > | **dconfig** | Configure Dynamic Text/Voice to your server! | \`dconfig &lt;view | set | enable | disable&gt;  \[value\]`or use`help dconfig\` for more info |

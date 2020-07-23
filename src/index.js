@@ -1,13 +1,14 @@
 require('dotenv').config();
 require('./terminal');
 require('./database/Connection');
+require('./listeners/process');
 
 const { Logger } = require('./utils');
 const { ShardingManager } = require('discord.js');
 
 const Manager = new ShardingManager('./src/Unicron.js', {
     token: process.env.BOT_TOKEN,
-    totalShards: 3,
+    totalShards: 'auto',
     shardArgs: ['--shard'],
     respawn: true,
 });

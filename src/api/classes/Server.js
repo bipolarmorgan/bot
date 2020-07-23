@@ -48,12 +48,13 @@ module.exports = class Server extends EventEmitter {
     fetchUser(user_id) {
         return new Promise(async (resolve, reject) => {
             const fetched = await this.manager.broadcastEval(`
-            (async function(){
-                if (this.shard.id === 0) {
-                    const user = await this.users.fetch(${user_id}).catch(() => { });
-                    return user;
-                }
-            })();
+                (async () => {
+                    if (this.shard.id === 0) {  
+                        const user = await this.users.fetch('${user_id}').catch(() => { });
+                        return user;
+                    }
+                    return null;
+                })();
             `);
             const user = fetched.find(u => u);
             return resolve(user ? user : null);
@@ -66,12 +67,7 @@ module.exports = class Server extends EventEmitter {
     fetchGuild(guild_id) {
         return new Promise(async (resolve, reject) => {
             const fetched = await this.manager.broadcastEval(`
-            (async function(){
-                if (this.shard.id === 0) {
-                    const guild = await this.guilds.fetch(${guild_id}).catch(() => { });
-                    if (guild) return guild;
-                }
-            })();
+                this.guilds.cache.get('${guild_id}');
             `);
             const guild = fetched.find(u => u);
             return resolve(guild ? guild : null);
@@ -106,9 +102,13 @@ module.exports = class Server extends EventEmitter {
      */
     async registerEndpoints(dir) {
         this.app.use((req, res, next) => {
-            console.log(`${req.ip} ${req.method} ${req.path}`);
+            console.log(`${req.ip.replace(/::ffff:/g, '')} ${req.method} ${req.path}`);
             next();
         });
+
+        
+
+
         const filePath = path.join(__dirname, dir);
         const files = await fs.readdir(filePath);
         for await (const file of files) {
@@ -123,10 +123,7 @@ module.exports = class Server extends EventEmitter {
             }
         }
         this.app.use((req, res) => {
-            res.status(404).send({
-                message: 'Not Found',
-                status: 404,
-            });
+            res.redirect(404, '/404');
         });
     }
     /**
