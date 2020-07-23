@@ -1,5 +1,4 @@
 const BaseManager = require('../classes/BaseManager');
-const Client = require('../classes/Unicron');
 const Guild = require('../classes/Guild');
 const {
     GuildDynamicVoice,
