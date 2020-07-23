@@ -15,11 +15,16 @@ class Webhook extends Endpoint {
             this.client.renderTemplate(req, res, 'dashboard.ejs', { guilds });
         });
         this.route.get('/manage/:id', async (req, res) => {
-            if (!req.params.id) return res.redirect('/dashboard');
-            const tmp = req.user.guilds.find((g) => g.id === req.params.id);
-            if (!tmp) return res.redirect('/404');
-            const guild = await this.client.fetchGuild(tmp.id);
-            if (!guild) return res.redirect('/invite');
+            try {
+                if (!req.params.id) return res.redirect('/dashboard');
+                const guild = await this.client.fetchGuild(req.params.id);
+                if (!guild) return res.redirect('/invite');
+                const db = await this.client.fetchGuildDB(guild.id);
+                this.client.renderTemplate(req, res, 'Manager.ejs', { guild, db });
+            } catch (e) {
+                this.client.logger.error(e);
+                res.redirect('/500');
+            }
         });
         return this.route;
     }

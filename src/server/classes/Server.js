@@ -5,31 +5,21 @@ const { promisify } = require('util');
 const BaseEvent = require('../../classes/BaseEvent');
 const Endpoint = require('./Endpoint');
 const EventEmitter = require('events').EventEmitter;
-const { ShardingManager, User, Guild } = require('discord.js');
-const GuildManager = require('../../managers/GuildManager');
-const UserManager = require('../../managers/UserManager');
+const { ShardingManager, Guild } = require('discord.js');
 const POSTManager = require('../../managers/POSTManager');
-const passport = require('passport');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
-const { Strategy } = require('passport-discord');
 const helmet = require('helmet');
 
-passport.serializeUser((user, done) => {
-    done(null, user);
-});
-passport.deserializeUser((obj, done) => {
-    done(null, obj);
-});
+const {
+    GuildDynamicVoice, GuildFilter, GuildLeave,
+    GuildMember, GuildModeration, GuildSettings,
+    GuildTags, GuildTicket, GuildVerification,
+    GuildWelcome,
+} = require('../../database/database');
 
-passport.use(new Strategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: process.env.CALLBACK_URI,
-    scope: ['identify', 'guilds']
-}, (accessToken, refreshToken, profile, done) => {
-    process.nextTick(() => done(null, profile));
-}));
+const GuildDB = require('../../classes/Guild');
+
 module.exports = class Server extends EventEmitter {
     /**
      * 
@@ -41,12 +31,14 @@ module.exports = class Server extends EventEmitter {
         this.utils = require('../../utils/');
         this.logger = this.utils.Logger;
         this.wait = promisify(setTimeout);
-        this.database = {
-            users: new UserManager(this, {}),
-            guilds: new GuildManager(this, {}),
-        }
         this.poster = new POSTManager(this, {});
         this.id = process.env.CLIENT_ID;
+        this.models = {
+            GuildDynamicVoice, GuildFilter, GuildLeave,
+            GuildMember, GuildModeration, GuildSettings,
+            GuildTags, GuildTicket, GuildVerification,
+            GuildWelcome,
+        };
     }
     /**
      * @returns {Promise<number>}
@@ -62,36 +54,39 @@ module.exports = class Server extends EventEmitter {
         } return 0;
     }
     /**
-     * @returns {Promise<User>}
-     * @param {string} user_id 
-     */
-    fetchUser(user_id) {
-        return new Promise(async (resolve, reject) => {
-            const fetched = await this.manager.broadcastEval(`
-                (async () => {
-                    if (this.shard.id === 0) {  
-                        const user = await this.users.fetch('${user_id}').catch(() => { });
-                        return user;
-                    }
-                    return null;
-                })();
-            `);
-            const user = fetched.find(u => u);
-            return resolve(user ? user : null);
-        });
-    }
-    /**
      * @returns {Promise<Guild>}
      * @param {string} guild_id 
      */
     fetchGuild(guild_id) {
         return new Promise(async (resolve, reject) => {
-            const fetched = await this.manager.broadcastEval(`
-                this.guilds.cache.get('${guild_id}');
-            `);
-            const guild = fetched.find(u => u);
-            return resolve(guild ? guild : null);
+            try {
+                const fetched = await this.manager.broadcastEval(`this.guilds.cache.get('${guild_id}');`);
+                const guild = fetched.find(u => u);
+                return resolve(guild ? guild : null);
+            } catch (e) {
+                reject(e);
+            }
         });
+    }
+    /**
+     * @returns {Promise<GuildDB>}
+     * @param {string} guild_id 
+     */
+    fetchGuildDB(guild_id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const data = new Map();
+                for await (const model of Object.keys(this.models)) {
+                    let value = await this.models[model].findOne({ where: { guild_id } });
+                    if (!value) value = await this.models[model].create({ guild_id });
+                    data.set(model, value);
+                }
+                const instance = new GuildDB(guild_id, data);
+                return resolve(instance);
+            } catch (e) {
+                reject(e);
+            }
+        })
     }
     /**
      * @brief Register stufss
@@ -106,10 +101,9 @@ module.exports = class Server extends EventEmitter {
             saveUninitialized: false,
         }));
         this.app.locals.domain = process.env.DOMAIN;
-        this.app.use(passport.initialize());
-        this.app.use(passport.session());
         this.app.use(helmet());
-        this.app.use(express.static(path.join(__dirname, 'public')));
+        this.app.use(express.static(path.join(__dirname, '..', 'public')));
+        this.app.use(express.static(path.join(__dirname, '..', 'views')));
         this.app.engine('html', require('ejs').renderFile);
         this.app.set('view engine', 'html');
         this.app.use(express.json());
@@ -122,23 +116,6 @@ module.exports = class Server extends EventEmitter {
      * @param {string} dir 
      */
     async registerRoutes(dir) {
-        this.app.get('/', (req, res) => {
-            this.renderTemplate(req, res, 'index.ejs');
-        });
-        this.app.get('/callback', passport.authenticate('discord', { failureRedirect: '/500' }), (req, res) => {
-            this.logger.info(`(${req.user.username}#${req.user.discriminator}/${req.user.id}) has been authenticated!`);
-            res.redirect('/dashboard');
-        });
-        this.app.get('/login', (req, res, next) => {
-            next();
-        }, passport.authenticate('discord', { failureRedirect: '/500' }));
-        this.app.get('/logout', (req, res) => {
-            this.logger.info(`(${req.user.username}#${req.user.discriminator}/${req.user.id}) has been logout!`);
-            req.session.destroy(() => {
-                req.logout();
-                res.redirect('/');
-            });
-        });
         const filePath = path.join(__dirname, dir);
         const files = await fs.readdir(filePath);
         for await (const file of files) {
@@ -151,6 +128,9 @@ module.exports = class Server extends EventEmitter {
                 }
             }
         }
+        this.app.get('/', (req, res) => {
+            this.renderTemplate(req, res, 'index.ejs');
+        });
         this.app.use((req, res) => {
             res.redirect('/404');
         });
