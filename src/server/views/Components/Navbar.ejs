@@ -1,52 +1,42 @@
 <div>
-    <nav class="navbar navbar-expand-lg border-light" style="background-color: #7289DA;">
+    <nav class="navbar-dark navbar navbar-expand-lg border-dark" style="background-color: #7289DA;">
         <a class="navbar-brand text-white" href="/">
-            <img class="rounded-circle"
+            <img class="rounded-circle" style="margin-left: 1rem;"
                 src='https://cdn.discordapp.com/avatars/634908645896880128/8b07933aa38d65760745017dadd4e520.png?size=32' />
-            <img class="rounded"
-                style="max-height: 4rem;max-width: 9rem;"
-                src="https://media.discordapp.net/attachments/725261970940624938/735838125326336060/logo.png"/>
+            <img class="rounded" style="max-height: 4rem;max-width: 9rem;"
+                src="https://media.discordapp.net/attachments/725261970940624938/735838125326336060/logo.png" />
         </a>
-        <button class="navbar-toggler rounded" style="background-color:#2f3136;" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse align-content-md-around" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse align-content-md-around">
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-light border-0" href="/dashboard">Dashboard</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link text-light border-0" href="/commands">Commands</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-light border-0" href="/docs">Documentation</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-light border-0" href="/guide">Guide</a>
+                    <a class="nav-link text-light border-0" href="/status">Status</a>
                 </li>
             </ul>
         </div>
         <% if (user) { %>
-        <span class="nav-item dropdown dropdown-menu-right">
-            <a class="btn btn-outline-light rounded dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <% if (user.avatar) {  %>
-                <img class="rounded-circle"
-                    src="<%= `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=32` %>" />
-                <% } %> <%- user.username %>#<%- user.discriminator %>
+        <div class="nav-item">
+            <a class="btn btn-outline-ligh text-light">
+                <%- user.username %>#<%- user.discriminator %>
             </a>
-            <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item text-light" href="/dashboard">My Servers</a>
-                <p class="dropdown-divider"></p>
-                <a class="dropdown-item text-light" href="/oauth/logout">Logout</a>
-            </div>
-        </span>
+        </div>
+
+        <div class="nav-item" style="margin-left: 1rem; margin-right: 1rem;">
+            <a class="btn btn-outline-light text-light" href="/oauth/logout">
+                Logout
+            </a>
+        </div>
         <% } else { %>
-        <span class="nav-item" , style="max-width: 8rem;">
-            <a class="btn btn-outline-light rounded" href="/oauth/login">
-                <img class="rounded"
-                    style="max-width: 1.5rem; max-height: 1.5rem;"
-                    src='https://discord.com/assets/28174a34e77bb5e5310ced9f95cb480b.png'> Login</a>
-        </span>
+        <div class="nav-item" style="text-align: center; margin-right: 1rem;">
+            <a class="btn btn-outline-light text-light" href="/oauth/login">
+                Login
+            </a>
+        </div>
         <% } %>
     </nav>
     <p>&nbsp;</p>

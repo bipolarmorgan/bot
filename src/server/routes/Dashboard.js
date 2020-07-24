@@ -26,6 +26,15 @@ class Webhook extends Endpoint {
                 res.redirect('/500');
             }
         });
+        this.route.post('/manage/:id', async (req, res) => {
+            try {
+                console.log(req.body);
+                res.redirect(`/dashboard/manage/${req.params.id}`);
+            } catch (e) {
+                this.client.logger.error(e);
+                res.redirect('/500');
+            }
+        });
         return this.route;
     }
 }

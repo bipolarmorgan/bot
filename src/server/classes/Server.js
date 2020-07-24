@@ -102,8 +102,8 @@ module.exports = class Server extends EventEmitter {
         }));
         this.app.locals.domain = process.env.DOMAIN;
         this.app.use(helmet());
-        this.app.use(express.static(path.join(__dirname, '..', 'public')));
-        this.app.use(express.static(path.join(__dirname, '..', 'views')));
+        this.app.use('/static', express.static(path.join(__dirname, '..', 'public')));
+        this.app.set('views', path.join(__dirname, '..', 'views'));
         this.app.engine('html', require('ejs').renderFile);
         this.app.set('view engine', 'html');
         this.app.use(express.json());
@@ -157,7 +157,7 @@ module.exports = class Server extends EventEmitter {
      */
     Authentication(req, res, next) {
         if (req.isAuthenticated()) return next();
-        res.redirect('/login');
+        res.redirect('/oauth/login');
     }
     /**
      * 
