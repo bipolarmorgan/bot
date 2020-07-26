@@ -1,5 +1,4 @@
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
+const { Message, MessageEmbed } = require('discord.js');
 const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 
@@ -30,7 +29,8 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const user = await client.resolveUser(args[0]) || message.author;
+        let user = await client.resolveUser(args[0]) || message.author;
+        if (!user) user = message.author;
         const member = message.guild.member(user);
         let nick = member.nickname;
         if (!nick) nick = '-';
@@ -55,7 +55,7 @@ module.exports = class extends BaseCommand {
         }
         let roles = member.roles.cache.map(r => `<@&${r.id}>`).join(', ').replace(new RegExp(`<@&${message.guild.id}>`, 'g'), '');
         if (roles.length === 0) roles = '-';
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setThumbnail(user.displayAvatarURL({ dynamic: true }))
             .addField(`${user.bot ? 'Bot' : 'User'} Info`, `${user.tag} / ${user.id}`)

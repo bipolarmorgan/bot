@@ -1,6 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
+const { Message, MessageEmbed } = require('discord.js');
 const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 
@@ -34,21 +32,21 @@ module.exports = class extends BaseCommand {
         const stat = message.guild.db.ticket('enabled');
         const strat = message.guild.db.ticket('category');
         if (!stat || !strat) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this')
             );
         }
         if (message.channel.parentID === strat) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription('Oi, you can\'t create a ticket inside a ticket ;p')
             );
         }
         if (message.guild.channels.cache.find((ch) => { return ch.type === 'text' && new RegExp(`${message.author.id}`).test(ch.topic) })) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription('Oi, you can\'t create a new ticket when you already have an open ticket ;p')
@@ -75,7 +73,7 @@ module.exports = class extends BaseCommand {
         }).catch((e) => {
             throw e;
         });
-        await message.channel.send(new Discord.MessageEmbed()
+        await message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setDescription(`Your ticket has been created! <#${channel.id}>\nWe will contact you in the ticket shortly!`)
             .setTimestamp()
@@ -86,9 +84,9 @@ module.exports = class extends BaseCommand {
             channel.createOverwrite(st, {
                 VIEW_CHANNEL: true,
                 SEND_MESSAGES: true,
-            });
+            }).catch(() => { });
         }
-        await channel.send(new Discord.MessageEmbed()
+        await channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .addField('Subject', `${args.join(' ')}`)
             .addField('Explain', "Describe your topic so it could be resolved faster!")
