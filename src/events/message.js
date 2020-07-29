@@ -1,7 +1,5 @@
-
 const ms = require('pretty-ms');
-const { Collection, MessageEmbed, Message } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { Collection, MessageEmbed } = require('discord.js');
 const BaseEvent = require('../classes/BaseEvent');
 const cooldowns = new Collection();
 const LevelingCD = new Collection();
@@ -19,12 +17,14 @@ module.exports = class extends BaseEvent {
         super('message');
     }
     /**
-     * @param {Message} message
-     * @param {Client} client
-     * @param {boolean} triggerCommand 
+     * 
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').Message} message
+     * @param {boolean} [triggerCommand=true]
      */
     async run(client, message, triggerCommand = true) {
 
+        if (!message) return;
         if (message.partial) await message.fetch();
         if (message.channel.partial) await message.channel.fetch();
         if (message.author.partial) await message.author.fetch();

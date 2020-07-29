@@ -1,13 +1,11 @@
-
-const { Message, MessageEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const AutoModeration = require('../modules/AutoModeration');
 const fs = require('fs');
-const Client = require('../classes/Unicron');
 const swearWords = fs.readFileSync('assets/swearWords.txt').toString().split('\r\n');
 
 /**
- * @param {Client} client
- * @param {Message} message
+ * @param {import('../classes/Unicron')} client
+ * @param {import('discord.js').Message} message
  */
 module.exports = (client, message) => {
     return new Promise(async (resolve, reject) => {

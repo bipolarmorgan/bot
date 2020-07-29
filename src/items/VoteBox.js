@@ -1,6 +1,3 @@
-
-const Client = require('../classes/Unicron');
-const { Message } = require('discord.js');
 const BaseItem = require('../classes/BaseItem');
 
 module.exports = class VoteBox extends BaseItem {
@@ -48,9 +45,9 @@ module.exports = class VoteBox extends BaseItem {
         ];
     }
     /**
-     * @returns {Promise<boolean|Message>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<boolean|import('discord.js').Message>}
+     * @param {import('../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      */
     async run(client, message) {
         const coins = client.utils.Random.nextInt({ max: 3000, min: 1000 });

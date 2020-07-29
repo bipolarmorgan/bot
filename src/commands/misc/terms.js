@@ -1,8 +1,5 @@
-
 const BaseCommand = require('../../classes/BaseCommand');
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -22,13 +19,13 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTitle(`Unicron Bot - Terms of Service`)
             .setDescription('\nUnicron has access to the End User Data through the Discord API, but Unicron does not collect, use and/or disclose End User Data except (a) as necessary to exercise your rights under this Agreement, (b) in accordance with Discord’s Privacy Policy.' +

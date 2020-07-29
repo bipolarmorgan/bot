@@ -1,6 +1,4 @@
-const { GuildMember } = require('discord.js');
 const Member = require('../classes/GuildMember');
-const Client = require('../classes/Unicron');
 const BaseEvent = require('../classes/BaseEvent');
 const Blacklist = require('../modules/Blacklist');
 
@@ -9,8 +7,8 @@ module.exports = class extends BaseEvent {
         super('guildMemberRemove');
     }
     /**
-     * @param {Client} client
-     * @param {GuildMember} member
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').GuildMember} member
      */
     async run(client, member) {
         if (member.user.bot) return;

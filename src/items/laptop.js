@@ -17,12 +17,4 @@ module.exports = class extends BaseItem {
             }
         });
     }
-    /**
-     * @returns {Promise<boolean|Message>}
-     * @param {Client} client 
-     * @param {Message} message 
-     */
-    async run(client, message) {
-
-    }
 }

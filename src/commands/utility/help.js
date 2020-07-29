@@ -1,11 +1,8 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed, Collection } = require('discord.js');
 const ms = require('ms');
 const BaseCommand = require('../../classes/BaseCommand');
 
-const category = new Discord.Collection();
+const category = new Collection();
 category.set('fun', 'Indeed very cool **Fun commands**.');
 category.set('economy', 'Oustanding **Economy System**! ONE OF THE BEST');
 category.set('misc', 'Miscellaneous commands! over over the door')
@@ -35,16 +32,16 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const prefix = message.guild.db.settings('prefix');
         if (args.length) {
             if (category.has(args[0])) {
-                let embed = new Discord.MessageEmbed()
+                let embed = new MessageEmbed()
                     .setColor('RANDOM')
                     .setTimestamp()
                     .setDescription(`${category.get(args[0])}\n\`\`\`xl\nhelp [Command]\n\`\`\``)
@@ -70,7 +67,7 @@ module.exports = class extends BaseCommand {
             if (!command) {
 
             } else {
-                let embed = new Discord.MessageEmbed()
+                let embed = new MessageEmbed()
                     .setColor('RANDOM')
                     .setTitle(`**${command.config.name}** Command`)
                     .setDescription(`${command.config.description}`)
@@ -90,7 +87,7 @@ module.exports = class extends BaseCommand {
                 return message.channel.send(embed);
             }
         }
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTitle('Unicron\'s Commands')
             .setDescription(`Join our [Support Server](${client.unicron.serverInviteURL}) for help and updates!\n\`\`\`xl\n${prefix}help [Category]\n\`\`\``)
@@ -100,9 +97,9 @@ module.exports = class extends BaseCommand {
             .addField(`♾️ Dynamic Text/Voice`, `\`dynamic\``, true)
             .addField(`💰 Economy`, `\`economy\``, true)
             .addField(`${await client.getEmoji('tools')} Utility`, `\`utility\``, true)
+            .addField('😂 Fun', `\`fun\``, true)
             .addField(`🔍 Search`, `\`search\``, true)
             .addField(`${await client.getEmoji('yes')} Misc`, `\`misc\``, true)
-            .addField('😂 Fun', `\`fun\``, true)
             .setTimestamp()
         );
     }

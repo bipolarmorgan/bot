@@ -1,5 +1,3 @@
-const { VoiceState } = require('discord.js');
-const Client = require('../classes/Unicron');
 const BaseEvent = require('../classes/BaseEvent');
 const Blacklist = require('../modules/Blacklist');
 
@@ -8,9 +6,9 @@ module.exports = class extends BaseEvent {
         super('voiceStateUpdate');
     }
     /**
-     * @param {Client} client
-     * @param {VoiceState} oldState
-     * @param {VoiceState} newState
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').VoiceState} oldState
+     * @param {import('discord.js').VoiceState} newState
      */
     async run(client, oldState, newState) {
         if (await Blacklist(client, newState.member.user.id, newState.guild.id)) return;

@@ -1,5 +1,4 @@
-const { MessageReaction, User, MessageEmbed } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseEvent = require('../classes/BaseEvent');
 const Blacklist = require('../modules/Blacklist');
 
@@ -8,9 +7,9 @@ module.exports = class extends BaseEvent {
         super('messageReactionRemove');
     }
     /**
-     * @param {Client} client
-     * @param {MessageReaction} reaction
-     * @param {User} user
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').MessageReaction} reaction
+     * @param {import('discord.js').User} user
      */
     async run(client, reaction, user) {
         try {

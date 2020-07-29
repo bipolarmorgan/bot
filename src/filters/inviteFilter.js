@@ -1,12 +1,10 @@
-
-const { Message, MessageEmbed } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const AutoModeration = require('../modules/AutoModeration');
 const { Regex } = require('../utils/');
 
 /**
- * @param {Client} client
- * @param {Message} message
+ * @param {import('../classes/Unicron')} client
+ * @param {import('discord.js').Message} message
  */
 module.exports = (client, message) => {
     return new Promise(async (resolve, reject) => {

@@ -1,8 +1,6 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+
 const slaps = [
     'https://i.giphy.com/media/3XlEk2RxPS1m8/giphy.gif',
     'https://i.giphy.com/media/mEtSQlxqBtWWA/giphy.gif',
@@ -37,15 +35,15 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const user = message.mentions.users.first();
         if (!user) return message.channel.send('Oh oh... you gotta provide a valid user to slap :/');
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setImage(slaps[Math.floor(Math.random() * slaps.length)])
             .setDescription(`${message.author.username} slapped ${user.username}!`)

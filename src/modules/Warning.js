@@ -1,12 +1,11 @@
-const { Message, MessageEmbed, GuildMember } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const Member = require('../classes/GuildMember');
 const ms = require('ms');
 
 /**
- * @param {Client} client
- * @param {Message} message
- * @param {GuildMember} member
+ * @param {import('../classes/Unicron')} client
+ * @param {import('discord.js').Message} message
+ * @param {import('discord.js').GuildMember} member
  */
 module.exports = (client, message, user_id, member) => {
     return new Promise(async (resolve, reject) => {

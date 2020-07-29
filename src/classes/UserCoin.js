@@ -1,10 +1,9 @@
 const Base = require('./Base');
-const User = require('./User');
 
 module.exports = class UserCoin extends Base {
     /**
      * 
-     * @param {User} parent 
+     * @param {import('./User')} parent 
      */
     constructor(parent) {
         super(parent.id);

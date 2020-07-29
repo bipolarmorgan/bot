@@ -1,9 +1,5 @@
-const Discord = require('discord.js');
-const { Random } = require('../../utils');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
-const User = require('../../classes/User');
 
 const MINIMUM_COINS = 500;
 
@@ -23,7 +19,7 @@ const Defense = {
 
 /**
  * 
- * @param {User} user 
+ * @param {import('../../classes/User')} user 
  */
 const getOffense = function (user) {
     return new Promise(async (resolve, reject) => {
@@ -37,7 +33,7 @@ const getOffense = function (user) {
 };
 /**
  * 
- * @param {User} user 
+ * @param {import('../../classes/User')} user 
  */
 const getDefense = function (user) {
     return new Promise(async (resolve, reject) => {
@@ -71,15 +67,15 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const utarget = await client.resolveUser(args[0]);
         if (!utarget || utarget.bot) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
@@ -87,7 +83,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (message.author.equals(utarget)) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
@@ -98,7 +94,7 @@ module.exports = class extends BaseCommand {
         const tbal = await target.coins.fetch();
         const ubal = await message.author.db.coins.fetch();
         if (tbal < MINIMUM_COINS) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
@@ -106,7 +102,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (ubal < MINIMUM_COINS) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
@@ -117,17 +113,17 @@ module.exports = class extends BaseCommand {
         const defendPoints = await getDefense(target);
         const chance = defendPoints - attackPoints;
         const bchance = 90 + chance;
-        if (Random.nextInt({ max: 200, min: 0 }) <= bchance) {
+        if (client.utils.Random.nextInt({ max: 200, min: 0 }) <= bchance) {
             const payout = Math.floor(
                 tbal - (
                     tbal * (
-                        Random.nextInt({
-                            max: Random.nextInt({
+                        client.utils.Random.nextInt({
+                            max: client.utils.Random.nextInt({
                                 max: 95,
                                 min: 75,
                             }),
-                            min: Random.nextInt({
-                                max: 75,
+                            min: client.utils.Random.nextInt({
+                                max: 74,
                                 min: 50
                             })
                         }) * 0.01
@@ -136,24 +132,24 @@ module.exports = class extends BaseCommand {
             );
             await target.coins.remove(payout);
             await message.author.db.coins.add(payout);
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setTimestamp()
                 .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription(`You successfully robbed <@${utarget.id}> and your payout is **${payout}** coins!`)
             );
         }
-        if (Random.nextInt({ max: 100, min: 0 }) <= 15) {
+        if (client.utils.Random.nextInt({ max: 100, min: 0 }) <= 15) {
             const lmao = Math.floor(
                 ubal - (
                     ubal * (
-                        Random.nextInt({
-                            max: Random.nextInt({
+                        client.utils.Random.nextInt({
+                            max: client.utils.Random.nextInt({
                                 max: 95,
                                 min: 85,
                             }),
-                            min: Random.nextInt({
-                                max: 85,
+                            min: client.utils.Random.nextInt({
+                                max: 84,
                                 min: 75,
                             })
                         }) * 0.01
@@ -161,7 +157,7 @@ module.exports = class extends BaseCommand {
                 )
             )
             await message.author.db.coins.remove(lmao);
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
                 .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)
@@ -170,7 +166,7 @@ module.exports = class extends BaseCommand {
         }
         await target.coins.add(MINIMUM_COINS);
         await message.author.db.coins.remove(MINIMUM_COINS);
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
             .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)

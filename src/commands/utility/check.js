@@ -1,6 +1,4 @@
 const BaseCommand = require('../../classes/BaseCommand');
-const Client = require('../../classes/Unicron');
-const { Message } = require('discord.js');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -23,10 +21,10 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
-     * @param {Array<string>} args
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
+     * @param {Array<string>} args 
      */
     async run(client, message, args) {
         message.react(await client.getEmoji('yes')).catch(() => {

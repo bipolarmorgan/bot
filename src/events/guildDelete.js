@@ -1,5 +1,3 @@
-const Discord = require('discord.js');
-const Client = require('../classes/Unicron');
 const BaseEvent = require('../classes/BaseEvent');
 
 module.exports = class extends BaseEvent {
@@ -7,8 +5,8 @@ module.exports = class extends BaseEvent {
         super('guildDelete');
     }
     /**
-     * @param {Client} client
-     * @param {Discord.Guild} guild
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').Guild} guild
      */
     async run(client, guild) {
         const channel = await client.channels.fetch(client.unicron.channel, false);

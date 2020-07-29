@@ -1,4 +1,3 @@
-const { request, response } = require('express');
 const { Admin } = require('../../database/database');
 
 /**
@@ -20,8 +19,8 @@ function validateKey(authorization) {
 
 /**
  * 
- * @param {request} req 
- * @param {response} res 
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
  * @param {function} next 
  */
 async function Authorization(req, res, next) {

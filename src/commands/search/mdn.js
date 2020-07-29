@@ -1,6 +1,4 @@
-
-const { Message, MessageEmbed } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 const fetch = require('node-fetch');
 
@@ -25,13 +23,13 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const query = args[0].replace(/#/g, '.prototype.');
+        const query = encodeURIComponent(args[0].replace(/#/g, '.prototype.'));
         try {
             const response = await fetch(`https://developer.mozilla.org/en-US/search.json?q=${query}&locale=en-US&highlight=false`);
             const body = await response.json();
@@ -41,7 +39,7 @@ module.exports = class extends BaseCommand {
                 .setColor(0x066FAD)
                 .setAuthor('MDN', 'https://i.imgur.com/DFGXabG.png', 'https://developer.mozilla.org/')
                 .setURL(data.url)
-                .setTitle(data.title)
+                .setTitle(`[${data.title}](${data.url})`)
                 .setDescription(data.excerpt));
         } catch (e) {
             throw e;

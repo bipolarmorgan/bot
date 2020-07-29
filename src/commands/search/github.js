@@ -1,6 +1,4 @@
-
-const { Message, MessageEmbed } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 const moment = require('moment');
 const fetch = require('node-fetch');
@@ -26,9 +24,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -58,7 +56,7 @@ module.exports = class extends BaseCommand {
                 .addField('❯ Modification Date', moment.utc(body.updated_at).format('MM/DD/YYYY h:mm A'), true)
             );
         } catch (err) {
-            if (err.status === 404) return message.channel.send('Could not find any results.');
+            if (err.status && err.status === 404) return message.channel.send('Could not find any results.');
             return message.channel.send(`Oh no, an error occurred: \`${err.message}\`. Try again later!`);
         }
     }

@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -25,23 +22,23 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const stat = message.guild.db.ticket('enabled');
         const strat = message.guild.db.ticket('category');
         if (!stat || !strat) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this')
             );
         }
         if (message.channel.parentID !== strat) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription('Oi, you can\'t close this ticket cuz it\'s not a ticket ;p')
@@ -53,7 +50,7 @@ module.exports = class extends BaseCommand {
         }
         const modchannel = message.guild.channels.cache.get(await message.guild.db.moderation('modLogChannel'));
         if (modchannel) {
-            modchannel.send(new Discord.MessageEmbed()
+            modchannel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
                 .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))

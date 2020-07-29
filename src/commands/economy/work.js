@@ -1,8 +1,4 @@
-
-const Discord = require('discord.js');
-const { Random } = require('../../utils');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 const salary = {
@@ -49,27 +45,27 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        let embed = new Discord.MessageEmbed()
+        let embed = new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null);
         let status = true;
         const job = args[0].toLowerCase();
         if (!job || !['mailman', 'developer', 'carpenter', 'mechanic', 'police'].includes(job)) {
-            message.channel.send(new Discord.MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setDescription(`Hey, that is not a valid job.\nAvailable Jobs:\nmailman, developer, carpenter, mechanic, police`)
             );
             return false;
         }
-        const payout = Random.nextInt(salary[job]);
+        const payout = client.utils.Random.nextInt(salary[job]);
         switch (job) {
             case 'mailman': {
                 await message.author.db.coins.add(payout);

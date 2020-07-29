@@ -1,6 +1,4 @@
-
-const { Message, MessageEmbed } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -24,13 +22,13 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const stat = client.utils.Random.nextInt({ max: 101, min: 0});
+        const stat = client.utils.Random.nextInt({ max: 101, min: 0 });
         const target = message.mentions.users.first() || message.author;
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')

@@ -1,16 +1,11 @@
-
-const { Message, MessageEmbed, GuildMember } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const ms = require('ms');
 
-/** Example
- * ```js
- * await autoMod(client, message, member);
- * ```
+/**
  * 
- * @param {Client} client
- * @param {Message} message
- * @param {GuildMember} member
+ * @param {import('../classes/Unicron')} client
+ * @param {import('discord.js').Message} message
+ * @param {import('discord.js').GuildMember} member
  * 
  */
 module.exports = (client, message, member) => {

@@ -1,12 +1,9 @@
 const { Admin } = require('../../database/database');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 /**
- * 
- * @param {Client} client Client
- * @param {Message} message Message
- * @param {Array<string>} args Arguments
+ * @param {import('../../classes/Unicron')} client 
+ * @param {import('discord.js').Message} message 
+ * @param {Array<string>} args 
  */
 const evaluation = async function (client, message, args) {
     try {
@@ -68,9 +65,9 @@ $ blacklist -fetch -guild\` [GuildID]
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {

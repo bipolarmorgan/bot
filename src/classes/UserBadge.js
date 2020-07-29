@@ -1,5 +1,4 @@
 const Base = require('./Base');
-const User = require('./User');
 
 function removeElement(arr, key) {
     return arr.filter((item) => { return item !== key });
@@ -8,7 +7,7 @@ function removeElement(arr, key) {
 module.exports = class UserBadge extends Base {
     /**
      * 
-     * @param {User} parent 
+     * @param {import('./User')} parent 
      */
     constructor(parent) {
         super(parent.id);

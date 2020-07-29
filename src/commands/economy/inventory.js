@@ -1,7 +1,5 @@
-
-const Discord = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
-const Client = require('../../classes/Unicron');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -24,9 +22,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -35,13 +33,13 @@ module.exports = class extends BaseCommand {
         const userp = await client.database.users.fetch(target.id);
         const items = await userp.inventory.fetch();
         if (!items.length) {
-            message.channel.send(new Discord.MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTitle(`**${target.tag}'s** Inventory`)
                 .setDescription(`**NOTHING**`));
             return false;
         }
-        let embed = new Discord.MessageEmbed()
+        let embed = new MessageEmbed()
             .setColor('RANDOM').setDescription(`**${target.tag}\'s** Inventory`);
         const _items = client.chunk(items.sort((a, b) => b.amount - a.amount), 4);
         const pages = _items.length;

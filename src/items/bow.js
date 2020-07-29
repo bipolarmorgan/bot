@@ -1,5 +1,3 @@
-
-const Discord = require('discord.js');
 const BaseItem = require('../classes/BaseItem');
 
 module.exports = class extends BaseItem {
@@ -18,13 +16,5 @@ module.exports = class extends BaseItem {
                 cost: Math.floor(3900 * 0.3),
             }
         });
-    }
-    /**
-     * @returns {Promise<boolean|Message>}
-     * @param {Client} client 
-     * @param {Message} message 
-     */
-    async run(client, message) {
-
     }
 }

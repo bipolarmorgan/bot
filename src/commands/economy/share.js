@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -23,9 +20,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -37,7 +34,7 @@ module.exports = class extends BaseCommand {
             else if (transferAmount === 'half') { transferAmount = Math.floor(currentAmount / 2); }
             else if (transferAmount === 'quarter') { transferAmount = Math.floor(currentAmount * .25); }
             else {
-                return message.channel.send(new Discord.MessageEmbed()
+                return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setTimestamp()
                     .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -46,7 +43,7 @@ module.exports = class extends BaseCommand {
             }
         }
         if (target.bot) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -54,7 +51,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (!target) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
@@ -62,7 +59,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (target.id === message.author.id) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -70,7 +67,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (transferAmount > currentAmount) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
@@ -78,7 +75,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (transferAmount < 100) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
@@ -88,7 +85,7 @@ module.exports = class extends BaseCommand {
         const transferTarget = await client.database.users.fetch(target.id);
         await message.author.db.coins.remove(transferAmount);
         await transferTarget.coins.add(transferAmount);
-        message.channel.send(new Discord.MessageEmbed()
+        message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setAuthor(`Transaction ID: ${client.utils.Random.string(6)}`)
             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))

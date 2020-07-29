@@ -1,17 +1,15 @@
-
-const express = require('express');
-const Client = require('./Server');
+const Router = require('express').Router;
 
 class Endpoint {
     /**
      * 
      * @param {string} url 
-     * @param {Client} client 
+     * @param {import('./Server')} client 
      */
     constructor(url, client) {
         this.url = url;
         this.client = client;
-        this.route = express.Router();
+        this.route = Router();
     }
 }
 module.exports = Endpoint;

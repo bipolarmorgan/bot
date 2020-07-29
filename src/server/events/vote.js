@@ -1,6 +1,4 @@
 const BaseEvent = require('../../classes/BaseEvent');
-const Voter = require('../../classes/Voter');
-const Client = require('../classes/Server');
 const User = require('../../classes/User');
 const { UserProfile } = require('../../database/database');
 
@@ -10,8 +8,8 @@ module.exports = class extends BaseEvent {
     }
     /**
      * 
-     * @param {Client} client 
-     * @param {Voter} voter 
+     * @param {import('../classes/Server')} client 
+     * @param {import('../../classes/Voter')} voter 
      */
     async run(client, voter) {
         let data = await UserProfile.findOne({ where: { user_id: voter.id } });

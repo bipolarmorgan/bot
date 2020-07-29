@@ -1,8 +1,7 @@
-const Client = require('../classes/Unicron');
-
 /**
- * @param {Client} client
- * @param {Message} message
+ * @param {import('../classes/Unicron')} client
+ * @param {string} user_id
+ * @param {string} guild_id
  */
 module.exports = (client, user_id, guild_id) => {
     return new Promise(async (resolve, reject) => {

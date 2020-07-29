@@ -19,8 +19,6 @@ class Client extends DiscordClient {
     constructor() {
         super({
             partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-            messageCacheMaxSize: 100,
-            messageSweepInterval: 30,
         });
         /**
          * @type {Collection<string, BaseCommand}
@@ -31,7 +29,7 @@ class Client extends DiscordClient {
          */
         this.shopitems = new Collection();
         /**
-         * @type {Collection<string, Emoji}
+         * @type {Collection<string, import('discord.js').Emoji>}
          */
         this.botEmojis = new Collection();
         this.unicron = {
@@ -68,11 +66,11 @@ class Client extends DiscordClient {
     }
     startSweepInterval() {
         this.setInterval(() => {
-            this.forceSweep(99);
-        }, 60000 * 5);
+            this.forceSweep(50);
+        }, 60000 * 30);
     }
     /**
-     * @returns {Promise<User>|null}
+     * @returns {Promise<import('discord.js').User>|null}
      * @param {string} search
      */
     async resolveUser(search) {
@@ -85,7 +83,7 @@ class Client extends DiscordClient {
         return user;
     }
     /**
-     * @returns {Promise<GuildMember>|null}
+     * @returns {Promise<import('discord.js').GuildMember>|null}
      * @param {string} search 
      * @param {Guild} guild 
      */
@@ -96,9 +94,9 @@ class Client extends DiscordClient {
         return await guild.members.fetch(user);
     }
     /**
-     * @returns {Role|null}
+     * @returns {import('discord.js').Role|null}
      * @param {string} search
-     * @param {Guild} guild 
+     * @param {import('discord.js').Guild} guild 
      */
     resolveRole(search, guild) {
         if (!search || typeof search !== 'string') return null;
@@ -109,9 +107,9 @@ class Client extends DiscordClient {
         return role;
     }
     /**
-     * @returns {Channel|null}
+     * @returns {import('discord.js').Channel|null}
      * @param {string} search
-     * @param {Guild} guild
+     * @param {import('discord.js').Guild} guild
      */
     resolveChannel(search, guild) {
         if (!search || typeof search !== 'string') return null;
@@ -139,7 +137,7 @@ class Client extends DiscordClient {
         `)
     }
     /**
-     * @returns {Promise<Emoji>}
+     * @returns {Promise<import('discord.js').Emoji>}
      * @param {string} name 
      */
     getEmoji(name) {
@@ -172,12 +170,12 @@ class Client extends DiscordClient {
     }
     /**
      * 
-     * @param {Message} message 
-     * @param {string|MessageEmbed} question 
+     * @param {import('discord.js').Message} message 
+     * @param {string|import('discord.js').MessageEmbed} question 
      * @param {number} [limit=60000] millieseconds
      * @param {boolean} [obj=false] Put `true` to return the message class instead of returning the message content
      * 
-     * @returns {Promise<boolean|string|Message>}
+     * @returns {Promise<boolean|string|import('discord.js').MessageEmbed>}
      */
     async awaitReply(message, question, limit = 60000, obj = false) {
         const filter = m => m.author.id === message.author.id;

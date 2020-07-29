@@ -1,8 +1,5 @@
-
-const Discord = require('discord.js');
 const https = require('https');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 const url = [
@@ -25,9 +22,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -40,14 +37,14 @@ module.exports = class extends BaseCommand {
                 let response = JSON.parse(body);
                 let index = response.data.children[Math.floor(Math.random() * 99) + 1].data;
                 if (index.post_hint !== 'image') {
-                    return message.channel.send(new Discord.MessageEmbed()
+                    return message.channel.send(new MessageEmbed()
                         .setAuthor('r/dankmemes')
                         .setColor('RANDOM')
                         .setDescription(`[${title}](${client.unicron.serverInviteURL})`));
                 }
                 let image = index.url;
                 let title = index.title;
-                return message.channel.send(new Discord.MessageEmbed()
+                return message.channel.send(new MessageEmbed()
                     .setAuthor('r/dankmemes')
                     .setImage(image)
                     .setColor('RANDOM')

@@ -1,11 +1,10 @@
-const Server = require('../server/classes/Server');
 const fetch = require('node-fetch');
 const { BotLists } = require('../utils/Constants');
 
 module.exports = class POSTManager {
     /**
      * 
-     * @param {Server} server
+     * @param {import('../server/classes/Server')} server
      * @param {Object<string, any>} options 
      */
     constructor(server) {

@@ -1,6 +1,4 @@
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -23,15 +21,15 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const target = message.mentions.users.first();
         if (!target) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -39,7 +37,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (target.bot) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -47,7 +45,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (message.author.equals(target)) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -58,7 +56,7 @@ module.exports = class extends BaseCommand {
         const tID = ttarget.profile('married_id');
         const mID = message.author.db.profile('married_id');
         if (tID === message.author.id) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -66,7 +64,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (tID) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
@@ -74,7 +72,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (mID) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))

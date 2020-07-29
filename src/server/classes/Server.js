@@ -5,7 +5,6 @@ const { promisify } = require('util');
 const BaseEvent = require('../../classes/BaseEvent');
 const Endpoint = require('./Endpoint');
 const EventEmitter = require('events').EventEmitter;
-const { ShardingManager, Guild } = require('discord.js');
 const POSTManager = require('../../managers/POSTManager');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
@@ -23,7 +22,7 @@ const GuildDB = require('../../classes/Guild');
 module.exports = class Server extends EventEmitter {
     /**
      * 
-     * @param {ShardingManager} manager 
+     * @param {import('discord.js').ShardingManager} manager 
      */
     constructor(manager) {
         super();
@@ -54,7 +53,7 @@ module.exports = class Server extends EventEmitter {
         } return 0;
     }
     /**
-     * @returns {Promise<Guild>}
+     * @returns {Promise<import('discord.js').Guild>}
      * @param {string} guild_id 
      */
     fetchGuild(guild_id) {
@@ -69,7 +68,7 @@ module.exports = class Server extends EventEmitter {
         });
     }
     /**
-     * @returns {Promise<GuildDB>}
+     * @returns {Promise<import('../../classes/Guild')>}
      * @param {string} guild_id 
      */
     fetchGuildDB(guild_id) {

@@ -1,8 +1,4 @@
-
-const Discord = require('discord.js');
-
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -26,9 +22,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -40,7 +36,7 @@ module.exports = class extends BaseCommand {
                 const wid = db.dynamicVoice('waitingRoom');
                 const category = message.guild.channels.cache.get(cid) ? `${message.guild.channels.cache.get(cid).name}` : `\`none\``;
                 const waitingRoom = message.guild.channels.cache.get(wid) ? `${message.guild.channels.cache.get(wid).name}` : `\`none\``;
-                const embed = new Discord.MessageEmbed()
+                const embed = new MessageEmbed()
                     .setColor('RANDOM')
                     .setDescription('You can also do \`dvsetup\` to setup Dynamic Voice interactively')
                     .addField('Key', `
@@ -77,7 +73,7 @@ module.exports = class extends BaseCommand {
                         break;
                     }
                     default: {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setTimestamp()
                             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())
@@ -97,7 +93,7 @@ module.exports = class extends BaseCommand {
                 break;
             }
             default: {
-                return message.channel.send(new Discord.MessageEmbed()
+                return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setTimestamp()
                     .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())

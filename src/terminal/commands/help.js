@@ -1,5 +1,4 @@
 const Command = require('../classes/Command');
-const Terminal = require('../Terminal');
 
 class Help extends Command {
     constructor() {
@@ -7,7 +6,7 @@ class Help extends Command {
     }
     /**
      * 
-     * @param {Terminal} terminal 
+     * @param {import('../Terminal')} terminal 
      * @param {string} content 
      * @param {Array<string>} args 
      */

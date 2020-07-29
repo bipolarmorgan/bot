@@ -1,7 +1,4 @@
-const Client = require('./Unicron');
-const { Message } = require('discord.js');
-
-module.exports = class Command {
+class Command {
     /**
      * 
      * @param {Object} props 
@@ -30,9 +27,11 @@ module.exports = class Command {
     }
     /**
      * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @param {import('./Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args
      */
     async run(client, message, args) { }
 }
+
+module.exports = Command;

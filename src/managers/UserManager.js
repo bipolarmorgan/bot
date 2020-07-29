@@ -11,7 +11,7 @@ module.exports = class UserManager extends BaseManager {
         super(client, options);
     }
     /**
-     * @returns {Promise<User>}
+     * @returns {Promise<import('../classes/User')>}
      * @param {string} user_id 
      * @param {boolean} cache
      */

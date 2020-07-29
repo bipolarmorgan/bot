@@ -1,11 +1,10 @@
 const Base = require('./Base');
-const User = require('./User');
 const { UserInventory: inv } = require('../database/database');
 
 module.exports = class UserInventory extends Base {
     /**
      * 
-     * @param {User} parent 
+     * @param {import('./User')} parent 
      */
     constructor(parent) {
         super(parent.id);

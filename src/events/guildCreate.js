@@ -1,5 +1,4 @@
-const { Guild, MessageEmbed } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseEvent = require('../classes/BaseEvent');
 const Blacklist = require('../modules/Blacklist');
 
@@ -8,8 +7,8 @@ module.exports = class extends BaseEvent {
         super('guildCreate');
     }
     /**
-     * @param {Client} client
-     * @param {Guild} guild
+     * @param {import('../classes/Unicron')} client
+     * @param {import('discord.js').Guild} guild
      */
     async run(client, guild) {
         if (await Blacklist(client, null, guild.id)) {

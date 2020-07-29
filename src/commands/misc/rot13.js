@@ -3,8 +3,6 @@ function rot13(s) {
         return String.fromCharCode(c.charCodeAt(0) + (c.toUpperCase() <= 'M' ? 13 : -13));
     });
 }
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -12,7 +10,7 @@ module.exports = class extends BaseCommand {
         super({
             config: {
                 name: 'rot13',
-                description: 'Encodes your given text to ROT13',
+                description: 'Encodes your given text to ROT13 Cipher!',
                 permission: 'User',
             },
             options: {
@@ -28,9 +26,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {

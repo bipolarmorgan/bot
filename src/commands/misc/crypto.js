@@ -1,6 +1,3 @@
-
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 const Util = require('util');
 const fetch = require('node-fetch')
@@ -27,9 +24,9 @@ module.exports = class extends BaseCommand {
     }
     /**
      * Return the exchange rate for one crypto currency in terms of other currencies.
-     * @param  {string} fsym
-     * @param  {Array<string>} tsyms
-     * @param  {Message} message
+     * @param {string} fsym
+     * @param {Array<string>} tsyms
+     * @param {import('discord.js').Message} message
      */
     CrytpoComparePrice(fsym, tsyms, message) {
         fetch(`https://min-api.cryptocompare.com/data/price?fsym=${fsym}&tsyms=${tsyms}`).then(async (response) => {
@@ -63,9 +60,9 @@ module.exports = class extends BaseCommand {
         else return (str + pad).substring(0, pad.length);
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {

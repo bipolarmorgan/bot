@@ -1,14 +1,9 @@
-
-const Discord = require('discord.js');
 const fs = require('fs');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
 const BaseCommand = require('../../classes/BaseCommand');
 /**
- * 
- * @param {Client} client Client
- * @param {Message} message Message
- * @param {Array<string>} args Arguments
+ * @param {import('../../classes/Unicron')} client 
+ * @param {import('discord.js').Message} message 
+ * @param {Array<string>} args 
  */
 const evaluation = function (client, message, args) {
     return new Promise(async (resolve, reject) => {
@@ -73,9 +68,9 @@ $ censor -fetch this
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {

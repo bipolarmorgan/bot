@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -25,27 +22,27 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const item = await client.shopitems.get(args[0].toLowerCase());
+        const item = client.shopitems.get(args[0].toLowerCase());
         if (!item) {
-            message.channel.send(new Discord.MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription('That\'s an invalid item.'));
             return false;
         }
         if (!await message.author.db.inventory.has(item.config.id)) {
-            message.channel.send(new Discord.MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Sorry, but you don\'t have a ${item.config.displayname}.`));
             return false;
         }
         if (!item.options.usable) {
-            message.channel.send(new Discord.MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription('Sorry, you cannot use this item'));
             return false;

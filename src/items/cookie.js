@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseItem = require('../classes/BaseItem');
 
 module.exports = class extends BaseItem {
@@ -22,14 +19,14 @@ module.exports = class extends BaseItem {
         });
     }
     /**
-     * @returns {Promise<boolean|Message>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<boolean|import('discord.js').Message>}
+     * @param {import('../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      */
     async run(client, message) {
         await message.author.db.levelup(client, message, 120);
         await message.author.db.inventory.remove(this.config.id);
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
             .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)

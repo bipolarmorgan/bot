@@ -1,5 +1,3 @@
-
-const Client = require('../classes/Unicron');
 const BaseEvent = require('../classes/BaseEvent');
 module.exports = class extends BaseEvent {
     constructor() {
@@ -7,7 +5,7 @@ module.exports = class extends BaseEvent {
     }
     /**
      * 
-     * @param {Client} client 
+     * @param {import('../classes/Unicron')} client 
      */
     async run(client) {
         client.forceSweep(70);

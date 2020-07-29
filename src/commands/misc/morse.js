@@ -1,7 +1,6 @@
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+
 const dit = '.';
 const dah = '–';
 function morse(char) {
@@ -90,7 +89,7 @@ function morse(char) {
         case 'ŭ': return dit + dit + dah + dah;
         case 'ź': return dah + dah + dit + dit + dah + dit;
         case 'ż': return dah + dah + dit + dit + dah;
-        case ' ':
+        case ' ': return ' ';
         default: return '\u2007'
     }
 };
@@ -115,17 +114,17 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         args = args.join(' ').toLowerCase();
         args = args.replace(/./g, x => `${morse(x)}\u2001`).trim();
-        message.channel.send(new Discord.MessageEmbed()
+        message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
-            .setDescription(`\`${client.shorten(args, 1024)}\``)
+            .setDescription(`\`${client.shorten(args, 2024)}\``)
         );
     }
 }

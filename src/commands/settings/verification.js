@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -25,9 +22,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -42,7 +39,7 @@ module.exports = class extends BaseCommand {
                     return message.channel.send(`Member Verification has been \`${stat ? 'enabled' : 'disabled'}\`.`);
                 }
                 default: {
-                    return message.channel.send(new Discord.MessageEmbed()
+                    return message.channel.send(new MessageEmbed()
                         .setColor('RED')
                         .setTimestamp()
                         .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
@@ -104,7 +101,7 @@ module.exports = class extends BaseCommand {
         await model.save();
 
         if (response3.content === 'react') {
-            const m = await channel.send(new Discord.MessageEmbed()
+            const m = await channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
                 .setDescription(`This server is protected by [Unicron](${client.unicron.serverInviteURL} 'Unicron's Support Server'), a powerful bot that prevents servers from being raided, React ${await client.getEmoji('yes')} to get yourself verified!`)

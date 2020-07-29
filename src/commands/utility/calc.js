@@ -1,6 +1,4 @@
-
-const { Message, MessageEmbed } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 const { evaluate } = require('mathjs');
 
@@ -25,9 +23,9 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
@@ -36,13 +34,10 @@ module.exports = class extends BaseCommand {
             .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             .setTimestamp()
             .setTitle('Calculator 101')
-            .addField(`Expression`, `\`\`\`m\n${client.shorten(args.join(' '))}\n\`\`\``, 1000)
-            ;
+            .addField(`Expression`, `\`\`\`m\n${client.shorten(args.join(' '))}\n\`\`\``, 1000);
         try {
             result = evaluate(args.join(' '));
-            if (isNaN(parseFloat(result))) {
-                throw 1;
-            }
+            if (isNaN(parseFloat(result))) throw 'LOL';
             embed.setColor(0x00FF00)
                 .addField(`Output`, `\`\`\`m\n${client.shorten(result, 1000)}\n\`\`\``);
         } catch (error) {

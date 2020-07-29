@@ -1,5 +1,4 @@
 const Command = require('../classes/Command');
-const Terminal = require('../Terminal');
 const { Admin } = require('../../database/database');
 const lureneight = require('../../utils/lureneight');
 
@@ -15,14 +14,14 @@ class Help extends Command {
     }
     /**
      * @returns {string}
-     * @param {Terminal} terminal 
+     * @param {import('../Terminal')} terminal 
      */
     createHash(terminal) {
         return lureneight(terminal.utils.Random.string(17));
     }
     /**
      * 
-     * @param {Terminal} terminal 
+     * @param {import('../Terminal')} terminal 
      * @param {string} content 
      * @param {Array<string>} args 
      */
@@ -69,7 +68,6 @@ class Help extends Command {
     }
     /**
      * 
-     * @param {Terminal} terminal 
      * @param {string} table 
      * @param {string} token 
      */
@@ -84,12 +82,11 @@ class Help extends Command {
     }
     /**
      * 
-     * @param {Terminal} terminal 
      * @param {string} table 
      * @param {string} token 
      * @var {Array<string>} tokens
      */
-    async revoke(terminal, table, token) {
+    async revoke(table, token) {
         if (!token) throw { message: 'No such token' };
 
         const keys = await Admin.findOne({ where: { table } });
@@ -103,7 +100,7 @@ class Help extends Command {
     }
     /**
      * 
-     * @param {Terminal} terminal 
+     * @param {import('../Terminal')} terminal 
      * @param {string} table 
      * @param {number} amount 
      * @param {boolean} force

@@ -1,7 +1,7 @@
 class Voter {
     /**
      * 
-     * @param {Object} data 
+     * @param {{}} data 
      */
     constructor(data) {
         this.id = data.id;

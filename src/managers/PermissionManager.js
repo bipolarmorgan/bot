@@ -1,7 +1,4 @@
-
 const BaseManager = require('../classes/BaseManager');
-const UnicronClient = require('../classes/Unicron');
-const { Message } = require('discord.js');
 
 const Levels = [
     {
@@ -46,7 +43,6 @@ const Levels = [
 module.exports = class PermissionManager extends BaseManager {
     /**
      * 
-     * @param {UnicronClient} client 
      * @param {Object<string, any>} options
      */
     constructor(client, options) {
@@ -59,7 +55,7 @@ module.exports = class PermissionManager extends BaseManager {
     }
     /**
      * @returns {number}
-     * @param {Message} message 
+     * @param {import('discord.js').Message} message 
      */
     level(message) {
         let num = 0;

@@ -1,7 +1,4 @@
-
-const Discord = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -25,16 +22,16 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const [user, ...reason] = args;
         const target = await client.resolveUser(user);
         if (!target) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Incorrect Usage, the correct usages are:\n\`${this.options.usage}\``)
                 .setTimestamp()
@@ -42,7 +39,7 @@ module.exports = class extends BaseCommand {
             );
         }
         if (target.equals(message.author)) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Hey there, You can\'t kick yourself :P`)
                 .setTimestamp()
@@ -52,7 +49,7 @@ module.exports = class extends BaseCommand {
         const member = message.guild.member(target.id);
         if (member) {
             if (message.author.id !== message.guild.ownerID && message.member.roles.highest.comparePositionTo(member.roles.highest) <= 0) {
-                return message.channel.send(new Discord.MessageEmbed()
+                return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setTimestamp()
                     .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
@@ -60,7 +57,7 @@ module.exports = class extends BaseCommand {
                 );
             }
             if (!member.kickable) {
-                return message.channel.send(new Discord.MessageEmbed()
+                return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setDescription('Error: I can\'t kick that member.')
                     .setTimestamp()
@@ -68,7 +65,7 @@ module.exports = class extends BaseCommand {
                 );
             }
         } else {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`You can't kick a user that is not on this server. ;-;`)
                 .setTimestamp()
@@ -77,7 +74,7 @@ module.exports = class extends BaseCommand {
         }
         const _reason = reason ? reason.join(' ') : 'No reason provided.';
         const dm = await target.createDM();
-        await dm.send(new Discord.MessageEmbed()
+        await dm.send(new MessageEmbed()
             .setTimestamp()
             .setTitle(`You have been kicked from ${message.guild.name}`)
             .setDescription(`Reason : ${_reason}`)
@@ -86,7 +83,7 @@ module.exports = class extends BaseCommand {
         try {
             await member.kick(_reason).catch((e) => { throw e });
         } catch (e) {
-            return message.channel.send(new Discord.MessageEmbed()
+            return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Unexpected error occured. Member was not kicked`)
                 .setTimestamp()
@@ -96,7 +93,7 @@ module.exports = class extends BaseCommand {
         message.channel.send(`Successfully kick ${target.tag}`);
         const modchannel = await client.channels.fetch(message.guild.db.moderation('modLogChannel')).catch(() => { });
         if (modchannel && modchannel.type === 'text') {
-            modchannel.send(new Discord.MessageEmbed()
+            modchannel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setAuthor(`${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())
                 .setTimestamp()

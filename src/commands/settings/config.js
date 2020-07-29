@@ -1,7 +1,5 @@
-const Discord = require('discord.js');
 const ms = require('ms');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -24,16 +22,16 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
         const [action, key, ...value] = args;
         const db = await client.database.guilds.fetch(message.guild.id, true);
         if (action === 'view') {
-            let embed = new Discord.MessageEmbed()
+            let embed = new MessageEmbed()
                 .setColor(0x00FFFF)
                 .setTimestamp();
             switch (key) {
@@ -148,7 +146,7 @@ module.exports = class extends BaseCommand {
                     const yn = await client.awaitReply(message, 'Are you sure to reset Unicron\'s configurations for this server (yes/no)? _You have 15 seconds to comply_', 15000);
                     if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
                     Promise.all([await db.destroy(false, false)]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s configurations for this server.`)
                             .setTimestamp()
@@ -156,7 +154,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -171,7 +169,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.settings(true);
                     settings.prefix = '?';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -179,7 +177,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -195,7 +193,7 @@ module.exports = class extends BaseCommand {
                     settings.channel = '';
                     settings.enabled = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -203,7 +201,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -218,7 +216,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.welcomer(true);
                     settings.message = 'Welcome {user} to the server!';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -226,7 +224,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -242,7 +240,7 @@ module.exports = class extends BaseCommand {
                     settings.channel = '';
                     settings.enabled = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -250,7 +248,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -265,7 +263,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.leaver(true);
                     settings.message = '{user} has left the server.';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -273,7 +271,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -288,7 +286,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.modLogChannel = '';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -296,7 +294,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -311,7 +309,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.autoModeration = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -319,7 +317,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -334,7 +332,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.autoModAction = 'WARN';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -342,7 +340,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -357,7 +355,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.maxWarnTreshold = Number(0);
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -365,7 +363,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -380,7 +378,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.warnActionExpiresOn = Number(0);
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -388,7 +386,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -403,7 +401,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.autoModeration = Number(0);
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -411,7 +409,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -426,7 +424,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.verification(true);
                     settings.enabled = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -434,7 +432,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -450,7 +448,7 @@ module.exports = class extends BaseCommand {
                     settings.enabled = false;
                     settings.channel = '';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -458,7 +456,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -474,7 +472,7 @@ module.exports = class extends BaseCommand {
                     settings.enabled = false;
                     settings.role = '';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -482,7 +480,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -497,7 +495,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.verification(true);
                     settings.type = 'discrim';
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -505,7 +503,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -520,7 +518,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.filters(true);
                     settings.inviteFilter = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -528,7 +526,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -543,7 +541,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.filters(true);
                     settings.swearFilter = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -551,7 +549,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -566,7 +564,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.filters(true);
                     settings.mentionSpamFilter = false;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
                             .setTimestamp()
@@ -574,7 +572,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while reseting.`)
                             .setTimestamp()
@@ -584,7 +582,7 @@ module.exports = class extends BaseCommand {
                     break;
                 }
                 default: {
-                    return message.channel.send(new Discord.MessageEmbed()
+                    return message.channel.send(new MessageEmbed()
                         .setColor('RED')
                         .setDescription('Error: Invalid Arguments')
                     );
@@ -595,7 +593,7 @@ module.exports = class extends BaseCommand {
                 case 'warnTresholdAction':
                 case 'autoModAction': {
                     if (!['MUTE', 'KICK', 'SOFTBAN', 'BAN'].includes(value[0])) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setTimestamp()
                             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
@@ -603,7 +601,7 @@ module.exports = class extends BaseCommand {
                         );
                     }
                     if (value[0] === 'MUTE' && !db.moderation('mutedRole')) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setTimestamp()
                             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
@@ -613,7 +611,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings[key] = value[0];
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${value[0]}\`.`)
                             .setTimestamp()
@@ -621,7 +619,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -632,7 +630,7 @@ module.exports = class extends BaseCommand {
                 }
                 case 'prefix': {
                     if (value[0].length > 3) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription('Error: Prefix length must not exceed 3 characters.')
                             .setTimestamp()
@@ -642,7 +640,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.settings(true);
                     settings.prefix = value[0];
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${value[0]}\`.`)
                             .setTimestamp()
@@ -650,7 +648,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -662,7 +660,7 @@ module.exports = class extends BaseCommand {
                 case 'modLogChannel': {
                     const channel = message.mentions.channels.first() || message.guild.channels.cache.get(value[0]) || message.guild.channels.cache.find(c => c.name === value[0]);
                     if (!channel) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Incorrect Arguments: Use \`config set ${key} [ChannelMention|ChannelID|ChannelName]\``)
                             .setTimestamp()
@@ -670,7 +668,7 @@ module.exports = class extends BaseCommand {
                         );
                     }
                     if (!channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Error: Unicron doesn't have access to that channel`)
                             .setTimestamp()
@@ -681,7 +679,7 @@ module.exports = class extends BaseCommand {
                     settings.modLogChannel = channel.id;
                     Promise.all([await settings.save()]).then(() => {
                         channel.send(`${key} synced`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to <#${channel.id}>.`)
                             .setTimestamp()
@@ -689,7 +687,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -700,7 +698,7 @@ module.exports = class extends BaseCommand {
                 }
                 case 'autoModeration': {
                     if (!['on', 'off'].includes(value[0])) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Incorrect Arguments: Use \`config set ${key} [on|off]\``)
                             .setTimestamp()
@@ -711,7 +709,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.autoModeration = bool;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${bool ? 'on' : 'off'}\`.`)
                             .setTimestamp()
@@ -719,7 +717,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -731,7 +729,7 @@ module.exports = class extends BaseCommand {
                 case 'maxWarnTreshold': {
                     const time = value[0];
                     if (isNaN(time)) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Incorrect Arguments: Use \`config set ${key} [Number]\``)
                             .setTimestamp()
@@ -741,7 +739,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings.maxWarnTreshold = Number(time);
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${time}\`.`)
                             .setTimestamp()
@@ -749,7 +747,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -762,7 +760,7 @@ module.exports = class extends BaseCommand {
                 case 'warnActionExpiresOn': {
                     const num = ms(value[0]);
                     if (isNaN(num)) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Incorrect or Invalid Arguments: Use \`config set ${key} [Duration]\``)
                             .setTimestamp()
@@ -772,7 +770,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.moderation(true);
                     settings[key] = num;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${ms(num)}\`.`)
                             .setTimestamp()
@@ -780,7 +778,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -793,7 +791,7 @@ module.exports = class extends BaseCommand {
                 case 'mentionSpamFilter':
                 case 'inviteFilter': {
                     if (!['on', 'off'].includes(value[0])) {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`Incorrect Arguments: Use \`config set ${key} [on|off]\``)
                             .setTimestamp()
@@ -804,7 +802,7 @@ module.exports = class extends BaseCommand {
                     const settings = db.filters(true);
                     settings[key] = bool;
                     Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RANDOM')
                             .setDescription(`Successfully set \`${key}\` to \`${bool ? 'on' : 'off'}\`.`)
                             .setTimestamp()
@@ -812,7 +810,7 @@ module.exports = class extends BaseCommand {
                         );
                     }).catch(e => {
                         client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new Discord.MessageEmbed()
+                        return message.channel.send(new MessageEmbed()
                             .setColor('RED')
                             .setDescription(`An error occured while setting \`${key}\`.`)
                             .setTimestamp()
@@ -822,7 +820,7 @@ module.exports = class extends BaseCommand {
                     break;
                 }
                 default: {
-                    return message.channel.send(new Discord.MessageEmbed()
+                    return message.channel.send(new MessageEmbed()
                         .setColor('RED')
                         .setDescription('Error: Invalid Key provided')
                     );

@@ -1,9 +1,6 @@
-const Discord = require('discord.js');
 const ms = require('pretty-ms');
 const { version } = require('../../../package.json');
-const { version: discordjsVersion } = require('discord.js');
-const { Message } = require('discord.js');
-const Client = require('../../classes/Unicron');
+const { MessageEmbed, version: discordjsVersion } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -24,13 +21,13 @@ module.exports = class extends BaseCommand {
         });
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
+     * @returns {Promise<import('discord.js').Message|boolean>}
+     * @param {import('../../classes/Unicron')} client 
+     * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        message.channel.send(new Discord.MessageEmbed()
+        message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTitle(`Unicron v${version}`)
             .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
@@ -42,7 +39,6 @@ module.exports = class extends BaseCommand {
             .addField('Shard Count', `${client.shard.count} shard(s)`, true)
             .addField('Commands', `${client.commands.size} cmds`,true)
             .addField('Node', `${process.version} on ${process.platform} ${process.arch}`, true)
-            .addField('Cached Data', `${client.users.cache.size} users\n${client.emojis.cache.size} emojis`, true)
             .addField('Discord.js', `${discordjsVersion}`, true)
             .setTimestamp()
         );

@@ -1,6 +1,5 @@
 const Command = require('../classes/Command');
 const UserProfile = require('../../classes/User');
-const Terminal = require('../Terminal');
 
 class Eco extends Command {
     constructor() {
@@ -8,7 +7,7 @@ class Eco extends Command {
     }
     /**
      * 
-     * @param {Terminal} terminal 
+     * @param {import('../Terminal')} terminal 
      * @param {string} content 
      * @param {Array<string>} args 
      */
