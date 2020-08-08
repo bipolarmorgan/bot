@@ -26,12 +26,6 @@ const Levels = [
             return message.author.id === message.guild.ownerID;
         }
     }, {
-        name: 'Bot Staff',
-        level: 8,
-        check: function (client, message) {
-            return message.author.db.badges.has('staff');
-        }
-    }, {
         name: 'Bot Owner',
         level: 10,
         check: function (client, message) {
@@ -40,18 +34,18 @@ const Levels = [
     },
 ]
 
-module.exports = class PermissionManager extends BaseManager {
-    /**
-     * 
-     * @param {Object<string, any>} options
-     */
-    constructor(client, options) {
-        super(client, options);
+class PermissionManager extends BaseManager {
+    constructor(client) {
+        super(client);
         this.levels = [];
         for (const l of Levels) {
             this.cache.set(l.name, l);
             this.levels[l.level] = l.name;
         }
+        /**
+         * @type {import('discord.js').Collection<string, typeof Levels[0]}
+         */
+        this.cache;
     }
     /**
      * @returns {number}
@@ -65,3 +59,5 @@ module.exports = class PermissionManager extends BaseManager {
         return num;
     }
 }
+
+module.exports = PermissionManager;

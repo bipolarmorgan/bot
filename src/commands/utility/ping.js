@@ -25,7 +25,7 @@ module.exports = class extends BaseCommand {
      */
     async run(client, message, args) {
         return message.channel.send('Ping?').then(msg => {
-            msg.edit(`Pong! Latency is \`${msg.createdTimestamp - message.createdTimestamp}\`ms.\nAPI Latency is \`${Math.round(client.ws.ping)}ms\``);
+            msg.edit(`Pong! Latency is \`${Math.round(msg.createdTimestamp - message.createdTimestamp)}ms\`.\nAPI Latency is \`${Math.round(client.ws.ping)}ms\``);
         }).catch((e) => {
             client.logger.error(`Error : ${e}`);
             return false;

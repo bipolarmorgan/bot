@@ -1,81 +1,137 @@
-const Base = require('./Base');
-const { UserProfile } = require('../database/database');
-const UserInventory = require('./UserInventory');
-const UserCoin = require('./UserCoin');
-const UserBadge = require('./UserBadge');
-const UserXP = require('./UserXP');
-
 const Leveling = require('../modules/Leveling');
-const { Random } = require('../utils/');
-const { MessageEmbed, Client, Message } = require('discord.js');
 
-module.exports = class User extends Base {
+class User {
     /**
      * 
-     * @param {string} id 
-     * @param {typeof UserProfile} data 
+     * @param {import('./Unicron')} client 
+     * @param {{any}} raw 
      */
-    constructor(id, data) {
-        super(id);
-        this.data = data;
-        this.inventory = new UserInventory(this);
-        this.coins = new UserCoin(this);
-        this.badges = new UserBadge(this);
-        this.experience = new UserXP(this);
+    constructor(client, raw = {}) {
+        this.client = client;
+        /**
+         * @type {string}
+         */
+        this.id = raw.id;
+        /**
+         * @type {number}
+         */
+        this.balance = raw.balance;
+        /**
+         * @type {number}
+         */
+        this.experience = raw.experience;
+        /**
+         * @type {number}
+         */
+        this.multiplier = raw.multiplier;
+        /**
+         * @type {string}
+         */
+        this.marriage_id = raw.marriage_id;
+        /**
+         * @type {Array<{item_id:string, amount:number}>}
+         */
+        this.inventory = raw.inventory;
+        /**
+         * @type {{badges: Array<string>, premium: boolean}}
+         */
+        this.data = raw.data;
     }
-    destroy() {
-        this.data.destroy();
+    get level() {
+        let lvl = 0;
+        const cur = this.experience;
+        for (let i = 0; i < 101; i++) {
+            lvl = i;
+            if (cur >= Leveling.LevelChart[i] && cur <= Leveling.LevelChart[i + 1]) break;
+        }
+        return lvl;
+    }
+    get levelxp() {
+        return Leveling.LevelChart[this.level];
+    }
+    get nextlevel() {
+        return this.level + 1;
+    }
+    get nextlevelxp() {
+        return Leveling.LevelChart[this.nextlevel];
+    }
+    get progress() {
+        return ((this.experience - this.levelxp /
+            (this.nextlevelxp- this.levelxp))) * 100; // (xp - lxp / nxp - lxp) * 100 = n
+    }
+    get progressbar() {
+        return Leveling.ProgressBar(this.progress);
+    }
+    get progressXP() {
+        return this.nextlevelxp - this.experience;
     }
     /**
-     * Searches:
-     * - premium
-     * - married_id
-     * - multiplier
-     * - data {Object}
-     * @returns {JSON|string|boolean}
-     * @param {boolean|string} value 
+     * 
+     * @param {string} item 
      */
-    profile(value) {
-        return typeof value === 'boolean' ? this.data : this.data[value];
+    addItem(item) {
+        const cur = this.inventory.find((t) => t.item_id === item);
+        if (cur) return cur.amount++;
+        this.inventory.push({ item_id: item, amount: 1 });
     }
     /**
-     * @returns {Promise<JSON>}
+     * 
+     * @param {string} item 
      */
-    async toJSON() {
-        return {
-            user_id: this.id,
-            balance: this.coins.fetch(),
-            experience: this.experience.fetch(),
-            premium: this.profile('premium'),
-            married_id: this.profile('married_id'),
-            multiplier: this.profile('multiplier'),
-            badges: this.profile('data').badges,
-            inventory: (await this.inventory.fetch()).map((v) => { return { id: v.item_id, amount: v.amount } }),
-        };
+    removeItem(item) {
+        const cur = this.inventory.find((t) => t.item_id === item);
+        if (cur && cur.amount >= 1) return cur.amount--;
+        this.inventory = this.inventory.filter((t) => t.item_id !== item);
     }
     /**
-     * @returns {Promise<Message|boolean>}
-     * @param {Client} client 
-     * @param {Message} message 
-     * @param {number} exp 
+     * 
+     * @param {string} item 
      */
-    levelup(client, message, exp) {
+    hasItem(item) {
+        return !!this.inventory.find((t) => t.item_id === item);
+    }
+    /**
+     * 
+     * @param {string} item 
+     */
+    addBadge(badge) {
+        if (!this.data.badges.includes(badge)) this.data.badges.push(badge);
+    }
+    /**
+     * 
+     * @param {string} item 
+     */
+    removeBadge(badge) {
+        if (this.data.badges.includes(badge)) this.data.badges = this.data.badges.filter((b) => b !== badge);
+    }
+    /**
+     * 
+     * @param {string} item 
+     */
+    hasBadge(badge) {
+        return this.data.badges.includes(badge);
+    }
+    /**
+     * @returns {Promise<void>}
+     */
+    save() {
         return new Promise(async (resolve, reject) => {
-            const next_level = this.experience.getNextLevel();
-            let current_level = this.experience.getLevel();
-            await this.experience.add(exp || Random.nextInt({ max: 12, min: 6 }));
-            current_level = this.experience.getLevel();
-            if (current_level === next_level) {
-                const prize = Leveling.RequiredLevelChart[current_level] * 2;
-                this.coins.add(prize);
-                return resolve(message.channel.send(new MessageEmbed()
-                    .setColor('0x00FFFF')
-                    .setTitle(':arrow_up:   **LEVELUP**   :arrow_up:')
-                    .setDescription(`GG, You levelup from **${current_level - 1}** ${await client.getEmoji('join_arrow', 'system')} **${current_level}**\nAnd received **${prize}**💰 coins!`)
-                    .setFooter(`${message.author.tag}`)
-                ));
-            }
-            return resolve(false);
+            const payload = this.toJSON();
+            await this.client.server.post(`/api/user/${payload.id}`, payload).catch(reject);
+            resolve();
         });
     }
+    toJSON() {
+        return {
+            id: this.id,
+            balance: this.balance,
+            experience: this.experience,
+            multiplier: this.multiplier,
+            marriage_id: this.marriage_id,
+            inventory: this.inventory,
+            data: this.data,
+        }
+    }
 }
+
+module.exports = User;

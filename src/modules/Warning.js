@@ -1,24 +1,24 @@
 const { MessageEmbed } = require('discord.js');
-const Member = require('../classes/GuildMember');
 const ms = require('ms');
 
 /**
  * @param {import('../classes/Unicron')} client
  * @param {import('discord.js').Message} message
  * @param {import('discord.js').GuildMember} member
+ * @param {import('../classes/Guild')} settings
  */
-module.exports = (client, message, user_id, member) => {
+module.exports = (client, message, member, settings) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const db = new Member(user_id, message.guild.id);
-            const maxTreshold = message.guild.db.moderation('maxWarnTreshold');
-            const action = message.guild.db.moderation('warnTresholdAction');
-            const duration = message.guild.db.moderation('warnActionExpiresOn');
-            const warns = await db.warnings.fetchAll();
+            const db = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+            const maxTreshold = settings.warnThreshold;
+            const action = settings.warnThresholdAction;
+            const duration = settings.warnActionDuration;
+            const warns = db.data.warnings;
             const faction = action.toLowerCase();
             const reason = 'Maximum Warn Threshold Reached!';
-            if (maxTreshold === 0 || maxTreshold >= warns.size) return resolve(false);
-            const dm = await member.user.createDM();
+            if (maxTreshold === 0 || maxTreshold > warns.length) return resolve(false);
+            const dm = await member.user.createDM().catch(() => { });
             await dm.send(new MessageEmbed()
                 .setTimestamp()
                 .setTitle(`You have been ${faction} from ${message.guild.name}`)
@@ -66,7 +66,6 @@ module.exports = (client, message, user_id, member) => {
                 case 'BAN': {
                     await message.guild.members.ban(member.user.id,
                         {
-                            days: 7,
                             reason,
                         }
                     ).catch(() => { });
@@ -80,20 +79,19 @@ module.exports = (client, message, user_id, member) => {
                 default:
                     return resolve(false);
             }
-            const modchannel = await client.channels.fetch(message.guild.db.moderation('modLogChannel')).catch(() => { });
+            const modchannel = await client.channels.fetch(settings.modLogChannel).catch(() => { });
             if (modchannel && modchannel.type === 'text') {
                 modchannel.send(new MessageEmbed()
                     .setColor('RANDOM')
                     .setAuthor(`${client.user.tag} / ${client.user.id}`, client.user.displayAvatarURL({ dynamic: true }))
                     .setTimestamp()
-                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }) || null)
-                    .setDescription(`**Member** : ${message.author.tag} / ${message.author.id}\n**Action** : ${faction}\n**Reason** : ${reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
+                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }) || null)
+                    .setDescription(`**Member** : ${member.user.tag} / ${member.user.id}\n**Action** : ${faction}\n**Reason** : ${reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
                 ).catch(() => { });
             }
             return resolve(true);
         } catch (e) {
-            console.log(e);
-            resolve(false);
+            reject(e);
         }
     });
 }

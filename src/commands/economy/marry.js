@@ -25,8 +25,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
+    async run(client, message, args, g, userStats) {
         const target = message.mentions.users.first();
         if (!target) {
             return message.channel.send(new MessageEmbed()
@@ -41,7 +42,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Sorry, You can\'t marry a bot user </3')
+                .setDescription('Sorry, You can\'t marry a bot user :P')
             );
         }
         if (message.author.equals(target)) {
@@ -49,12 +50,12 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Sorry, You can\'t marry yourself :<')
+                .setDescription('Sorry, You can\'t marry yourself :P')
             );
         }
-        const ttarget = await client.database.users.fetch(target.id);
-        const tID = ttarget.profile('married_id');
-        const mID = message.author.db.profile('married_id');
+        const ttarget = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        const tID = ttarget.marriage_id;
+        const mID = userStats.marriage_id;
         if (tID === message.author.id) {
             return message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
@@ -68,7 +69,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Woah, that person is already married to someone else -,-')
+                .setDescription('Sorry, but that person is already married to someone else -,-')
             );
         }
         if (mID) {
@@ -84,16 +85,13 @@ module.exports = class extends BaseCommand {
         };
         message.channel.send(`Hey ${target} will you accept ${message.author} as your beloved husband/wife? yes or no`);
         message.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ['time'] })
-            .then(async (collected) => {
-                const m1 = await message.author.db.profile(true);
-                const m2 = await ttarget.profile(true);
-                m1.married_id = target.id;
-                m2.married_id = message.author.id;
-                await m1.save();
-                await m2.save();
+            .then(async () => {
+                userStats.married_id = target.id;
+                ttarget.married_id = message.author.id;
+                await userStats.save().catch((e) => { throw e; });
+                await ttarget.save().catch((e) => { throw e; });
                 return message.channel.send(`🎉 ${message.author} and ${target} has been married yay!. 🎉`);
-            }).catch((e) => {
-                console.log(e);
+            }).catch(() => {
                 message.channel.send('Looks like nobody is getting married today.');
             });
     }

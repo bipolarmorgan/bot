@@ -28,7 +28,7 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        let user = await client.resolveUser(args[0]) || message.author;
+        let user = await client.resolveUser(args.join(' ')) || message.author;
         if (!user) user = message.author;
         let member = message.guild.member(user);
         if (!member) member = message.member;

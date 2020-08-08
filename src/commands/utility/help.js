@@ -36,9 +36,10 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
-        const prefix = message.guild.db.settings('prefix');
+    async run(client, message, args, guildSettings) {
+        const prefix = guildSettings.prefix;
         if (args.length) {
             if (category.has(args[0])) {
                 let embed = new MessageEmbed()

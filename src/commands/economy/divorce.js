@@ -25,9 +25,10 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
-        const id = message.author.db.profile('married_id');
+    async run(client, message, _args, _g, userStats) {
+        const id = userStats.marriage_id;
         if (!id) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
@@ -36,13 +37,11 @@ module.exports = class extends BaseCommand {
                 .setDescription(`You can't file a divorce when you are not married to someone ;p`)
             );
         }
-        const waifu = await client.database.users.fetch(id);
-        const m1 = waifu.profile(true);
-        const m2 = message.author.db.profile(true);
-        m1['married_id'] = '';
-        m2['married_id'] = '';
-        await m1.save();
-        await m2.save();
+        const waifu = await client.db.users.fetch(id).catch((e) => { throw e; });
+        userStats.marriage_id = '';
+        waifu.marriage_id = '';
+        await userStats.save().catch((e) => { throw e; });
+        await waifu.save().catch((e) => { throw e; });
         return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTimestamp()

@@ -53,9 +53,10 @@ module.exports = class extends BaseCommand {
     async run(client, message, args) {
         const chance = client.utils.Random.nextInt({ max: 100, min: 0 }) <= 60;
         if (chance) {
-            const user = await client.database.users.fetch(message.author.id);
+            const user = await client.db.users.fetch(message.author.id);
             const prize = chance + client.utils.Random.nextInt({ max: 250, min: 50 });
-            await user.coins.add(prize);
+            user.balance += prize;
+            await user.save().catch((e) => { throw e });
             message.channel.send(this.messages.on_begged[Math.floor(Math.random() * this.messages.on_begged.length)](prize));
             return true;
         }

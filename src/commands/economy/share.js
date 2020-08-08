@@ -24,9 +24,10 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
-        const currentAmount = message.author.db.coins.fetch();
+    async run(client, message, args, _g, userStats) {
+        const currentAmount = userStats.balance;
         const target = await client.resolveUser(args[0]) || await client.resolveUser(args[1]);
         let transferAmount = await client.resolveUser(args[0]) ? args[1] : args[0];
         if (isNaN(transferAmount)) {
@@ -47,7 +48,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Error: Cannot send coins to this user')
+                .setDescription('Sorry, cannot send coins to this bot user')
             );
         }
         if (!target) {
@@ -63,7 +64,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription(`Sorry, You cannot send coins to yourself, lmao`)
+                .setDescription(`Sorry, uou cannot send coins to yourself, lmao`)
             );
         }
         if (transferAmount > currentAmount) {
@@ -71,7 +72,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
-                .setDescription(`Sorry, you don\'t have enough balance to send that amount of coins`)
+                .setDescription(`Sorry, you don\'t have enough balance to send that amount of coins :P`)
             );
         }
         if (transferAmount < 100) {
@@ -79,18 +80,20 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
-                .setDescription('Error: Please enter an amount greater than **100**')
+                .setDescription('Sorry, please enter an amount greater than **100**')
             );
         }
-        const transferTarget = await client.database.users.fetch(target.id);
-        await message.author.db.coins.remove(transferAmount);
-        await transferTarget.coins.add(transferAmount);
+        const transferTarget = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        userStats -= transferAmount;
+        transferTarget.balance += transferAmount;
+        await userStats.save().catch((e) => { throw e; });
+        await transferTarget.save().catch((e) => { throw e; })
         message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setAuthor(`Transaction ID: ${client.utils.Random.string(6)}`)
             .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             .setTimestamp()
-            .setDescription(`Successfully transferred **${transferAmount}**💰 to ${target}.\nYour balance is now **${await message.author.db.coins.fetch()}**💰`)
+            .setDescription(`Successfully transferred **${transferAmount}**💰 to ${target}.\nYour balance is now **${userStats.balance}**💰`)
         );
     }
 }

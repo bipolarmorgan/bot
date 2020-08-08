@@ -1,5 +1,4 @@
 const ms = require('ms');
-const Member = require('../../classes/GuildMember');
 const Warning = require('../../modules/Warning');
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
@@ -29,8 +28,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
+    async run(client, message, args, guildSettings) {
         const [user, ...reason] = args;
         const target = await client.resolveUser(user);
         if (!target || target.bot) {
@@ -38,7 +38,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription(`Incorrect Usage, the correct usages are:\n\`${this.options.usage}\``)
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
         if (target.equals(message.author)) {
@@ -46,7 +46,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription(`Hey there, You can't warn yourself :P`)
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
         const member = message.guild.member(target);
@@ -55,42 +55,39 @@ module.exports = class extends BaseCommand {
                 return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setTimestamp()
-                    .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                    .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                     .setDescription('You can\'t warn a member who has a higher or equal to your highest role.')
                 );
             }
         } else {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`You can't warn a user that is not on this server. Or that user doesn't exist`)
+                .setDescription(`You can't warn a user that is not on this server.`)
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
         const duration = reason[0] ? ms(reason[0]) : false;
         if (duration) reason.shift();
         const _reason = reason ? reason.join(' ') : 'No reason provided.';
-        const instance = new Member(target.id, message.guild.id);
-        try {
-            const stat = await instance.warnings.add({
-                reason: _reason,
-                issued_by: `${message.author.tag} / ${message.author.id}`,
-            });
-            if (!stat) throw 'error';
-            if (duration && !isNaN(duration)) {
-                setTimeout(() => {
-                    instance.warnings.remove(stat);
-                }, Number(duration));
-            }
-            message.channel.send(`Successfully warned ${target}`);
-        } catch (e) {
-            return message.channel.send('Member was not warned. unexpected error occured.');
+        /**
+         * @type {import('../../classes/Member')}
+         */
+        const instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+        const index = instance.addWarn(_reason, message.author);
+        if (duration && !isNaN(duration)) {
+            setTimeout(() => {
+                instance.removeWarn(index);
+                instance.save().catch(console.log);
+            }, Number(duration));
         }
-        const modChannel = await client.channels.fetch(message.guild.db.moderation('modLogChannel')).catch(() => { });
+        await instance.save().catch((e) => { throw e; });
+        await message.channel.send(`Successfully warned ${target}`);
+        const modChannel = await client.channels.fetch(guildSettings.modLogChannel).catch(() => { });
         if (modChannel) {
             modChannel.send(new MessageEmbed()
                 .setColor('RANDOM')
-                .setAuthor(`${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())
+                .setAuthor(`${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
                 .setThumbnail(target.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription(`**Member** : ${target.tag} / ${target.id}\n**Action** : Warn\n**Reason** : ${_reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
@@ -101,8 +98,8 @@ module.exports = class extends BaseCommand {
             .setTimestamp()
             .setTitle(`You have been warned from ${message.guild.name}`)
             .setDescription(`Reason : ${_reason}`)
-            .setFooter(`Moderator : ${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())
+            .setFooter(`Moderator : ${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
         ).catch(() => { });
-        await Warning(client, message, target.id, member);
+        await Warning(client, message, member, guildSettings).catch((e) => { throw e; });
     }
 }

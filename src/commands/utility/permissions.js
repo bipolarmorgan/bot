@@ -28,7 +28,7 @@ module.exports = class extends BaseCommand {
         const friendly = client.permission.levels[message.author.permLevel];
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
-            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             .setDescription(`Permission Level : ${message.author.permLevel} - ${friendly}`)
         );
     }

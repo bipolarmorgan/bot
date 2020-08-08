@@ -6,17 +6,17 @@ const ms = require('ms');
  * @param {import('../classes/Unicron')} client
  * @param {import('discord.js').Message} message
  * @param {import('discord.js').GuildMember} member
+ * @param {import('../classes/Guild')} settings
  * 
  */
-module.exports = (client, message, member) => {
+module.exports = (client, message, member, settings) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const g = await client.database.guilds.fetch(message.guild.id);
-            const strat = g.moderation('autoModeration');
-            const act = g.moderation('autoModAction');
+            const strat = settings.autoModeration;
+            const act = settings.autoModAction;
             const action = act.toLowerCase();
             if (!strat) return resolve(false);
-            const duration = g.moderation('warnActionExpiresOn');
+            const duration = settings.autoModDuration;
             const reason = 'Auto Moderation';
             const dm = await member.user.createDM();
             await dm.send(new MessageEmbed()
@@ -66,7 +66,6 @@ module.exports = (client, message, member) => {
                 case 'BAN': {
                     await message.guild.members.ban(member.user.id,
                         {
-                            days: 7,
                             reason,
                         }
                     ).catch(() => { });
@@ -80,7 +79,7 @@ module.exports = (client, message, member) => {
                 default:
                     return resolve(false);
             }
-            const modchannel = await client.channels.fetch(g.moderation('modLogChannel'));
+            const modchannel = await client.channels.fetch(settings.modLogChannel).catch(() => { });
             if (modchannel && modchannel.type === 'text') {
                 modchannel.send(new MessageEmbed()
                     .setColor('RANDOM')
@@ -92,8 +91,7 @@ module.exports = (client, message, member) => {
             }
             return resolve(true);
         } catch (e) {
-            console.log(e);
-            resolve(false);
+            reject(e);
         }
     });
 }

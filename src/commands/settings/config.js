@@ -1,4 +1,5 @@
 const ms = require('ms');
+const Pagination = require('../../utils/Pagination');
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 
@@ -16,816 +17,394 @@ module.exports = class extends BaseCommand {
                 cooldown: 3,
                 nsfwCommand: false,
                 args: true,
-                usage: 'config view\nconfig view [page]\nconfig set <key> <value>\nconfig reset\nconfig reset [key]',
+                usage: 'config view [page]\nconfig set <key> <value>\nconfig reset\nconfig reset [key]',
                 donatorOnly: false,
             }
         });
+        this.settings = [
+            'prefix', 'modLogChannel', 'autoModeration', 'autoModAction', 'autoModDuration',
+            'warnThreshold', 'warnThresholdAction', 'warnActionDuration',
+            'welcomeChannel', 'welcomeMessage', 'welcomeEnabled',
+            'farewellChannel', 'farewellMessage', 'farewellEnabled',
+            'inviteFilter', 'swearFilter', 'mentionSpamFilter',
+            'verificationChannel', 'verificationType', 'verificationRole', 'verificationEnabled',
+            'ticketCategory', 'ticketEnabled',
+        ];
     }
     /**
      * @returns {Promise<import('discord.js').Message|boolean>}
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
+    async run(client, message, args, guildSettings) {
         const [action, key, ...value] = args;
-        const db = await client.database.guilds.fetch(message.guild.id, true);
         if (action === 'view') {
-            let embed = new MessageEmbed()
-                .setColor(0x00FFFF)
-                .setTimestamp();
-            switch (key) {
-                case '2': {
-                    const inviteFilter = db.filters('inviteFilter') ? 'ON' : 'OFF';
-                    const mentionSpamFilter = db.filters('mentionSpamFilter') ? 'ON' : 'OFF';
-                    const swearFilter = db.filters('swearFilter') ? 'ON' : 'OFF';
-                    embed.setFooter('Page 2 of 4', message.guild.iconURL() || client.user.displayAvatarURL({ dynamic: true }))
-                        .addField('Key', `
+            const inviteFilter = guildSettings.inviteFilter ? 'TRUE' : 'FALSE';
+            const mentionSpamFilter = guildSettings.mentionSpamFilter ? 'TRUE' : 'FALSE';
+            const swearFilter = guildSettings.swearFilter ? 'TRUE' : 'FALSE';
+            const dynamicCategory = guildSettings.dynamicCategory ? `<@#${guildSettings.dynamicCategory}>` : `\`none\``;
+            const dynamicRoom = guildSettings.dynamicRoom ? `<@#${guildSettings.dynamicRoom}>` : `\`none\``;
+            const dynamicEnabled = guildSettings.dynamicEnabled ? 'TRUE' : 'FALSE';
+            const welcomeChannel = guildSettings.welcomeChannel ? `<#${guildSettings.welcomeChannel}>` : '\`none\`';
+            const welcomeMessage = guildSettings.welcomeMessage;
+            const welcomer = guildSettings.welcomeEnabled ? 'TRUE' : 'FALSE';
+            const farewellChannel = guildSettings.farewellChannel ? `<#${guildSettings.farewellChannel}>` : '\`none\`';
+            const farewellMessage = guildSettings.farewellEnabled;
+            const farewell = guildSettings.farewellEnabled ? 'TRUE' : 'FALSE';
+            const memberVerification = guildSettings.verificationEnabled ? 'TRUE' : 'FALSE';
+            const verificationChannel = guildSettings.verificationChannel ? `<#${guildSettings.verificationChannel}>` : '\`none\`';
+            const verifiedRole = guildSettings.verificationRole ? `<@&${guildSettings.verificationRole}>` : '\`none\`';
+            const verificationType = guildSettings.verificationType;
+            const ticketSystem = guildSettings.ticketEnabled ? 'TRUE' : 'FALSE';
+            const ticketCategory = guildSettings.ticketCategory ? `<@#${guildSettings.ticketCategory}>` : '\`none\`';
+            const prefix = guildSettings.prefix;
+            const modLogChannel = guildSettings.modLogChannel ? `<#${guildSettings.modLogChannel}>` : '\`none\`';
+            const autoModeration = guildSettings.autoModeration ? 'TRUE' : 'FALSE';
+            const autoModAction = `${guildSettings.autoModAction} MEMBER`;
+            const autoModDuration = guildSettings.autoModDuration ? ms(guildSettings.autoModDuration) : '0s';
+            const warnThreshold = guildSettings.warnThreshold;
+            const warnThresholdAction = guildSettings.warnThresholdAction;
+            const warnActionDuration = guildSettings.warnActionDuration ? ms(guildSettings.warnActionDuration) : '0s';
+            const embeds = [
+                new MessageEmbed()
+                    .setColor('RANDOM')
+                    .setTimestamp()
+                    .addField('Key', `
+                    \`prefix\`
+                    \`modLogChannel\`
+                    \`autoModeration\`
+                    \`autoModAction\`
+                    \`autoModDuration\`
+                    \`warnThreshold\`
+                    \`warnThresholdAction\`
+                    \`warnActionDuration\`
+                    `, true)
+                    .addField('Value', `
+                    \`${prefix}\`
+                    ${modLogChannel}
+                    \`${autoModeration}\`
+                    \`${autoModAction}\`
+                    \`${autoModDuration}\`
+                    \`${warnThreshold}\`
+                    \`${warnThresholdAction}\`
+                    \`${warnActionDuration}\`
+                    `, true),
+                new MessageEmbed()
+                    .setColor('RANDOM')
+                    .setTimestamp()
+                    .addField('Key', `
                     \`inviteFilter\`
                     \`swearFilter\`
                     \`mentionSpamFilter\`
+                    \`dynamicCategory\`
+                    \`dynamicRoom\`
+                    \`dynamicEnabled\`
                     `, true)
-                        .addField('Value', `
+                    .addField('Value', `
                     \`${inviteFilter}\`
                     \`${swearFilter}\`
                     \`${mentionSpamFilter}\`
-                    `, true);
-                    break;
-                }
-                case '3': {
-                    const welcomeChannel = db.welcomer('channel') ? `<#${db.welcomer('channel')}>` : '\`none\`';
-                    const welcomeMessage = db.welcomer('message');
-                    const welcomer = db.welcomer('enabled') ? 'ON' : 'OFF';
-                    const leaveChannel = db.leaver('channel') ? `<#${db.leaver('channel')}>` : '\`none\`';
-                    const leaveMessage = db.leaver('message');
-                    const leaver = db.leaver('enabled') ? 'ON' : 'OFF';
-                    embed.setDescription('Use command \`welcomer\` or \`farewell\` to change these values')
-                    embed.setFooter('Page 3 of 4', message.guild.iconURL() || client.user.displayAvatarURL({ dynamic: true }))
-                        .addField('Key', `
-                    \`welcomer\`
+                    ${dynamicCategory}
+                    ${dynamicRoom}
+                    \`${dynamicEnabled}\`
+                    `, true),
+                new MessageEmbed()
+                    .setColor('RANDOM')
+                    .setTimestamp()
+                    .addField('Key', `
+                    \`welcomerEnabled\`
                     \`welcomeChannel\`
                     \`welcomeMessage\`
-                    \`farewell\`
+                    \`farewellEnabled\`
                     \`farewellChannel\`
                     \`farewellMessage\`
                     `, true)
-                        .addField('Value', `
+                    .addField('Value', `
                     \`${welcomer}\`
                     ${welcomeChannel}
                     \`${welcomeMessage}\`
-                    \`${leaver}\`
-                    ${leaveChannel}
-                    \`${leaveMessage}\`
-                    `, true);
-                    break;
-                }
-                case '4': {
-                    const memberVerification = db.verification('enabled') ? 'ON' : 'OFF';
-                    const verificationChannel = db.verification('channel') ? `<#${db.verification('channel')}>` : '\`none\`';
-                    const verifiedRole = db.verification('role') ? `<@&${db.verification('role')}>` : '\`none\`';
-                    const verificationType = db.verification('type');
-                    const ticketSystem = db.ticket('enabled') ? 'ON' : 'OFF';
-                    const ticketCategory = db.ticket('category') ? `<#${db.ticket('category')}>` : '\`none\`';
-                    embed.setDescription('Use command \`verification\` or \`ticketconfig\` / \`ticketsetup\` to change these values.')
-                    embed.setFooter('Page 4 of 4', message.guild.iconURL() || client.user.displayAvatarURL({ dynamic: true }))
-                        .addField('Key', `
-                    \`memberVerification\`
+                    \`${farewell}\`
+                    ${farewellChannel}
+                    \`${farewellMessage}\`
+                    `, true),
+                new MessageEmbed()
+                    .setColor('RANDOM')
+                    .setTimestamp()
+                    .addField('Key', `
+                    \`verificationEnabled\`
                     \`verificationChannel\`
-                    \`verifiedRole\`
+                    \`verificationRole\`
                     \`verificationType\`
-                    \`ticketSystem\`
+                    \`ticketEnabled\`
                     \`ticketCategory\`
                     `, true)
-                        .addField('Value', `
+                    .addField('Value', `
                     \`${memberVerification}\`
                     ${verificationChannel}
                     ${verifiedRole}
                     \`${verificationType}\`
                     \`${ticketSystem}\`
                     ${ticketCategory}
-                    `, true)
-                    break;
-                }
-                case '1':
-                default: {
-                    const prefix = db.settings('prefix');
-                    const modLogChannel = db.moderation('modLogChannel') ? `<#${db.moderation('modLogChannel')}>` : '\`none\`';
-                    const autoModeration = db.moderation('autoModeration') ? 'ON' : 'OFF';
-                    const autoModAction = `${db.moderation('autoModAction')} MEMBER`;
-                    const maxWarnTreshold = db.moderation('maxWarnTreshold');
-                    const warnTresholdAction = `${db.moderation('warnTresholdAction')} MEMBER`;
-                    const warnActionExpiresOn = db.moderation('warnActionExpiresOn') ? ms(db.moderation('warnActionExpiresOn')) : '0s';
-                    const warningExpiresOn = db.moderation('warningExpiresOn') ? ms(db.moderation('warningExpiresOn')) : '0s';
-                    embed.addField('Key', `
-                    \`prefix\`
-                    \`modLogChannel\`
-                    \`autoModeration\`
-                    \`autoModAction\`
-                    \`maxWarnTreshold\`
-                    \`warnTresholdAction\`
-                    \`warnActionExpiresOn\`
-                    \`warningExpiresOn\`
-                    `, true)
-                        .addField('Value', `
-                    \`${prefix}\`
-                    ${modLogChannel}
-                    \`${autoModeration}\`
-                    \`${autoModAction}\`
-                    \`${maxWarnTreshold}\`
-                    \`${warnTresholdAction}\`
-                    \`${warnActionExpiresOn}\`
-                    \`${warningExpiresOn}\`
-                    `, true).setFooter('Page 1 of 4', message.guild.iconURL() || client.user.displayAvatarURL({ dynamic: true }));
-                    break;
-                }
-            }
-            return message.channel.send(embed);
+                    `, true),
+            ];
+            Pagination(message, embeds);
         } else if (action === 'reset') {
+            if (!key || !this.settings.includes(key)) {
+                return message.channel.send(new MessageEmbed()
+                    .setColor('RED')
+                    .setDescription(`Oops, that's invalid key, please do \`${guildSettings.prefix}config view\` for valid keys!`)
+                );
+            }
+            const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key !== 'all' ? key : 'settings'}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
+            if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
             switch (key) {
                 case 'all': {
-                    const yn = await client.awaitReply(message, 'Are you sure to reset Unicron\'s configurations for this server (yes/no)? _You have 15 seconds to comply_', 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    Promise.all([await db.destroy(false, false)]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s configurations for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.prefix = '-';
+                    guildSettings.modLogChannel = '';
+                    guildSettings.autoModeration = false;
+                    guildSettings.autoModAction = 'MUTE';
+                    guildSettings.autoModDuration = 0;
+                    guildSettings.warnThreshold = 0;
+                    guildSettings.warnThresholdAction = 'MUTE';
+                    guildSettings.warnActionDuration = 0;
+                    guildSettings.welcomeChannel = '';
+                    guildSettings.welcomeEnabled = false;
+                    guildSettings.welcomeMessage = '{user} has joined the server!';
+                    guildSettings.farewellChannel = '';
+                    guildSettings.farewellEnabled = false;
+                    guildSettings.farewellMessage = '{user} has left the server.';
+                    guildSettings.dynamicCategory = '';
+                    guildSettings.dynamicRoom = '';
+                    guildSettings.dynamicEnabled = false;
+                    guildSettings.verificationChannel = '';
+                    guildSettings.verificationType = 'discrim';
+                    guildSettings.verificationRole = '';
+                    guildSettings.verificationEnabled = false;
+                    guildSettings.inviteFilter = false;
+                    guildSettings.swearFilter = false;
+                    guildSettings.mentionSpamFilter = false;
+                    guildSettings.ticketCategory = '';
+                    guildSettings.ticketEnabled = false;
                     break;
                 }
                 case 'prefix': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.settings(true);
-                    settings.prefix = '?';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.prefix = '-';
                     break;
                 }
                 case 'welcomeChannel': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.welcomer(true);
-                    settings.channel = '';
-                    settings.enabled = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.welcomeChannel = '';
+                    guildSettings.welcomeEnabled = false;
                     break;
                 }
                 case 'welcomeMessage': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.welcomer(true);
-                    settings.message = 'Welcome {user} to the server!';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.welcomeMessage = '{user} has joined the server!';
                     break;
                 }
                 case 'farewellChannel': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.leaver(true);
-                    settings.channel = '';
-                    settings.enabled = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.farewellChannel = '';
+                    guildSettings.farewellEnabled = false;
                     break;
                 }
                 case 'farewellMessage': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.leaver(true);
-                    settings.message = '{user} has left the server.';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.farewellMessage = '{user} has left the server.';
                     break;
                 }
                 case 'modLogChannel': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.modLogChannel = '';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.modLogChannel = '';
                     break;
                 }
                 case 'autoModeration': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.autoModeration = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.autoModeration = false;
                     break;
                 }
                 case 'autoModAction': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.autoModAction = 'WARN';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.autoModAction = 'MUTE';
                     break;
                 }
-                case 'maxWarnTreshold': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.maxWarnTreshold = Number(0);
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                case 'autoModDuration': {
+                    guildSettings.autoModDuration = 0;
                     break;
                 }
-                case 'warnActionExpiresOn': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.warnActionExpiresOn = Number(0);
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                case 'warnThreshold': {
+                    guildSettings.warnThreshold = 0;
                     break;
                 }
-                case 'warningExpiresOn': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.moderation(true);
-                    settings.autoModeration = Number(0);
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                case 'warnThresholdAction': {
+                    guildSettings.warnThresholdAction = 'MUTE';
                     break;
                 }
-                case 'memberVerification': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.verification(true);
-                    settings.enabled = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                case 'warnActionDuration': {
+                    guildSettings.warnActionDuration = 0;
+                    break;
+                }
+                case 'welcomeChannel': {
+                    guildSettings.welcomeChannel = '';
+                    guildSettings.welcomeEnabled = false;
+                    break;
+                }
+                case 'welcomeMessage': {
+                    guildSettings.welcomeMessage = '{user} has joined the server!';
+                    break;
+                }
+                case 'welcomeEnabled': {
+                    guildSettings.welcomeEnabled = false;
+                    break;
+                }
+                case 'farewellChannel': {
+                    guildSettings.farewellChannel = '';
+                    guildSettings.farewellEnabled = false;
+                    break;
+                }
+                case 'farewellMessage': {
+                    guildSettings.farewellMessage = '{user} has left the server.';
+                    break;
+                }
+                case 'farewellEnabled': {
+                    guildSettings.farewellEnabled = false;
+                    break;
+                }
+                case 'dynamicCategory': {
+                    guildSettings.dynamicCategory = '';
+                    guildSettings.dynamicEnabled = false;
+                    break;
+                }
+                case 'dynamicRoom': {
+                    guildSettings.dynamicRoom = '';
+                    break;
+                }
+                case 'dynamicEnabled': {
+                    guildSettings.dynamicEnabled = false;
                     break;
                 }
                 case 'verificationChannel': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.verification(true);
-                    settings.enabled = false;
-                    settings.channel = '';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'verifiedRole': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.verification(true);
-                    settings.enabled = false;
-                    settings.role = '';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.verificationChannel = '';
+                    guildSettings.verificationEnabled = false;
                     break;
                 }
                 case 'verificationType': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.verification(true);
-                    settings.type = 'discrim';
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.verificationType = 'discrim';
+                    break;
+                }
+                case 'verificationRole': {
+                    guildSettings.verificationRole = '';
+                    guildSettings.verificationEnabled = false;
+                    break;
+                }
+                case 'verificationEnabled': {
+                    guildSettings.verificationEnabled = false;
                     break;
                 }
                 case 'inviteFilter': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.filters(true);
-                    settings.inviteFilter = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.inviteFilter = false;
                     break;
                 }
                 case 'swearFilter': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.filters(true);
-                    settings.swearFilter = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.swearFilter = false;
                     break;
                 }
                 case 'mentionSpamFilter': {
-                    const yn = await client.awaitReply(message, `Are you sure to reset Unicron\'s \`${key}\` for this server (yes/no)? _You have 15 seconds to comply_`, 15000);
-                    if (!['y', 'yes', 'YES'].includes(yn)) return message.channel.send('Request terminated.');
-                    const settings = db.filters(true);
-                    settings.mentionSpamFilter = false;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully reseted Unicron\'s \`${key}\` for this server.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on reseting settings for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while reseting.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
+                    guildSettings.mentionSpamFilter = false;
                     break;
                 }
-                default: {
-                    return message.channel.send(new MessageEmbed()
-                        .setColor('RED')
-                        .setDescription('Error: Invalid Arguments')
-                    );
+                case 'ticketCategory': {
+                    guildSettings.ticketCategory = '';
+                    guildSettings.ticketEnabled = false;
+                    break;
+                }
+                case 'ticketEnabled': {
+                    guildSettings.ticketEnabled = false;
+                    break;
                 }
             }
+            await guildSettings.save().catch((e) => { throw e; });
+            return message.channel.send(new MessageEmbed()
+                .setColor('RANDOM')
+                .setDescription(`Successfully reseted Unicron\'s \`${key !== 'all' ? key : 'settings'}\` for this server.`)
+                .setTimestamp()
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+            );
         } else if (action === 'set') {
-            switch (key) {
-                case 'warnTresholdAction':
-                case 'autoModAction': {
-                    if (!['MUTE', 'KICK', 'SOFTBAN', 'BAN'].includes(value[0])) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                            .setDescription('TypeError: invalid type.\nActions: \`MUTE\`, \`KICK\`, \`SOFTBAN\`,\`BAN\`\nCASE SENSITIVE')
-                        );
+            try {
+                switch (key) {
+                    case 'farewellMessage':
+                    case 'welcomeMessage': {
+                        if (!value.join(' ').includes('{user}')) throw `Sorry, the placeholder \`{user}\` is not provided in the message, please add \`{user}\` in order to work!`;
+                        guildSettings[key] = value.join(' ').replace(/@/g, String.fromCharCode(8203));
+                        break;
                     }
-                    if (value[0] === 'MUTE' && !db.moderation('mutedRole')) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                            .setDescription('Error: Muted Role not setup, use \`config set mutedRole [RoleMention|RoleID|RoleName]\` to set it up and use this command again!')
-                        );
+                    case 'warnThresholdAction':
+                    case 'autoModAction': {
+                        if (!value[0] || !['MUTE', 'KICK', 'SOFTBAN', 'BAN'].includes(value[0].toUpperCase())) throw `Oopsie, That's an invalid action type bud,\nValid Types: \`MUTE\`, \`KICK\`, \`SOFTBAN\`, \`BAN\``;
+                        guildSettings[key] = value[0].toUpperCase();
+                        break;
                     }
-                    const settings = db.moderation(true);
-                    settings[key] = value[0];
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${value[0]}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
+                    case 'prefix': {
+                        if (!value[0] || value[0].length > 5) throw 'Sorry, but the prefix cannot exceed more than 5 characters ;-;';
+                        guildSettings[key] = value[0];
+                        break;
+                    }
+                    case 'welcomeChannel':
+                    case 'farewellChannel':
+                    case 'verificationChannel':
+                    case 'modLogChannel': {
+                        const channel = client.resolveChannel(value.join(' '), message.guild);
+                        if (!channel) throw `Sorry, that\'s an invalid channel, please use \`${guildSettings.prefix}config set ${key} [ChannelMention|ChannelName]\``;
+                        guildSettings[key] = channel.id;
+                        break;
+                    }
+                    case 'autoModeration':
+                    case 'dynamicEnabled':
+                    case 'farewellEnabled':
+                    case 'welcomeEnabled':
+                    case 'verificationEnabled':
+                    case 'ticketEnabled': {
+                        if (!value[0] || !['TRUE', 'FALSE'].includes(value[0].toUpperCase())) throw `Sorry, that\'s an invalid boolean, please use \`${guildSettings.prefix}config set ${key} <TRUE|FALSE>\` to set this up!`;
+                        guildSettings[key] = value[0].toUpperCase() === 'TRUE' && ['TRUE', 'FALSE'].includes(value[0].toUpperCase());
+                        break;
+                    }
+                    case 'autoModDuration':
+                    case 'warnActionDuration': {
+                        const duration = ms(value.join(' '));
+                        if (!duration || isNaN(duration)) throw `Sorry, that's an invalid duration, please use \`${guildSettings.prefix}config set ${key} <Duration>\` like \`5m\` for 5 minutes, \`1h\` for an hour.. etc.`;
+                        guildSettings[key] = duration;
+                        break;
+                    }
+                    case 'verificationRole': {
+                        const role = client.resolveRole(value.join(' '), message.guild);
+                        if (!role) throw `Sorry, that's an invalid role, please use \`${guildSettings.prefix}config set ${key} <RoleID|RoleName>\` and try again!`;
+                        guildSettings[key] = role.id;
+                        break;
+                    }
+                    case 'verificationType': {
+                        if (!['discrim', 'react', 'captcha'].includes(value[0].toLowerCase())) throw `Sorry, that's an invalid verification type, please use either \`discrim\`, \`react\` or \`captcha\` and try again!`;
+                        guildSettings[key] = value[0].toLowerCase();
+                        break;
+                    }
+                    case 'warnThreshold': {
+                        if (isNaN(Number(value[0]))) throw `Sorry, that is not a number, please use \`${guildSettings.prefix}config set ${key} <Number>\` instead!`;
+                        guildSettings[key] = Number(value[0]);
+                        break;
+                    }
+                    default:
+                        throw `Oopsie, That's an Invalid Key Value, please do \`${guildSettings.prefix}config view [page]\` for more Key Values! CASE-SENSITIVE`;
                 }
-                case 'prefix': {
-                    if (value[0].length > 3) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription('Error: Prefix length must not exceed 3 characters.')
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const settings = db.settings(true);
-                    settings.prefix = value[0];
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${value[0]}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'modLogChannel': {
-                    const channel = message.mentions.channels.first() || message.guild.channels.cache.get(value[0]) || message.guild.channels.cache.find(c => c.name === value[0]);
-                    if (!channel) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Incorrect Arguments: Use \`config set ${key} [ChannelMention|ChannelID|ChannelName]\``)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    if (!channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Error: Unicron doesn't have access to that channel`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const settings = db.moderation(true);
-                    settings.modLogChannel = channel.id;
-                    Promise.all([await settings.save()]).then(() => {
-                        channel.send(`${key} synced`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to <#${channel.id}>.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'autoModeration': {
-                    if (!['on', 'off'].includes(value[0])) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Incorrect Arguments: Use \`config set ${key} [on|off]\``)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const bool = (value[0] === 'on') ? true : false;
-                    const settings = db.moderation(true);
-                    settings.autoModeration = bool;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${bool ? 'on' : 'off'}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'maxWarnTreshold': {
-                    const time = value[0];
-                    if (isNaN(time)) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Incorrect Arguments: Use \`config set ${key} [Number]\``)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const settings = db.moderation(true);
-                    settings.maxWarnTreshold = Number(time);
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${time}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'warningExpiresOn':
-                case 'warnActionExpiresOn': {
-                    const num = ms(value[0]);
-                    if (isNaN(num)) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Incorrect or Invalid Arguments: Use \`config set ${key} [Duration]\``)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const settings = db.moderation(true);
-                    settings[key] = num;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${ms(num)}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                case 'swearFilter':
-                case 'mentionSpamFilter':
-                case 'inviteFilter': {
-                    if (!['on', 'off'].includes(value[0])) {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`Incorrect Arguments: Use \`config set ${key} [on|off]\``)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }
-                    const bool = (value[0] === 'on') ? true : false;
-                    const settings = db.filters(true);
-                    settings[key] = bool;
-                    Promise.all([await settings.save()]).then(() => {
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RANDOM')
-                            .setDescription(`Successfully set \`${key}\` to \`${bool ? 'on' : 'off'}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    }).catch(e => {
-                        client.logger.error(`Error on setting configurations for ${message.guild.name}/${message.guild.id} : ${e}`);
-                        return message.channel.send(new MessageEmbed()
-                            .setColor('RED')
-                            .setDescription(`An error occured while setting \`${key}\`.`)
-                            .setTimestamp()
-                            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        );
-                    });
-                    break;
-                }
-                default: {
-                    return message.channel.send(new MessageEmbed()
-                        .setColor('RED')
-                        .setDescription('Error: Invalid Key provided')
-                    );
-                }
+            } catch (e) {
+                return message.channel.send(new MessageEmbed()
+                    .setColor('RED')
+                    .setTimestamp()
+                    .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+                    .setDescription(e)
+                );
             }
+            await guildSettings.save().catch((e) => { throw e; });
+            return message.channel.send(new MessageEmbed()
+                .setColor(0x00FF00)
+                .setTimestamp()
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+                .setDescription(`Successfully changed **${key}** to a new value!`)
+            );
         }
     }
 }

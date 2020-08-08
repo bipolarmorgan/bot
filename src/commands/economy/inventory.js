@@ -30,8 +30,8 @@ module.exports = class extends BaseCommand {
     async run(client, message, args) {
         const [action, paging] = args;
         const target = await client.resolveUser(action) || message.author;
-        const userp = await client.database.users.fetch(target.id);
-        const items = await userp.inventory.fetch();
+        const userp = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        const items = userp.inventory;
         if (!items.length) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')

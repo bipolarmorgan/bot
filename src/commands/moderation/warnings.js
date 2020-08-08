@@ -1,6 +1,6 @@
-const Member = require('../../classes/GuildMember');
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const Pagination = require('../../utils/Pagination');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -16,7 +16,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 10,
                 nsfwCommand: false,
                 args: false,
-                usage: 'warnings <User> [Page]\nwarnings [Page]',
+                usage: 'warnings <User>',
                 donatorOnly: false,
                 premiumServer: false,
             }
@@ -29,34 +29,35 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const [user, page] = args;
-        const target = await client.resolveUser(user) || message.author;
+        const target = await client.resolveUser(args.join(' ')) || message.author;
         if (!target || target.bot) target = message.author;
-        let embed = new MessageEmbed()
-            .setColor('RANDOM')
-            .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }) || null)
-            .setTimestamp();
-        const mem = new Member(target.id, message.guild.id);
-        const warns = client.chunk(await mem.warnings.fetchAll(), 3);
-        if (!warns || !warns.length) {
-            embed.setDescription('No warnings here, clean slate');
-            return message.channel.send(embed);
-        }
-        const num_of_pages = warns.length;
-        const PAGE = Number(user) || Number(page);
-        if (!PAGE) {
 
-        } else if (PAGE > 0 && PAGE <= num_of_pages) {
-            warns[PAGE - 1].map(item => {
-                embed.addField(`**Case ${item.case}**`, `**Reason** : ${item.reason}\n**Moderator** : ${item.issued_by}\n**Date** : ${item.when}`);
-            });
-            embed.setFooter(`Page ${PAGE} of ${num_of_pages}`);
-            return message.channel.send(embed);
+        /**
+         * @type {import('../../classes/Member')}
+         */
+        const mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        if (!mem.data || !mem.data.warnings) {
+            return message.channel.send(new MessageEmbed()
+                .setColor('RANDOM')
+                .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }))
+                .setTimestamp().setDescription('No warnings here')
+            );
         }
-        warns[0].map(item => {
-            embed.addField(`**Case ${item.case}**`, `**Reason** : ${item.reason}\n**Moderator** : ${item.issued_by}\n**Date** : ${item.when}`);
+        /**
+         * @type {[[{reason:string, moderator:string, date:string, case:number}]]}
+         */
+        const warns = client.chunk(mem.data.warnings || [], 4);
+        /**
+         * @type {import('discord.js').MessageEmbed[]}
+         */
+        const embeds = warns.map((ws) => {
+            let embed = new MessageEmbed()
+                .setColor('RANDOM')
+                .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }))
+                .setTimestamp()
+            ws.map((w) => embed.addField(`**Case ${w.case}**`, `**Reason** : ${w.reason}\n**Moderator** : ${w.moderator}\n**Date** : ${w.date}`));
+            return embed;
         });
-        embed.setFooter(`Page 1 of ${num_of_pages}`);
-        return message.channel.send(embed);
+        Pagination(message, embeds);
     }
 }

@@ -26,13 +26,14 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
-        const item = await client.shopitems.get(args[0]);
+    async run(client, message, args, _g, userStats) {
+        const item = client.shopitems.get(args[0]);
         if (!item) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription('That item doesn\'t'));
+                .setDescription('That item doesn\'t exist in the Unicron Shop'));
             return false;
         }
         if (!item.options.buyable) {
@@ -41,18 +42,18 @@ module.exports = class extends BaseCommand {
                 .setDescription('This item is not for sale.'));
             return false;
         }
-        if (item.options.price > message.author.db.coins.fetch()) {
+        if (item.options.price > userStats.balance) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`You need **${item.options.price - message.author.db.coins.fetch()}** more coins to buy this item.`));
+                .setDescription(`You need **${item.options.price - userStats}** more coins to buy this item.`));
             return false;
         }
-        await message.author.db.coins.remove(item.options.price);
-        await message.author.db.inventory.add(item.config.id);
-
+        userStats.balance -= item.options.price;
+        userStats.addItem(item.config.id);
+        await userStats.save().catch((e) => { throw e; });
         message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
-            .setDescription(`You've bought: **${item.config.displayname}** , for the price of **${item.options.price}** Coins`)
+            .setDescription(`You've bought: **${item.config.displayname}** , for the price of **${item.options.price}** Coins!`)
         );
     }
 }

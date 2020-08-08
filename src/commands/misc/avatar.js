@@ -28,8 +28,8 @@ module.exports = class extends BaseCommand {
         if (!target) target = message.author;
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
-            .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))
-            .setImage(target.displayAvatarURL({ dynamic: true }))
+            .setAuthor(target.tag, target.avatarURL({ dynamic: true }))
+            .setImage(`${target.displayAvatarURL({ dynamic: true })}?size=1024`)
         );
     }
 }

@@ -33,13 +33,12 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription('Error: Cannot show balance of a bot user.'));
         }
-        const user = await client.database.users.fetch(target.id);
-        const coins = user.coins.fetch();
+        const user = await client.db.users.fetch(target.id);
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))
             .setTimestamp()
-            .setDescription(`**${coins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** 💸`)
+            .setDescription(`**${user.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}** 💸`)
         );
     }
 }

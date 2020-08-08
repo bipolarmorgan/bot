@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const Pagination = require('../../utils/Pagination');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -10,12 +11,12 @@ module.exports = class extends BaseCommand {
                 permission: 'User',
             },
             options: {
-                aliases: ['market', 'store'],
+                aliases: [],
                 clientPermissions: [],
                 cooldown: 3,
                 nsfwCommand: false,
                 args: false,
-                usage: 'shop view <Item>\nshop [Page]',
+                usage: 'shop view <Item>\nshop',
                 donatorOnly: false,
                 premiumServer: false,
             }
@@ -26,53 +27,45 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
+    async run(client, message, args, guildSettings, userStats) {
         const [action, key] = args;
         if (action === 'view') {
             if (!key) {
                 return message.channel.send(new MessageEmbed()
                     .setColor(`RED`)
                     .setDescription(`You didn\'t provide any arguments at \`[item]\`
-                                Usage: \`${await message.guild.db.settings('prefix')}shop view <Item ID>\`
-                                Example: \`${await message.guild.db.settings('prefix')}shop view bread\``));
+                                Usage: \`${guildSettings.prefix}shop view <Item ID>\`
+                                Example: \`${guildSettings.prefix}shop view bread\``));
             }
             const item = client.shopitems.get(key.toLowerCase());
             if (!item) {
                 return message.channel.send(new MessageEmbed()
                     .setColor(`RED`)
-                    .setDescription(`Sorry, That item does not exist.`));
+                    .setDescription(`Sorry, That item does not exist in the Unicron Shop.`));
             };
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTitle(`${item.config.displayname}`)
                 .setDescription(`**Price** : **${item.options.price}**\n**Description** : ${item.config.description}\n**ID** : \`${item.config.id}\``));
         }
-        let embed = new MessageEmbed()
-            .setColor('RANDOM')
-            .setTitle('**Shop**')
-            .setDescription(`You can also do \`${await message.guild.db.settings('prefix')}shop view [item]\` to get an information from a specific item.\nYou currently have **${await message.author.db.coins.fetch()}** 💰`);
-        const ITEMS = client.chunk(client.shopitems.sort((a, b) => b.options.price - a.options.price).filter((item) => item.options.buyable), 4);
-        const pages = ITEMS.length;
-        if (!pages) {
-            return message.channel.send(new MessageEmbed()
-                .setColor('RED')
-                .setDescription('The Shop is temporarily closed for today.'));
-        }
-        const PAGE = Number(action);
-        if (!PAGE) {
-            // ¯\_(ツ)_/¯
-        } else if (PAGE > 0 && PAGE <= pages) {
-            ITEMS[PAGE - 1].map(item => {
-                embed.addField(`${item.config.displayname} ─ __**${item.options.price}**__ Coins`, `• ${item.config.description}\nID : \`${item.config.id}\``, false);
+        const items = client.shopitems.sort((a, b) => b.options.price - a.options.price).filter((item) => item.options.buyable);
+        /**
+         * @type {[import('../../classes/BaseItem')[]]}
+         */
+        const chunks = client.chunk(items, 4);
+        const embeds = chunks.map((ia) => {
+            let embed = new MessageEmbed()
+                .setColor('RANDOM')
+                .setTitle('**Unicron Shop**')
+                .setDescription(`You can also do \`${guildSettings.prefix}shop view <Item>\` to get an information of a specific item.\nYou currently have **${userStats.balance}** 💰`);
+            ia.map((i) => {
+                embed.addField(`${i.config.displayname} ─ __**${i.options.price}**__ Coins`, `• ${i.config.description}\nID : \`${i.config.id}\``, false);
             });
-            embed.setFooter(`Page ${PAGE} of ${pages} | ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }) || null);
-            return message.channel.send(embed);
-        }
-        ITEMS[0].map(item => {
-            embed.addField(`${item.config.displayname} ─ __**${item.options.price}**__ Coins`, `• ${item.config.description}\nID : \`${item.config.id}\``, false);
+            return embed;
         });
-        embed.setFooter(`Page 1 of ${pages} | ${message.author.tag} | buy [ItemID]`, message.author.displayAvatarURL({ dynamic: true }) || null);
-        return message.channel.send(embed);
+        Pagination(message, embeds);
     }
 }

@@ -6,11 +6,12 @@ const swearWords = fs.readFileSync('assets/swearWords.txt').toString().split('\r
 /**
  * @param {import('../classes/Unicron')} client
  * @param {import('discord.js').Message} message
+ * @param {import('../classes/Guild')} settings
  */
-module.exports = (client, message) => {
+module.exports = (client, message, settings) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const status = message.guild.db.filters('swearFilter');
+            const status = settings.swearFilter;
             const strat = (status && !message.channel.nsfw && message.author.permLevel < 3 &&
                 (
                     message.content.match(new RegExp(swearWords.map(client.escapeRegex).join('|'), 'gi'))
@@ -19,8 +20,8 @@ module.exports = (client, message) => {
             if (!strat) return resolve(false);
             if (message.deletable) message.delete().catch(() => { });
             message.channel.send(`No Swearing! ${message.author}.`)
-                .then(msg => msg.delete({ timeout: 5000 }));
-            const mChannel = message.guild.channels.cache.get(message.guild.db.moderation('modLogChannel'));
+                .then(msg => msg.delete({ timeout: 5000 })).catch(() => { });
+            const mChannel = message.guild.channels.cache.get(settings.modLogChannel);
             if (mChannel) {
                 mChannel.send(new MessageEmbed()
                     .setTimestamp()
@@ -29,7 +30,7 @@ module.exports = (client, message) => {
                     .setDescription(`Member: ${message.author.tag} / ${message.author.id}`)
                 ).catch(() => { });
             }
-            await AutoModeration(client, message, message.member);
+            await AutoModeration(client, message, message.member, settings).catch(() => { });
             resolve(true);
         } catch (e) {
             reject(e);

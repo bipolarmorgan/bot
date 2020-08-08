@@ -18,7 +18,7 @@ class Command {
      * @param {boolean} props.options.donatorOnly
      * @param {boolean} props.options.premiumServer
      * 
-     * @param {Object<string, any>} props.argsDefinitions
+     * @param {{any}} props.argsDefinitions
      */
     constructor(props) {
         this.options = props.options;
@@ -30,8 +30,10 @@ class Command {
      * @param {import('./Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args
+     * @param {import('./Guild')} settings
+     * @param {import('./User')} user
      */
-    async run(client, message, args) { }
+    async run(client, message, args, settings, user) { }
 }
 
 module.exports = Command;

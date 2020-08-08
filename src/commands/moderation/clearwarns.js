@@ -1,4 +1,3 @@
-const Member = require('../../classes/GuildMember');
 const BaseCommand = require('../../classes/BaseCommand');
 
 module.exports = class extends BaseCommand {
@@ -30,10 +29,10 @@ module.exports = class extends BaseCommand {
     async run(client, message, args) {
         const target = await client.resolveUser(args[0]);
         if (!target || target.bot) return message.channel.send(`I can't clear the warnings of an invalid user :/`);
-        const member = new Member(target.id, message.guild.id);
-        const warns = await member.warnings.fetchAll();
-        if (warns) {
-            await member.warnings.destroy();
+        const member = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        if (member.data && member.data.warnings) {
+            member.data.warnings = [];
+            await member.save().catch((e) => { throw e; });
             return message.channel.send(`${target}'s warnings cleared!`);
         }
         return message.channel.send(`${target}'s warnings was not cleared, because he/she doesn't have any warnings :P`);

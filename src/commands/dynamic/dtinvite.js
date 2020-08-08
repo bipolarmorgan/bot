@@ -26,12 +26,12 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
-        const db = await client.database.guilds.fetch(message.guild.id, true);
-        const category = db.dynamicVoice('category');
-        const enabled = db.dynamicVoice('enabled');
-        if (!category || !enabled) {
+    async run(client, message, args, guildSettings) {
+        const category = guildSettings.dynamicCategory;
+        const enabled = guildSettings.dynamicEnabled;
+        if (!category || !enabled || !message.guild.channels.cache.get(category)) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)

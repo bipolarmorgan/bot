@@ -1,6 +1,6 @@
-const { UserProfile } = require('../../database/database');
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const Pagination = require('../../utils/Pagination');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -15,7 +15,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 3,
                 nsfwCommand: false,
                 args: false,
-                usage: `leaderboard [Flags: -exp] [Page]`,
+                usage: `leaderboard`,
                 donatorOnly: false,
             }
         });
@@ -27,42 +27,24 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const Cache = await UserProfile.findAll();
-        const UserCache = Cache.filter((item) => {
-            return message.guild.members.cache.has(item.user_id);
+        const cache = client.db.users.cache.filter((i) => message.guild.members.cache.has(i.id) && client.users.cache.has(i.id)).sort((a, b) => b.balance - a.balance);
+        /**
+         * @type {[import('../../classes/User')[]]}
+         */
+        const users = client.chunk(cache, 12);
+        const mapped = cache.map((p) => p);
+        const embeds = users.map((us) => {
+            const f1 = us.map((u) => `**${mapped.indexOf(u) + 1}** | ${client.users.cache.get(u.id).tag}`).join('\n');
+            const f2 = us.map((u) => `**${u.balance}** 💰`).join('\n');
+            const whereIam = mapped.indexOf(cache.get(message.author.id)) + 1;
+            return new MessageEmbed()
+                .setColor('RANDOM')
+                .setTimestamp()
+                .setTitle('Unicron Leaderboard')
+                .setDescription(`${message.author.tag}'s ranking \`${whereIam}/${mapped.length}\``)
+                .addField('**Richest Users**', f1, true)
+                .addField('**Coins**', f2, true)
         });
-        const rich = message.flags.includes('exp') ? false : true;
-        const type = rich ? 'balance' : 'experience';
-        const icon = rich ? '💰' : '✨';
-        const name = rich ? 'Richest Users' : 'Experienced Users';
-        const tabl = rich ? 'Coins' : 'Experience';
-        const RichCache = client.chunk(UserCache.sort((a, b) => b.balance - a.balance).filter((item) => client.users.cache.has(item.user_id) && item.balance), 8);
-        const ExpCache = client.chunk(UserCache.sort((a, b) => b.experience - a.experience).filter((item) => client.users.cache.has(item.user_id) && item.experience), 8)
-        let embed = new MessageEmbed().setColor('RANDOM').setTimestamp();
-        const PAGE = Number(args[0]) ? Number(args[0]) : 1;
-        const Chunks = rich ? RichCache : ExpCache;
-        const pages = Chunks.length;
-        if (PAGE && PAGE > 0 && PAGE <= pages) {
-            const text = Chunks[PAGE - 1].map((item, pos) => {
-                return `**${pos + 1}** ${client.users.cache.get(item.user_id).tag}`;
-            }).join('\n');
-            const cornip = Chunks[PAGE - 1].map((item) => {
-                return `**${item[type]}**  ${icon}`;
-            }).join('\n');
-            embed.addField(`__**${name}**__`, text || '\u200b', true);
-            embed.addField(`__**${tabl}**__`, cornip || '\u200b', true);
-            embed.setFooter(`Page ${PAGE} of ${pages} | ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }) || null);
-            return message.channel.send(embed);
-        }
-        const text = Chunks[PAGE - 1].map((item, pos) => {
-            return `**${pos + 1}** ${client.users.cache.get(item.user_id).tag}`;
-        }).join('\n');
-        const cornip = Chunks[PAGE - 1].map((item) => {
-            return `**${item[type]}**  ${icon}`;
-        }).join('\n');
-        embed.addField(`__**${name}**__`, text || '\u200b', true);
-        embed.addField(`__**${tabl}**__`, cornip || '\u200b', true);
-        embed.setFooter(`Page ${PAGE} of ${pages} | ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }) || null);
-        return message.channel.send(embed);
+        Pagination(message, embeds);
     }
 }

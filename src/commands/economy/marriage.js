@@ -27,9 +27,10 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const target = await client.resolveUser(args[0]) || message.author;
-        const t = await client.database.users.fetch(target.id);
-        if (!t.profile('married_id')) {
+        let target = await client.resolveUser(args[0]) || message.author;
+        if (!target) target = message.author;
+        const t = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        if (!t.marriage_id) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
@@ -42,7 +43,7 @@ module.exports = class extends BaseCommand {
             .setTimestamp()
             .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }) || null)
             .setTitle('Marriage Certificate')
-            .setDescription(`${target} ❤️ <@${await t.profile('married_id')}>`)
+            .setDescription(`<@${target.id}> ❤️ <@${t.marriage_id}>`)
         );
     }
 }

@@ -25,11 +25,11 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
-        const toggle = message.guild.db.moderation(true);
-        toggle.autoModeration = !toggle.autoModeration;
-        await toggle.save();
-        message.channel.send(`Auto Moderation has been ${toggle.autoModeration ? 'enabled' : 'disabled'}`);
+    async run(client, message, args, guildSettings) {
+        guildSettings.autoModeration = !guildSettings.autoModeration;
+        await guildSettings.save().catch((e) => { throw e; });
+        message.channel.send(`Auto Moderation has been ${guildSettings.autoModeration ? 'enabled' : 'disabled'}`);
     }
 }

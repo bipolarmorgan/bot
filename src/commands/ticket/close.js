@@ -26,11 +26,12 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} settings
      */
-    async run(client, message, args) {
-        const stat = message.guild.db.ticket('enabled');
-        const strat = message.guild.db.ticket('category');
-        if (!stat || !strat) {
+    async run(client, message, args, settings) {
+        const stat = settings.ticketEnabled;
+        const strat = settings.ticketCategory;
+        if (!stat || !strat || !message.guild.channels.cache.get(strat)) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()

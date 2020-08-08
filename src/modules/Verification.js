@@ -3,15 +3,15 @@ const { MessageEmbed } = require('discord.js');
 /**
  * @param {import('../classes/Unicron')} client
  * @param {import('discord.js').Message} message
+ * @param {import('../classes/Guild')} settings
  */
-module.exports = (client, message) => {
+module.exports = (client, message, settings) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const db = await client.database.guilds.fetch(message.guild.id, true);
-            const channel_id = db.verification('channel');
-            const type = db.verification('type');
-            const role = db.verification('role');
-            const enabled = db.verification('enabled');
+            const channel_id = settings.verificationChannel;
+            const type = settings.verificationType;
+            const role = settings.verificationRole;
+            const enabled = settings.verificationEnabled;
             const stat = (!enabled || !role || !channel_id) ? true : false;
             if (stat || (channel_id !== message.channel.id)) return resolve(false);
             if (message.deletable) message.delete({ timeout: 1000 }).catch(() => { });
@@ -31,8 +31,8 @@ module.exports = (client, message) => {
             ).then((m) => {
                 m.delete({ timeout: 5000 }).catch(() => { });
                 if (!message.member.roles.cache.has(role)) message.member.roles.add(role).catch(() => { });
-                resolve(true);
             }).catch(() => { });
+            resolve(true);
         } catch (e) {
             reject(e);
         }

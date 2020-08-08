@@ -26,26 +26,28 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} s
      */
-    async run(client, message, args) {
+    async run(client, message, args, _g, s) {
         const item = client.shopitems.get(args[0].toLowerCase());
         if (!item) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`An item with an ID of \`${args[0]}\` doesn\'t exists`));
+                .setDescription(`Sorry, An item with an ID of \`${args[0]}\` doesn\'t exists`));
         }
         if (!item.options.sellable) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`You cannot sell this item.`));
+                .setDescription(`Sorry, but you cannot sell this item.`));
         }
-        if (!await message.author.db.inventory.has(item.config.id)) {
+        if (!s.hasItem(item.config.id)) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`You don\'t have that item to sell.`));
+                .setDescription(`Sorry, you don\'t have that item to be sold.`));
         }
-        await message.author.db.coins.add(item.options.cost);
-        await message.author.db.inventory.remove(item.config.id);
+        s.balance += item.options.cost;
+        s.removeItem(item.config.id);
+        await s.save().catch((e) => { throw e; });
         return message.channel.send(new MessageEmbed()
             .setColor('0x00FF00')
             .setDescription(`You've sold **${item.config.displayname}**, for the price of **${item.options.cost}** Coins!`)

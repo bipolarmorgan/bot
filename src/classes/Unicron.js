@@ -1,19 +1,20 @@
-const { Client: DiscordClient, Collection,
-    Message, MessageEmbed, Emoji, Guild,
-    GuildEmoji, User, Channel, Role, GuildMember
-} = require('discord.js');
+const { Client: DiscordClient, Collection, Guild, GuildEmoji } = require('discord.js');
 const { promisify } = require('util');
 const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
-const { Admin } = require('../database/database.js');
 const Emotes = require('../../assets/Emotes.json');
 const BaseCommand = require('./BaseCommand');
 const BaseItem = require('./BaseItem');
-const BaseEvent = require('./BaseEvent');
+const DiscordEvent = require('./DiscordEvent');
+const WebSocketEvent = require('./WebSocketEvent');
+const PermissionManager = require('../managers/PermissionManager');
+const API = require('../api/');
+
+const TagManager = require('../managers/TagManager');
 const UserManager = require('../managers/UserManager');
 const GuildManager = require('../managers/GuildManager');
-const PermissionManager = require('../managers/PermissionManager');
+const MemberManager = require('../managers/MemberManager');
 
 class Client extends DiscordClient {
     constructor() {
@@ -36,38 +37,28 @@ class Client extends DiscordClient {
             owner: process.env.BOT_OWNER_ID,
             serverInviteURL: process.env.BOT_SERVER_URL,
             channel: process.env.BOT_CHANNEL_ID,
-            data: new Collection(),
-            /**
-             * @returns {Promise<JSON|typeof Admin>}
-             * @param {string} table 
-             * @param {boolean} model if true, returns the actuall model instance
-             */
-            database: function (table, model = false) {
-                return new Promise(async (resolve, reject) => {
-                    if (this.data.has(table)) return resolve(model ? this.data.get(table) : this.data.get(table).data);
-                    let data = await Admin.findOne({ where: { table: table } });
-                    if (!data) data = await Admin.create({ table });
-                    this.data.set(table, data);
-                    return resolve(model ? this.data.get(table) : this.data.get(table).data);
-                });
-            }
         }
         this.utils = require('../utils/');
         this.logger = this.utils.Logger;
         this.wait = promisify(setTimeout);
-        this.database = {
+        this.server = new API();
+        this.permission = new PermissionManager(this);
+        this.db = {
+            tags: new TagManager(this),
             users: new UserManager(this),
             guilds: new GuildManager(this),
+            members: new MemberManager(this),
         }
-        this.permission = new PermissionManager(this);
     }
-    forceSweep(coverage = 25) {
-        this.users.cache.sweep(() => (Math.random() * 100) <= coverage);
+    async superlogin() {
+        this.server.connect();
+        await this.login(process.env.BOT_TOKEN);
     }
-    startSweepInterval() {
-        this.setInterval(() => {
-            this.forceSweep(50);
-        }, 60000 * 30);
+    async register() {
+        await this.registerItems();
+        await this.registerCommands();
+        await this.registerDiscordEvents();
+        await this.registerWebSocketEvents();
     }
     /**
      * @returns {Promise<import('discord.js').User>|null}
@@ -78,7 +69,6 @@ class Client extends DiscordClient {
         let user = null;
         if (search.match(/^<@!?(\d+)>$/)) user = await this.users.fetch(search.match(/^<@!?(\d+)>$/)[1]).catch(() => { });
         if (search.match(/^!?(\w+)#(\d+)$/) && !user) user = this.users.cache.find((u) => u.username === search.match(/^!?(\w+)#(\d+)$/)[0] && u.discriminator === search.match(/^!?(\w+)#(\d+)$/)[1]);
-        if (search.match(/.{2,32}/) && !user) user = this.users.cache.find((u) => u.username === search);
         if (!user) user = await this.users.fetch(search).catch(() => { });
         return user;
     }
@@ -91,7 +81,7 @@ class Client extends DiscordClient {
         if (!search || typeof search !== 'string') return null;
         const user = await this.resolveUser(search);
         if (!user) return null;
-        return await guild.members.fetch(user);
+        return await guild.members.fetch(user).catch(() => { });
     }
     /**
      * @returns {import('discord.js').Role|null}
@@ -126,15 +116,15 @@ class Client extends DiscordClient {
      * @param {string} message 
      */
     async presence(status, activity, message) {
-        this.shard.broadcastEval(`
+        await this.shard.broadcastEval(`
             this.user.setPresence({
                 status: ['online', 'idle', 'dnd', 'invisible'].includes(${status}) ? ${status} : 'online',
                 activity: {
                     type: ['PLAYING', 'STREAMING', 'LISTENING', 'WATCHING'].includes(${activity.toUpperCase()}) ? ${activity.toUpperCase()} : 'PLAYING',
-                    name: ${message},
+                    name: '${message}',
                 }
             });
-        `)
+        `);
     }
     /**
      * @returns {Promise<import('discord.js').Emoji>}
@@ -205,12 +195,8 @@ class Client extends DiscordClient {
             return `Unable to load item ${dir}: ${e}`;
         }
     }
-    /**
-     * 
-     * @param {string} dir 
-     */
-    async registerItems(dir) {
-        const filePath = path.join(__dirname, dir);
+    async registerItems() {
+        const filePath = path.join(__dirname, '../items/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
             if (file.endsWith('.js')) {
@@ -237,12 +223,8 @@ class Client extends DiscordClient {
             return `Unable to load command ${dir}: ${e}`;
         }
     }
-    /**
-     * 
-     * @param {string} dir 
-     */
-    async registerCommands(dir) {
-        const filePath = path.join(__dirname, dir);
+    async registerCommands() {
+        const filePath = path.join(__dirname, '../commands/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
             const filesPath = path.join(filePath, file);
@@ -255,17 +237,27 @@ class Client extends DiscordClient {
             }
         }
     }
-    /**
-     * 
-     * @param {string} dir 
-     */
-    async registerEvents(dir) {
-        const filePath = path.join(__dirname, dir);
+    async registerWebSocketEvents() {
+        const filePath = path.join(__dirname, '../events/websocket/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
             if (file.endsWith('.js')) {
                 const Event = require(path.join(filePath, file));
-                if (Event.prototype instanceof BaseEvent) {
+                if (Event.prototype instanceof WebSocketEvent) {
+                    const instance = new Event();
+                    this.server.on(instance.eventName, instance.run.bind(instance, this));
+                }
+                delete require.cache[require.resolve(path.join(filePath, file))];
+            }
+        }
+    }
+    async registerDiscordEvents() {
+        const filePath = path.join(__dirname, '../events/discord/');
+        const files = await fs.readdir(filePath);
+        for (const file of files) {
+            if (file.endsWith('.js')) {
+                const Event = require(path.join(filePath, file));
+                if (Event.prototype instanceof DiscordEvent) {
                     const instance = new Event();
                     this.on(instance.eventName, instance.run.bind(instance, this));
                 }
@@ -286,7 +278,6 @@ class Client extends DiscordClient {
             return raw.reduce((acc, cur) => acc + cur, 0);
         } return 0;
     }
-
     /**
      * @returns {Array<any>}
      * @param {Array<any>} arr 
@@ -353,12 +344,10 @@ class Client extends DiscordClient {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
     /**
-     * @returns {Array<Array>}
      * @param {Array} array 
      * @param {number} [chunkSize=0] 
      */
     chunk(array, chunkSize = 0) {
-        if (!Array.isArray(array)) throw new Error('First Parameter must be an array');
         return array.reduce((previous, current) => {
             let chunk;
             if (previous.length === 0 || previous[previous.length - 1].length === chunkSize) {
