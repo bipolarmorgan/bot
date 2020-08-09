@@ -14,7 +14,7 @@ module.exports = class extends BaseEvent {
         client.shard.broadcastEval(`
             this.user.setPresence({
                 activity: {
-                    name: \`${await client.getCount('guilds')} guilds! | ?help\`,
+                    name: \`${await client.getCount('guilds')} guilds! | -help\`,
                     type: 'LISTENING',
                 },
                 status: 'online',

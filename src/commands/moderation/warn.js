@@ -73,7 +73,8 @@ module.exports = class extends BaseCommand {
         /**
          * @type {import('../../classes/Member')}
          */
-        const instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+        let instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+        if (!instance) instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
         const index = instance.addWarn(_reason, message.author);
         if (duration && !isNaN(duration)) {
             setTimeout(() => {

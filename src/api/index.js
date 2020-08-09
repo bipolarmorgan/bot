@@ -71,7 +71,7 @@ class API extends EventEmitter {
      */
     delete(path) {
         return new Promise(async (resolve, reject) => {
-            const response = await fetch.default(`${this.database_uri}${path}`, {
+            const response = await fetch.default(`${this.uri}${path}`, {
                 method: 'delete',
             }).catch(reject);
             if (response.status !== 200) return reject(response);

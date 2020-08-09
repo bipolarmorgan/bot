@@ -31,6 +31,6 @@ $ setpresence <Status> <Activity> <...Message>
      */
     async run(client, message, args) {
         const [status, activity, ...m] = args;
-        return message.channel.send(`\`Output:\`\n\`\`\`xl\n${await client.presence(status, activity, m.join(' ')).catch((e) => { throw e; })}\n\`\`\`\n`);
+        return message.channel.send(`\`Output:\`\n\`\`\`xl\n${await client.presenceSet(status, activity, m.join(' ')).catch((e) => { throw e; })}\n\`\`\`\n`);
     }
 }

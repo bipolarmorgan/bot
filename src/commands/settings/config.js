@@ -44,23 +44,23 @@ module.exports = class extends BaseCommand {
             const inviteFilter = guildSettings.inviteFilter ? 'TRUE' : 'FALSE';
             const mentionSpamFilter = guildSettings.mentionSpamFilter ? 'TRUE' : 'FALSE';
             const swearFilter = guildSettings.swearFilter ? 'TRUE' : 'FALSE';
-            const dynamicCategory = guildSettings.dynamicCategory ? `<@#${guildSettings.dynamicCategory}>` : `\`none\``;
+            const dynamicCategory = guildSettings.dynamicCategory && message.guild.channels.cache.has(guildSettings.dynamicCategory) ? message.guild.channels.cache.get(guildSettings.dynamicCategory) : `\`none\``;
             const dynamicRoom = guildSettings.dynamicRoom ? `<@#${guildSettings.dynamicRoom}>` : `\`none\``;
             const dynamicEnabled = guildSettings.dynamicEnabled ? 'TRUE' : 'FALSE';
-            const welcomeChannel = guildSettings.welcomeChannel ? `<#${guildSettings.welcomeChannel}>` : '\`none\`';
+            const welcomeChannel = guildSettings.welcomeChannel && message.guild.channels.cache.has(guildSettings.welcomeChannel) ? `<#${guildSettings.welcomeChannel}>` : '\`none\`';
             const welcomeMessage = guildSettings.welcomeMessage;
             const welcomer = guildSettings.welcomeEnabled ? 'TRUE' : 'FALSE';
-            const farewellChannel = guildSettings.farewellChannel ? `<#${guildSettings.farewellChannel}>` : '\`none\`';
-            const farewellMessage = guildSettings.farewellEnabled;
+            const farewellChannel = guildSettings.farewellChannel && message.guild.channels.cache.has(guildSettings.farewellChannel) ? `<#${guildSettings.farewellChannel}>` : '\`none\`';
+            const farewellMessage = guildSettings.farewellMessage;
             const farewell = guildSettings.farewellEnabled ? 'TRUE' : 'FALSE';
             const memberVerification = guildSettings.verificationEnabled ? 'TRUE' : 'FALSE';
-            const verificationChannel = guildSettings.verificationChannel ? `<#${guildSettings.verificationChannel}>` : '\`none\`';
+            const verificationChannel = guildSettings.verificationChannel && message.guild.channels.cache.has(guildSettings.verificationChannel) ? `<#${guildSettings.verificationChannel}>` : '\`none\`';
             const verifiedRole = guildSettings.verificationRole ? `<@&${guildSettings.verificationRole}>` : '\`none\`';
             const verificationType = guildSettings.verificationType;
             const ticketSystem = guildSettings.ticketEnabled ? 'TRUE' : 'FALSE';
-            const ticketCategory = guildSettings.ticketCategory ? `<@#${guildSettings.ticketCategory}>` : '\`none\`';
+            const ticketCategory = guildSettings.ticketCategory && message.guild.channels.cache.has(guildSettings.ticketCategory) ? message.guild.channels.cache.get(guildSettings.ticketCategory).name : '\`none\`';
             const prefix = guildSettings.prefix;
-            const modLogChannel = guildSettings.modLogChannel ? `<#${guildSettings.modLogChannel}>` : '\`none\`';
+            const modLogChannel = guildSettings.modLogChannel && message.guild.channels.cache.has(guildSettings.modLogChannel) ? `<#${guildSettings.modLogChannel}>` : '\`none\`';
             const autoModeration = guildSettings.autoModeration ? 'TRUE' : 'FALSE';
             const autoModAction = `${guildSettings.autoModAction} MEMBER`;
             const autoModDuration = guildSettings.autoModDuration ? ms(guildSettings.autoModDuration) : '0s';
@@ -349,8 +349,15 @@ module.exports = class extends BaseCommand {
                     case 'farewellChannel':
                     case 'verificationChannel':
                     case 'modLogChannel': {
+                        const channel = message.mentions.channels.first() || client.resolveChannel(value.join(' '), message.guild);
+                        if (!channel || channel.type !== 'text') throw `Sorry, that\'s an invalid text channel, please use \`${guildSettings.prefix}config set ${key} [ChannelMention|ChannelName]\``;
+                        guildSettings[key] = channel.id;
+                        break;
+                    }
+                    case 'dynamicCategory':
+                    case 'ticketCategory': {
                         const channel = client.resolveChannel(value.join(' '), message.guild);
-                        if (!channel) throw `Sorry, that\'s an invalid channel, please use \`${guildSettings.prefix}config set ${key} [ChannelMention|ChannelName]\``;
+                        if (!channel || channel.type !== 'category') throw `Sorry, that\'s an invalid category channel, please use \`${guildSettings.prefix}config set ${key} [CategoryName|CategoryID]\``;
                         guildSettings[key] = channel.id;
                         break;
                     }
@@ -359,6 +366,9 @@ module.exports = class extends BaseCommand {
                     case 'farewellEnabled':
                     case 'welcomeEnabled':
                     case 'verificationEnabled':
+                    case 'inviteFilter':
+                    case 'swearFilter':
+                    case 'mentionSpamFilter':
                     case 'ticketEnabled': {
                         if (!value[0] || !['TRUE', 'FALSE'].includes(value[0].toUpperCase())) throw `Sorry, that\'s an invalid boolean, please use \`${guildSettings.prefix}config set ${key} <TRUE|FALSE>\` to set this up!`;
                         guildSettings[key] = value[0].toUpperCase() === 'TRUE' && ['TRUE', 'FALSE'].includes(value[0].toUpperCase());

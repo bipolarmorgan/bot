@@ -25,11 +25,11 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} guildSettings
      */
-    async run(client, message, args) {
-        const toggle = message.guild.db.filters(true);
-        toggle.swearFilter = !toggle.swearFilter;
-        await toggle.save();
-        message.channel.send(`No Swear has been ${toggle.swearFilter ? 'enabled' : 'disabled'}`);
+    async run(client, message, args, guildSettings) {
+        guildSettings.swearFilter = !guildSettings.swearFilter;
+        await guildSettings.save().catch((e) => { throw e; });
+        message.channel.send(`Swear Filter has been ${guildSettings.swearFilter ? 'enabled' : 'disabled'}`);
     }
 }

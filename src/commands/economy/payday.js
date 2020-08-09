@@ -29,7 +29,7 @@ module.exports = class extends BaseCommand {
      */
     async run(client, message, _args, _g, userStats) {
         const prize = client.utils.Random.nextInt({ max: 1200, min: 1000 });
-        userStats += prize;
+        userStats.balance += prize;
         await userStats.save().catch((e) => { throw e; });
         message.channel.send(`You have received **${prize}** coins!`);
     }

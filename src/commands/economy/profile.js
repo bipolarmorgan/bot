@@ -33,7 +33,8 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription('Sorry, i cannot show the profile of a bot user.'));
         }
-        const profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        let profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        if (!profile) profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
         const badges = profile.data.badges ? client.chunk(profile.data.badges, 8) : [];
         const balance = profile.balance;
         const inventory = profile.inventory;

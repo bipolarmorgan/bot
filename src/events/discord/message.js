@@ -32,7 +32,8 @@ module.exports = class extends BaseEvent {
         if (!message.channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) return;
         if (!message.member) await message.member.fetch().catch(() => { });
 
-        const guildSettings = await client.db.guilds.fetch(message.guild.id).catch(console.log);
+        let guildSettings = await client.db.guilds.fetch(message.guild.id).catch(console.log);
+        if (!guildSettings) guildSettings = await client.db.guilds.fetch(message.guild.id).catch(console.log);
         message.author.permLevel = client.permission.level(message);
 
         if (await memberVerification(client, message, guildSettings)) return;
@@ -42,7 +43,7 @@ module.exports = class extends BaseEvent {
 
         if (!triggerCommand) return;
 
-        const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${client.escapeRegex(guildSettings.prefix || '-')})\\s*`);
+        const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${client.escapeRegex(guildSettings.prefix)})\\s*`);
         if (!prefixRegex.test(message.content)) return;
         const [, matchedPrefix] = message.content.match(prefixRegex);
         const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
@@ -101,8 +102,9 @@ ${command.options.usage}
         const timestamps = cooldowns.get(command.config.name);
         let cooldownAmount = (command.options.cooldown || 3) * 1000;
         // const bcd = cooldownAmount;
-        const userStats = await client.db.users.fetch(message.author.id).catch(console.log);
-        const donator = userStats.data.premium || false;
+        let userStats = await client.db.users.fetch(message.author.id).catch(console.log);
+        if (!userStats) userStats = await client.db.users.fetch(message.author.id).catch(console.log);
+        const donator = userStats.data && userStats.data.premium || false;
         if (command.options.donatorOnly && !donator) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')

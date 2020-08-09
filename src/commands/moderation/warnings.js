@@ -35,8 +35,9 @@ module.exports = class extends BaseCommand {
         /**
          * @type {import('../../classes/Member')}
          */
-        const mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
-        if (!mem.data || !mem.data.warnings) {
+        let mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        if (!mem) mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        if (!mem.data || !mem.data.warnings || !mem.data.warnings.length) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }))
@@ -46,18 +47,13 @@ module.exports = class extends BaseCommand {
         /**
          * @type {[[{reason:string, moderator:string, date:string, case:number}]]}
          */
-        const warns = client.chunk(mem.data.warnings || [], 4);
-        /**
-         * @type {import('discord.js').MessageEmbed[]}
-         */
-        const embeds = warns.map((ws) => {
+        const warns = client.chunk(mem.data.warnings, 5);
+        Pagination(message, warns.map((ws) => {
             let embed = new MessageEmbed()
                 .setColor('RANDOM')
-                .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }))
-                .setTimestamp()
+                .setAuthor(`${target.tag} / ${target.id}`, target.displayAvatarURL({ dynamic: true }));
             ws.map((w) => embed.addField(`**Case ${w.case}**`, `**Reason** : ${w.reason}\n**Moderator** : ${w.moderator}\n**Date** : ${w.date}`));
             return embed;
-        });
-        Pagination(message, embeds);
+        }));
     }
 }

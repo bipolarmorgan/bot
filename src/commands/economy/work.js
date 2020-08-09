@@ -49,8 +49,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} u
      */
-    async run(client, message, args) {
+    async run(client, message, args, p, u) {
         let embed = new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
@@ -68,51 +69,52 @@ module.exports = class extends BaseCommand {
         const payout = client.utils.Random.nextInt(salary[job]);
         switch (job) {
             case 'mailman': {
-                await message.author.db.coins.add(payout);
+                u.balance += payout;
                 embed.setDescription(`You have worked as a ${job} and earned **${payout}** coins!`)
                 break;
             }
             case 'developer': {
-                if (!await message.author.db.inventory.has('laptop')) {
+                if (!u.hasItem('laptop')) {
                     status = false;
                     embed.setDescription(`Hey, you need a laptop to work as a developer.`);
                     break;
                 }
-                await message.author.db.coins.add(payout);
+                u.balance += payout;
                 embed.setDescription(`You have worked as a ${job} and earned **${payout}** coins!`)
                 break;
             }
             case 'carpenter': {
-                if (!await message.author.db.inventory.has('hammer')) {
+                if (!u.hasItem('hammer')) {
                     status = false;
                     embed.setDescription(`Hey, you need a hammer to work as a carpenter.`);
                     break;
                 }
-                await message.author.db.coins.add(payout);
+                u.balance += payout;
                 embed.setDescription(`You have worked as a ${job} and earned **${payout}** coins!`)
                 break;
             }
             case 'mechanic': {
-                if (!await message.author.db.inventory.has('wrench')) {
+                if (!u.hasItem('wrench')) {
                     status = false;
                     embed.setDescription(`Hey, you need a wrench to work as a mechanic.`);
                     break;
                 }
-                await message.author.db.coins.add(payout);
+                u.balance += payout;
                 embed.setDescription(`You have worked as a ${job} and earned **${payout}** coins!`)
                 break;
             }
             case 'police': {
-                if (!await message.author.db.inventory.has('pistol')) {
+                if (!u.hasItem('pistol')) {
                     status = false;
                     embed.setDescription(`Hey, you need a pistol to work as a police.`);
                     break;
                 }
-                await message.author.db.coins.add(payout);
+                u.balance += payout;
                 embed.setDescription(`You have worked as a ${job} and earned **${payout}** coins!`)
                 break;
             }
         }
+        if (status) await u.save().catch((e) => { throw e; });
         message.channel.send(embed);
         return status;
     }

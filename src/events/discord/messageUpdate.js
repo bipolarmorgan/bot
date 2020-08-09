@@ -10,8 +10,7 @@ module.exports = class extends Event {
      * @param {import('discord.js').Message} newMessage
      */
     async run(client, oldMessage, newMessage) {
-        if (newMessage.author.bot) return;
-        if (newMessage.partial) await newMessage.fetch().catch(() => { });
+        if (newMessage.partial) await newMessage.fetch().catch((e) => { return; });
         client.emit('message', newMessage, false);
     }
 }

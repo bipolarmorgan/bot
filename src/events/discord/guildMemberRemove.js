@@ -10,7 +10,8 @@ module.exports = class extends BaseEvent {
      */
     async run(client, member) {
         if (member.user.bot) return;
-        const guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
+        let guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
+        if (!guild) guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         const channel_id = guild.farewellChannel;
         const message = guild.farewellMessage;
         const enabled = guild.farewellEnabled;

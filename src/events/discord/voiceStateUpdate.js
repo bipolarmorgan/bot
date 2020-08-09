@@ -10,7 +10,8 @@ module.exports = class extends BaseEvent {
      * @param {import('discord.js').VoiceState} newState
      */
     async run(client, oldState, newState) {
-        const db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
+        let db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
+        if (!db) db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
         const enabled = db.dynamicEnabled;
         const waitingRoom = db.dynamicRoom;
         const category = db.dynamicCategory;

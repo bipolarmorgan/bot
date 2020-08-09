@@ -30,7 +30,8 @@ module.exports = class extends BaseCommand {
     async run(client, message, args) {
         const [action, paging] = args;
         const target = await client.resolveUser(action) || message.author;
-        const userp = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        let userp = await client.db.users.fetch(target.id).catch(console.log);
+        if (!userp) userp = await client.db.users.fetch(target.id).catch(console.log);
         const items = userp.inventory;
         if (!items.length) {
             message.channel.send(new MessageEmbed()

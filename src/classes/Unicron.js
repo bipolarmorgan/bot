@@ -115,7 +115,7 @@ class Client extends DiscordClient {
      * @param {string} activity 
      * @param {string} message 
      */
-    async presence(status, activity, message) {
+    async presenceSet(status, activity, message) {
         await this.shard.broadcastEval(`
             this.user.setPresence({
                 status: ['online', 'idle', 'dnd', 'invisible'].includes(${status}) ? ${status} : 'online',

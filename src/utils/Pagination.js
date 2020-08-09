@@ -1,7 +1,7 @@
 /**
  * 
  * @param {import('discord.js').Message} msg 
- * @param {import('discord.js').MessageEmbed} pages 
+ * @param {import('discord.js').MessageEmbed[]} pages 
  * @param {number} timeout 
  */
 async function Pagination(msg, pages, timeout = 120000) {

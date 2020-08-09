@@ -11,10 +11,13 @@ module.exports = class extends BaseEvent {
      */
     async run(client, member) {
         if (member.user.bot) return;
-        const memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+        let memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+        if (!memberStats) memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+        if (!memberStats.data) memberStats.data = {};
         memberStats.data.captcha = client.utils.Random.string(8);
         await memberStats.save().catch(console.log);
-        const guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
+        let guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
+        if (!guild) guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         const verifier = guild.verificationType;
         if (['discrim', 'captcha'].includes(verifier)) {
             const enabled = guild.verificationEnabled;

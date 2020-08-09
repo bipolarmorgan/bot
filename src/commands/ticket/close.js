@@ -49,7 +49,7 @@ module.exports = class extends BaseCommand {
         if (!response || response.content === 'no' || response.content !== 'yes') {
             return message.channel.send('i guess not.')
         }
-        const modchannel = message.guild.channels.cache.get(await message.guild.db.moderation('modLogChannel'));
+        const modchannel = message.guild.channels.cache.get(settings.modLogChannel);
         if (modchannel) {
             modchannel.send(new MessageEmbed()
                 .setColor('RANDOM')
