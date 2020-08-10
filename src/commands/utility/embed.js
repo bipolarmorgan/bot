@@ -35,7 +35,7 @@ $ embed -json {"fields": [{"name": "My field name", "value": "My field value"}, 
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        if (message.flags.includes('json')) {
+        if (args.includes('-json')) {
             try {
                 const json = JSON.parse(args.join(' '));
                 return message.channel.send({

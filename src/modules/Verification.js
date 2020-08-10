@@ -20,8 +20,12 @@ module.exports = (client, message, settings) => {
             if (type === 'discrim') {
                 verified = message.content === `I am ${message.author.discriminator}`;
             } else if (type === 'captcha') {
-                const cptcha = await message.member.db.captcha.fetch();
-                verified = message.content === `>verify ${cptcha}`;
+                /**
+                 * @type {import('../classes/Member')}
+                 */
+                let member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
+                if (!member) member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
+                verified = message.content === `>verify ${member.data.captcha}`;
             }
             if (!verified) return;
             message.channel.send(new MessageEmbed()
