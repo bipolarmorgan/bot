@@ -29,7 +29,7 @@ module.exports = class extends BaseCommand {
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setAuthor(target.tag, target.avatarURL({ dynamic: true }))
-            .setImage(`${target.displayAvatarURL({ dynamic: true })}?size=1024`)
+            .setImage(target.displayAvatarURL({ dynamic: true }))
         );
     }
 }

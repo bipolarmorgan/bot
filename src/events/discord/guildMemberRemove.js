@@ -17,7 +17,7 @@ module.exports = class extends BaseEvent {
         const enabled = guild.farewellEnabled;
         if (!channel_id || !enabled || !message) return;
         const channel = await client.channels.fetch(channel_id).catch(() => { });
-        if (!channel) return;
-        channel.send(message.replace('{user}', member.user.tag));
+        if (!channel || channel.type !== 'text') return;
+        channel.send(message.replace('{user}', member.user.tag)).catch(() => { });
     }
 }

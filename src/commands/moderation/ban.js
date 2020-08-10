@@ -27,8 +27,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/Guild')} settings
      */
-    async run(client, message, args) {
+    async run(client, message, args, settings) {
         const [user, ...reason] = args;
         const target = await client.resolveUser(user);
         if (!target) {
@@ -99,7 +100,7 @@ module.exports = class extends BaseCommand {
             }, Number(duration));
         }
         message.channel.send(`Successfully banned ${target.tag}`);
-        const modchannel = await client.channels.fetch(await message.guild.db.moderation('modLogChannel')).catch(() => { });
+        const modchannel = await client.channels.fetch(settings.modLogChannel).catch(() => { });
         if (modchannel && modchannel.type === 'text') {
             modchannel.send(new MessageEmbed()
                 .setColor('RANDOM')
@@ -107,7 +108,7 @@ module.exports = class extends BaseCommand {
                 .setTimestamp()
                 .setThumbnail(target.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription(`**Member** : ${target.tag} / ${target.id}\n**Action** : Ban\n**Reason** : ${_reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
-            );
+            ).catch(() => { });
         }
     }
 }

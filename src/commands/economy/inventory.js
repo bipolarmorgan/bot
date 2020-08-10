@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const Paginate = require('../../utils/Pagination');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -15,7 +16,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 8,
                 nsfwCommand: false,
                 args: false,
-                usage: 'inventory [User] [Page]\ninventory [Page]\binventory page <Page>',
+                usage: 'inventory [User]',
                 donatorOnly: false,
                 premiumServer: false,
             }
@@ -28,8 +29,10 @@ module.exports = class extends BaseCommand {
      * @param {Array<string>} args 
      */
     async run(client, message, args) {
-        const [action, paging] = args;
-        const target = await client.resolveUser(action) || message.author;
+        const target = await client.resolveUser(args.join(' ')) || message.author;
+        /**
+         * @type {import('../../classes/User')}
+         */
         let userp = await client.db.users.fetch(target.id).catch(console.log);
         if (!userp) userp = await client.db.users.fetch(target.id).catch(console.log);
         const items = userp.inventory;
@@ -40,26 +43,20 @@ module.exports = class extends BaseCommand {
                 .setDescription(`**NOTHING**`));
             return false;
         }
-        let embed = new MessageEmbed()
-            .setColor('RANDOM').setDescription(`**${target.tag}\'s** Inventory`);
-        const _items = client.chunk(items.sort((a, b) => b.amount - a.amount), 4);
-        const pages = _items.length;
-        const page = Number(paging) || Number(action);
-        if (!page) {
-            //
-        } else if (page > 0 && page <= pages) {
-            _items[page - 1].map(m => {
+        /**
+         * @type {{item_id:string, amount:number}[][]}
+         */
+        const chunks = client.chunk(items.sort((a, b) => b.amount - a.amount), 4);
+        const embeds = chunks.map((ia) => {
+            const embed = new MessageEmbed()
+                .setColor('RANDOM')
+                .setTitle(`**${target.tag}'s** Inventory`);
+            ia.map((m) => {
                 const p = client.shopitems.get(m.item_id);
-                embed.addField(` **${m.amount} ~ ${p.config.displayname}**`, `• ${p.config.description}\n Cost : **${p.options.cost}** coins`);
+                embed.addField(`**${m.amount} ~ ${p.config.displayname}**`, `• ${p.config.description}\n Cost : **${p.options.cost}** coins`);
             });
-            embed.setFooter(`Page ${page} of ${pages} | ${message.author.tag}`, message.author.displayAvatarURL);
-            return message.channel.send(embed);
-        }
-        _items[0].map(m => {
-            const p = client.shopitems.get(m.item_id);
-            embed.addField(` **${m.amount} ~ ${p.config.displayname}**`, `• ${p.config.description}\n Cost : **${p.options.cost}** coins`);
+            return embed;
         });
-        embed.setFooter(`Page 1 of ${pages} | ${message.author.tag}`, message.author.displayAvatarURL);
-        return message.channel.send(embed);
+        Paginate(message, embeds);
     }
 }

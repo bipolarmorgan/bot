@@ -11,11 +11,6 @@ module.exports = class extends BaseEvent {
      */
     async run(client, member) {
         if (member.user.bot) return;
-        let memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
-        if (!memberStats) memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
-        if (!memberStats.data) memberStats.data = {};
-        memberStats.data.captcha = client.utils.Random.string(8);
-        await memberStats.save().catch(console.log);
         let guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         if (!guild) guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         const verifier = guild.verificationType;
@@ -25,7 +20,13 @@ module.exports = class extends BaseEvent {
             const role = guild.verificationRole;
             const vChannel = member.guild.channels.cache.get(channel);
             const vRole = member.guild.roles.cache.get(role);
-            if (enabled && channel && role && vChannel && vRole) {
+            const stat = enabled && channel && role && vChannel && vRole;
+            if (stat) {
+                let memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+                if (!memberStats) memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+                if (!memberStats.data) memberStats.data = {};
+                memberStats.data.captcha = client.utils.Random.string(8);
+                await memberStats.save().catch(console.log);
                 const dm = await member.user.createDM().catch(() => { });
                 if (!dm) return;
                 switch (verifier) {
@@ -35,7 +36,7 @@ module.exports = class extends BaseEvent {
                             .setColor(0xD3D3D3)
                             .setTitle(`Welcome to ${member.guild.name}`)
                             .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
-                            .setDescription(`This server is protected by [Unicron](${client.unicron.serverInviteURL} 'Unicron's Support Server'), a powerful bot that prevents servers from being raided\nTo get yourself verified use \`I am XXXX\`, where \`XXXX\` is your discriminator at <@#${channel}>\nEg: \`I am ${member.user.discriminator}\``)
+                            .setDescription(`This server is protected by [Unicron](${client.unicron.serverInviteURL} 'Unicron's Support Server'), a powerful bot that prevents servers from being raided\nTo get yourself verified use \`I am ${member.user.discriminator}\` at <@#${channel}>.`)
                         ).catch(() => { });
                         break;
                     }
@@ -61,7 +62,7 @@ module.exports = class extends BaseEvent {
         const enabled = guild.welcomeEnabled;
         if (!channel_id || !enabled || !message) return;
         const channel = await client.channels.fetch(channel_id).catch(() => { });
-        if (!channel) return;
-        channel.send(message.replace('{user}', member.user));
+        if (!channel || channel.type !== 'text') return;
+        channel.send(message.replace('{user}', member.user)).catch(() => { });
     }
 }

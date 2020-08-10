@@ -18,21 +18,14 @@
         "one-liner-joke": "^1.2.0",
         "passport": "^0.4.1",
         "pretty-ms": "^7.0.0",
-        "sequelize": "^6.3.4",
-        "socket.io-client": "^2.3.0",
-        "sqlite3": "^5.0.0"
+        "socket.io-client": "^2.3.0"
     },
     "devDependencies": {},
     "scripts": {
         "start": "node .",
         "nodemon": "nodemon src/index.js"
     },
-    "keywords": [
-        "discordjs",
-        "discord",
-        "bot",
-        "unicron"
-    ],
+    "keywords": [],
     "author": "oadpoaw",
-    "license": "MIT"
+    "license": "GNU GPL"
 }

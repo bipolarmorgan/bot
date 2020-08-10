@@ -16,10 +16,10 @@ class TagManager extends BaseManager {
      * @param {string} tag_name
      */
     fetch(guild_id, tag_name) {
-        if (!this.client.db.tags.cache.has(guild_id)) this.client.db.tags.cache.set(guild_id, new Collection());
+        if (!this.cache.has(guild_id)) this.cache.set(guild_id, new Collection());
         return new Promise(async (resolve, reject) => {
             await this.client.server.get(`/api/tag/${guild_id}/${tag_name}`).catch(reject);
-            resolve(this.client.db.tags.cache.get(guild_id).get(tag_name));
+            resolve(this.cache.get(guild_id).get(tag_name));
         });
     }
     /**
@@ -27,13 +27,13 @@ class TagManager extends BaseManager {
      * @param {string} guild_id
      */
     fetchAll(guild_id) {
-        if (!this.client.db.tags.cache.has(guild_id)) this.client.db.tags.cache.set(guild_id, new Collection());
+        if (!this.cache.has(guild_id)) this.cache.set(guild_id, new Collection());
         return new Promise(async (resolve, reject) => {
             /**
              * @type {[{guild_id:string, tag: { name:string, data: {}}}]}
              */
             const rawTags = await this.client.server.get(`/api/tags/${guild_id}`).catch(reject);
-            const tags = this.client.db.tags.cache.get(guild_id);
+            const tags = this.cache.get(guild_id);
             rawTags.forEach((t) => {
                 tags.set(t.tag.name, new Tag(this.client, t));
             });

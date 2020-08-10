@@ -13,7 +13,7 @@ module.exports = {
 		console.log(`${timestamp(thread)} ${chalk.black.bgWhite('[INFO]')} : ${contents}`);
 	},
 	error: function (contents, thread = 'Server') {
-		console.log(`${timestamp(thread)} ${chalk.black.bgRed('[ERROR]')} : ${contents}`);
+		console.error(`${timestamp(thread)} ${chalk.black.bgRed('[ERROR]')} : ${contents}`);
 		if (settings['tracing']) {
 			console.log(chalk.black.bgRed('[ERROR_TRACE]'));
 			console.trace(contents);
@@ -30,7 +30,7 @@ module.exports = {
 			}
 		}
 	},
-	debug: function (content, thread = 'Server') {
+	debug: function (contents, thread = 'Server') {
 		if (settings['debug']) {
 			console.log(`${timestamp(thread)} ${chalk.black.bgGreen('[DEBUG]')} : ${contents}`);
 		}
