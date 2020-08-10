@@ -45,7 +45,7 @@ module.exports = class extends BaseCommand {
         if (item.options.price > userStats.balance) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setDescription(`You need **${item.options.price - userStats}** more coins to buy this item.`));
+                .setDescription(`You need **${item.options.price - userStats.balance}** more coins to buy this item.`));
             return false;
         }
         userStats.balance -= item.options.price;
