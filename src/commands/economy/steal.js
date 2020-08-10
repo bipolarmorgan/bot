@@ -22,28 +22,24 @@ const Defense = {
  * @param {import('../../classes/User')} user 
  */
 const getOffense = function (user) {
-    return new Promise(async (resolve, reject) => {
-        let score = 0;
-        if (await user.inventory.has('car')) score += Offense.car;
-        if (await user.inventory.has('motorcycle')) score += Offense.motorcycle;
-        if (await user.inventory.has('pistol')) score += Offense.pistol;
-        if (await user.inventory.has('dagger')) score += Offense.dagger;
-        return resolve(score);
-    });
+    let score = 0;
+    if (user.hasItem('car')) score += Offense.car;
+    if (user.hasItem('motorcycle')) score += Offense.motorcycle;
+    if (user.hasItem('pistol')) score += Offense.pistol;
+    if (user.hasItem('dagger')) score += Offense.dagger;
+    return score;
 };
 /**
  * 
  * @param {import('../../classes/User')} user 
  */
 const getDefense = function (user) {
-    return new Promise(async (resolve, reject) => {
-        let score = 0;
-        if (await user.inventory.has('dog')) score += Defense.dog;
-        if (await user.inventory.has('shield')) score += Defense.shield;
-        if (await user.inventory.has('bow')) score += Defense.bow;
-        if (await user.inventory.has('padlock')) score += Defense.padlock;
-        return resolve(score);
-    });
+    let score = 0;
+    if (user.hasItem('dog')) score += Defense.dog;
+    if (user.hasItem('shield')) score += Defense.shield;
+    if (user.hasItem('bow')) score += Defense.bow;
+    if (user.hasItem('padlock')) score += Defense.padlock;
+    return score;
 };
 
 module.exports = class extends BaseCommand {
@@ -71,8 +67,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} userStats
      */
-    async run(client, message, args) {
+    async run(client, message, args, g, userStats) {
         const utarget = await client.resolveUser(args[0]);
         if (!utarget || utarget.bot) {
             return message.channel.send(new MessageEmbed()
@@ -90,9 +87,9 @@ module.exports = class extends BaseCommand {
                 .setDescription('Sorry, you can\'t rob yourself, :P')
             );
         }
-        const target = await client.database.users.fetch(utarget.id);
-        const tbal = await target.coins.fetch();
-        const ubal = await message.author.db.coins.fetch();
+        const target = await client.db.users.fetch(utarget.id).catch(console.log);
+        const tbal = userStats.balance;
+        const ubal = target.balance;
         if (tbal < MINIMUM_COINS) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
@@ -109,8 +106,8 @@ module.exports = class extends BaseCommand {
                 .setDescription(`Sorry, You must have atleast **${MINIMUM_COINS}** coins to steal from someone!`)
             );
         }
-        const attackPoints = await getOffense(message.author.db);
-        const defendPoints = await getDefense(target);
+        const attackPoints = getOffense(message.author.db);
+        const defendPoints = getDefense(target);
         const chance = defendPoints - attackPoints;
         const bchance = 90 + chance;
         if (client.utils.Random.nextInt({ max: 200, min: 0 }) <= bchance) {
@@ -130,8 +127,10 @@ module.exports = class extends BaseCommand {
                     )
                 )
             );
-            await target.coins.remove(payout);
-            await message.author.db.coins.add(payout);
+            target.balance -= payout;
+            userStats.balance += payout;
+            await target.save().catch((e) => { throw e; });
+            await userStats.save().catch((e) => { throw e; });
             return message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setTimestamp()
@@ -156,7 +155,8 @@ module.exports = class extends BaseCommand {
                     )
                 )
             )
-            await message.author.db.coins.remove(lmao);
+            userStats.balance -= lmao;
+            userStats.save().catch((e) => { throw e; });
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
@@ -164,8 +164,10 @@ module.exports = class extends BaseCommand {
                 .setDescription(`You got caught by the authorities and paid **${lmao}** coins to stay out of prison, OHHH.`)
             );
         }
-        await target.coins.add(MINIMUM_COINS);
-        await message.author.db.coins.remove(MINIMUM_COINS);
+        target.balance += MINIMUM_COINS;
+        userStats.balance -= MINIMUM_COINS;
+        await target.save().catch((e) => { throw e; });
+        await userStats.save().catch((e) => { throw e; });
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
