@@ -35,7 +35,7 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this')
+                .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this\nSetup Ticket System using `config` command!')
             );
         }
         if (message.channel.parentID === strat) {

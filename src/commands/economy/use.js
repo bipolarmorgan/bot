@@ -26,8 +26,9 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
      * @param {Array<string>} args 
+     * @param {import('../../classes/User')} s
      */
-    async run(client, message, args) {
+    async run(client, message, args, g, s) {
         const item = client.shopitems.get(args[0].toLowerCase());
         if (!item) {
             message.channel.send(new MessageEmbed()
@@ -35,7 +36,7 @@ module.exports = class extends BaseCommand {
                 .setDescription('That\'s an invalid item.'));
             return false;
         }
-        if (!await message.author.db.inventory.has(item.config.id)) {
+        if (!s.hasItem(item.config.id)) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Sorry, but you don\'t have a ${item.config.displayname}.`));
@@ -47,6 +48,6 @@ module.exports = class extends BaseCommand {
                 .setDescription('Sorry, you cannot use this item'));
             return false;
         }
-        return await item.run(client, message).catch((e) => { throw e });
+        return await item.run(client, message, s).catch((e) => { throw e });
     }
 }

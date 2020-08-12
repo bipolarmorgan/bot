@@ -3,14 +3,14 @@ const ms = require('ms');
 const BaseCommand = require('../../classes/BaseCommand');
 
 const category = new Collection();
-category.set('fun', 'Indeed very cool **Fun commands**.');
+category.set('fun', 'Indeed very cool **Fun commands**');
 category.set('economy', 'Oustanding **Economy System**! ONE OF THE BEST');
 category.set('misc', 'Miscellaneous commands! over over the door')
-category.set('utility', '**Utility** commands that can help you do better.');
+category.set('utility', '**Utility** commands that can help you do better');
 category.set('moderation', 'Simple **Moderation** commands to strict your server from rule breakers!');
-category.set('settings', 'Fully **Customizable** Configurations. including simplistic interactive configuration setups.');
-category.set('dynamic', '**Dynamic Text/Voice System!** Which Allows users to create their own text/voice Channels to enhance your community environment as your users continue to meet new people.');
-category.set('ticket', 'Wonderful **Ticket System** for ease of server management.');
+category.set('settings', 'Fully **Customizable** Configurations. including simplistic interactive configuration setups');
+category.set('dynamic', '**Dynamic Text/Voice System!** Which Allows users to create their own text/voice Channels to enhance your community environment as your users continue to meet new people\nSetup Dynamic Text/Voice using `config` command!');
+category.set('ticket', 'Wonderful **Ticket System** for ease of server management.\nSetup Ticket System using `config` command!');
 category.set('search', 'Searching commands!');
 category.set('staff', 'Bot Staff Commands ONLY!');
 
@@ -26,7 +26,7 @@ module.exports = class extends BaseCommand {
                 aliases: ['commands'],
                 cooldown: 3,
                 args: false,
-                usage: 'help [command | category]',
+                usage: 'help [command|category]',
                 donatorOnly: false,
             }
         });
@@ -65,9 +65,7 @@ module.exports = class extends BaseCommand {
             }
             const name = args[0].toLowerCase();
             const command = client.commands.get(name) || client.commands.find(c => c.options.aliases && c.options.aliases.includes(name));
-            if (!command) {
-
-            } else {
+            if (command) {
                 let embed = new MessageEmbed()
                     .setColor('RANDOM')
                     .setTitle(`**${command.config.name}** Command`)
@@ -91,7 +89,7 @@ module.exports = class extends BaseCommand {
         return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTitle('Unicron\'s Commands')
-            .setDescription(`Join our [Support Server](${client.unicron.serverInviteURL}) for help and awesome updates!\n\nWebsite https://unicron-bot.xyz/ **(Coming soon)**`)
+            .setDescription(`Join our [Support Server](${client.unicron.serverInviteURL}) for help and awesome updates!\n\nWebsite https://unicron-bot.xyz/ **(Coming soon)**\nDocumentation https://docs.unicron-bot.xyz/`)
             .addField(`${await client.getEmoji('staff')} Moderation`, `\`${prefix}help moderation\``, true)
             .addField(`${await client.getEmoji('settings')} Settings`, `\`${prefix}help settings\``, true)
             .addField(`🎫 Ticket System`, `\`${prefix}help ticket\``, true)

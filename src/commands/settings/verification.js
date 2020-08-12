@@ -43,7 +43,7 @@ module.exports = class extends BaseCommand {
                         .setColor('RED')
                         .setTimestamp()
                         .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                        .setDescription('Error: Invalid flag provided, Please try again.')
+                        .setDescription('Sorry, incorrect arguments, Please try again.')
                     );
                 }
             }
@@ -53,6 +53,9 @@ module.exports = class extends BaseCommand {
         const response1 = await client.awaitReply(message, `Enter Verification Channel name:\nEg: \`#channel\`\n\nType \`cancel\` to exit this setup.`, 20000, true);
         if (!response1) return message.channel.send(`No response... Exiting setup...`);
         if (response1.content === 'cancel') return message.channel.send(`Exiting setup...`);
+        /**
+         * @type {import('discord.js').TextChannel}
+         */
         const channel = response1.mentions.channels.first();
         if (!channel || channel.type !== 'text') return message.channel.send(`Invalid channel... Exiting setup...Please Try again...`);
         if (!channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES', 'ADD_REACTIONS', 'MANAGE_MESSAGES', 'MANAGE_ROLES'])) return message.channel.send('Unicron doesn\'t have permissions to that channel, please give Unicron access to that channel for this to work and try again...Exiting Setup');
@@ -94,12 +97,13 @@ module.exports = class extends BaseCommand {
         guildSettings.verificationEnabled = true;
         await guildSettings.save().catch((e) => { throw e; });
         if (response3.content === 'react') {
-            const m = await channel.send(new MessageEmbed()
+            await channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
                 .setDescription(`This server is protected by [Unicron](${client.unicron.serverInviteURL} 'Unicron's Support Server'), a powerful bot that prevents servers from being raided, React ${await client.getEmoji('yes')} to get yourself verified!`)
-            ).catch(() => { });
-            await m.react(await client.getEmoji('yes')).catch(() => { });
+            ).then((m) => {
+                m.react(await client.getEmoji('yes'))
+            }).catch(() => { });
         }
         message.channel.send('Setup complete!');
     }

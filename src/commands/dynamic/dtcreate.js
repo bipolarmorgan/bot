@@ -36,7 +36,7 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
-                .setDescription('Hey, Dynamic Feature is disabled or Dynamic Category cannot be found, contact server admins to enable/fix this')
+                .setDescription('Hey, Dynamic Feature is disabled or Dynamic Category cannot be found, contact server admins to enable/fix this\nSetup Dynamic Text/Voice System using `config` command!')
             );
         }
         if (message.channel.parentID === category) {

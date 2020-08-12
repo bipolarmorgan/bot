@@ -29,8 +29,9 @@ module.exports = class extends BaseItem {
      * @returns {Promise<boolean|import('discord.js').Message>}
      * @param {import('../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
+     * @param {import('../classes/User')} stats
      */
-    async run(client, message) {
+    async run(client, message, stats) {
         const msg = await message.channel.send('Rolling...');
         await client.wait(3000);
         await msg.edit(`YOU HAVE RECEIVED...`);

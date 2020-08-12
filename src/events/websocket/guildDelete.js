@@ -12,7 +12,6 @@ class guildDelete extends BaseEvent {
     run(client, payload_id) {
         if (client.db.guilds.cache.has(payload_id)) client.db.guilds.cache.delete(payload_id);
         if (client.db.members.cache.has(payload_id)) client.db.members.cache.delete(payload_id);
-        if (client.db.tags.cache.has(payload_id)) client.db.tags.cache.delete(payload_id);
     }
 }
 

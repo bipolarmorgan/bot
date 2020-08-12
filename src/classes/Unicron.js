@@ -11,7 +11,6 @@ const WebSocketEvent = require('./WebSocketEvent');
 const PermissionManager = require('../managers/PermissionManager');
 const API = require('../api/');
 
-const TagManager = require('../managers/TagManager');
 const UserManager = require('../managers/UserManager');
 const GuildManager = require('../managers/GuildManager');
 const MemberManager = require('../managers/MemberManager');
@@ -44,7 +43,6 @@ class Client extends DiscordClient {
         this.server = new API();
         this.permission = new PermissionManager(this);
         this.db = {
-            tags: new TagManager(this),
             users: new UserManager(this),
             guilds: new GuildManager(this),
             members: new MemberManager(this),

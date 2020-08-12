@@ -48,8 +48,9 @@ module.exports = class VoteBox extends BaseItem {
      * @returns {Promise<boolean|import('discord.js').Message>}
      * @param {import('../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
+     * @param {import('../classes/User')} stats
      */
-    async run(client, message) {
+    async run(client, message, stats) {
         const coins = client.utils.Random.nextInt({ max: 3000, min: 1000 });
         const msg = await message.channel.send('Rolling the Vote Box...');
         const theItem = this.prizes[Math.floor(Math.random() * this.prizes.length)];

@@ -22,10 +22,12 @@ module.exports = class extends BaseItem {
      * @returns {Promise<boolean|import('discord.js').Message>}
      * @param {import('../classes/Unicron')} client 
      * @param {import('discord.js').Message} message 
+     * @param {import('../classes/User')} stats
      */
-    async run(client, message) {
-        await message.author.db.levelup(client, message, 20);
-        await message.author.db.inventory.remove(this.config.id);
+    async run(client, message, stats) {
+        stats.addXP(client, message, 20);
+        stats.removeItem(this.config.id);
+        await stats.save().catch((e) => { throw e; });
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()

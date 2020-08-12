@@ -57,13 +57,37 @@ class User {
     }
     get progress() {
         return ((this.experience - this.levelxp /
-            (this.nextlevelxp- this.levelxp))) * 100; // (xp - lxp / nxp - lxp) * 100 = n
+            (this.nextlevelxp - this.levelxp))) * 100; // (xp - lxp / nxp - lxp) * 100 = n
     }
     get progressbar() {
         return Leveling.ProgressBar(this.progress);
     }
     get progressXP() {
         return this.nextlevelxp - this.experience;
+    }
+
+    /**
+     * 
+     * @param {import('./Unicron')} client 
+     * @param {import('discord.js').Message} message 
+     * @param {number} amount 
+     */
+    async addXP(client, message, amount) {
+        const next_level = this.nextlevel;
+        let current_level = this.level;
+        this.experience += amount || client.utils.Random.nextInt({ max: 25, min: 15 });
+        current_level = this.level;
+        if (current_level === next_level) {
+            const prize = Leveling.RequiredLevelChart[current_level] * 2;
+            this.balance += prize;
+            await this.save().catch((e) => { throw e; });
+            message.channel.send(new MessageEmbed()
+                .setColor('0x00FFFF')
+                .setTitle(':arrow_up:   **LEVELUP**   :arrow_up:')
+                .setDescription(`GG, You levelup from **${current_level - 1}** ${await client.getEmoji('join_arrow')} **${current_level}**\nAnd received **${prize}**💰 coins!`)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+            );
+        }
     }
     /**
      * 

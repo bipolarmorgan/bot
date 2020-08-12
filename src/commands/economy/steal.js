@@ -1,22 +1,18 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
-
 const MINIMUM_COINS = 500;
-
 const Offense = {
     car: 30,
     motorcycle: 25,
     pistol: 20,
     dagger: 15,
 };
-
 const Defense = {
     dog: 30,
     shield: 25,
     bow: 20,
     padlock: 15,
 };
-
 /**
  * 
  * @param {import('../../classes/User')} user 
@@ -70,43 +66,48 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/User')} userStats
      */
     async run(client, message, args, g, userStats) {
-        const utarget = await client.resolveUser(args[0]);
+        const utarget = await client.resolveUser(args.join(' '));
         if (!utarget || utarget.bot) {
-            return message.channel.send(new MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription('Sorry, You need to mention a valid user to rob\n\`steal [UserMention|UserID|UserTag]\`')
             );
+            return false;
         }
         if (message.author.equals(utarget)) {
-            return message.channel.send(new MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription('Sorry, you can\'t rob yourself, :P')
             );
+            return false;
         }
-        const target = await client.db.users.fetch(utarget.id).catch(console.log);
+        let target = await client.db.users.fetch(utarget.id).catch(console.log);
+        if (!target) target = await client.db.users.fetch(utarget.id).catch(console.log);
         const tbal = userStats.balance;
         const ubal = target.balance;
         if (tbal < MINIMUM_COINS) {
-            return message.channel.send(new MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription(`Sorry, The victim must have atleast **${MINIMUM_COINS}** coins!`)
             );
+            return false;
         }
         if (ubal < MINIMUM_COINS) {
-            return message.channel.send(new MessageEmbed()
+            message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
                 .setDescription(`Sorry, You must have atleast **${MINIMUM_COINS}** coins to steal from someone!`)
             );
+            return false;
         }
-        const attackPoints = getOffense(message.author.db);
+        const attackPoints = getOffense(userStats);
         const defendPoints = getDefense(target);
         const chance = defendPoints - attackPoints;
         const bchance = 90 + chance;

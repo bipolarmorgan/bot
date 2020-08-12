@@ -25,7 +25,7 @@ module.exports = class extends BaseEvent {
             || !newState.guild.channels.cache.get(waitingRoom)
         ) return;
 
-        if (!!newState.channel) {
+        if (newState.channel) {
             const dvlimit = newState.channel.parentID === category ? 11 : 10;
             if (newState.channel.id === waitingRoom && newState.channel.parent.children.filter((c) => c.type === 'voice').size <= dvlimit) {
                 newState.guild.channels.create(`${newState.member.displayName}'s channel`,
@@ -43,7 +43,7 @@ module.exports = class extends BaseEvent {
                     }).catch(() => { });
             }
         }
-        if (!!oldState.channel) {
+        if (oldState.channel) {
             if (oldState.channel.parent.id === category && oldState.channel.id !== waitingRoom) {
                 if (oldState.channel.members.size === 0) {
                     oldState.channel.delete().catch(() => { });

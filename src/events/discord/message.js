@@ -6,6 +6,10 @@ const BaseEvent = require('../../classes/DiscordEvent');
  * @type {Collection<string, Collection<string, number>>}
  */
 const cooldowns = new Collection();
+/**
+ * @type {Collection<string, boolean>}
+ */
+const xpcooldown = new Collection();
 
 const inviteFilter = require('../../filters/inviteFilter');
 const mentionSpamFilter = require('../../filters/mentionSpamFilter');
@@ -27,7 +31,7 @@ module.exports = class extends BaseEvent {
     async run(client, message, triggerCommand = true) {
 
         if (!message) return;
-        if (message.partial) await message.fetch();
+        if (message.partial) await message.fetch().catch(() => { });
         if (message.author.bot || message.channel.type !== 'text' || !message.guild) return;
         if (!message.channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) return;
         if (!message.member) await message.member.fetch().catch(() => { });
@@ -102,6 +106,9 @@ ${command.options.usage}
         const timestamps = cooldowns.get(command.config.name);
         let cooldownAmount = (command.options.cooldown || 3) * 1000;
         // const bcd = cooldownAmount;
+        /**
+         * @type {import('../../classes/User')}
+         */
         let userStats = await client.db.users.fetch(message.author.id).catch(console.log);
         if (!userStats) userStats = await client.db.users.fetch(message.author.id).catch(console.log);
         const donator = userStats.data && userStats.data.premium || false;
@@ -127,9 +134,14 @@ ${command.options.usage}
             }
         }
         try {
+            if (!xpcooldown.has(message.author.id)) {
+                await userStats.addXP(client, message).catch((e) => { throw e; });
+                xpcooldown.set(message.author.id, true);
+                client.setTimeout(() => xpcooldown.delete(message.author.id), 30000);
+            }
             client.logger.info(`Shard[${message.guild.shardID}][${message.guild.id}] (${message.author.tag}/${message.author.id}) ${commandName} ${args.join(' ')}`);
             const argv = command.argsDefinitions ? Parse(args, command.argsDefinitions) : args;
-            const success = await command.run(client, message, argv, guildSettings, userStats).catch((e) => { throw e });
+            const success = await command.run(client, message, argv, guildSettings, userStats).catch((e) => { throw e; });
             if (success !== false) {
                 timestamps.set(message.author.id, now);
                 setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);

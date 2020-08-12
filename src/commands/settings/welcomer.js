@@ -64,6 +64,7 @@ module.exports = class extends BaseCommand {
                 if (!msg.includes('{user}')) return message.channel.send(`Missing placeholder \`{user}\`... Please try again...`);
                 guildSettings.welcomeMessage = msg;
                 await guildSettings.save().catch((e) => { throw e; });
+                client.emit('guildMemberAdd', message.member);
                 return message.channel.send(`Welcome Message has been set to \n\`${msg}\``);
             }
             case 'enable':
@@ -71,6 +72,7 @@ module.exports = class extends BaseCommand {
                 const stat = key === 'enable';
                 guildSettings.welcomeEnabled = stat;
                 await guildSettings.save().catch((e) => { throw e; });
+                client.emit('guildMemberAdd', message.member);
                 return message.channel.send(`Welcomer has been \`${stat ? 'enabled' : 'disabled'}\`.`);
             }
             default:
