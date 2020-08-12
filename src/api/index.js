@@ -8,6 +8,7 @@ class API extends EventEmitter {
         this.uri = process.env.DATABASE_URI;
     }
     connect() {
+        this.emit('connecting');
         this.ws = io(this.uri);
         this.ws.on('raw', (event, payload) => {
             this.emit('raw', event, payload);

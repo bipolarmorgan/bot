@@ -108,23 +108,6 @@ class Client extends DiscordClient {
         return channel;
     }
     /**
-     * 
-     * @param {string} status 
-     * @param {string} activity 
-     * @param {string} message 
-     */
-    async presenceSet(status, activity, message) {
-        await this.shard.broadcastEval(`
-            this.user.setPresence({
-                status: ['online', 'idle', 'dnd', 'invisible'].includes(${status}) ? ${status} : 'online',
-                activity: {
-                    type: ['PLAYING', 'STREAMING', 'LISTENING', 'WATCHING'].includes(${activity.toUpperCase()}) ? ${activity.toUpperCase()} : 'PLAYING',
-                    name: '${message}',
-                }
-            });
-        `);
-    }
-    /**
      * @returns {Promise<import('discord.js').Emoji>}
      * @param {string} name 
      */
