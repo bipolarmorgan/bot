@@ -1,4 +1,5 @@
 const Leveling = require('../modules/Leveling');
+const { MessageEmbed } = require('discord.js');
 
 class User {
     /**
@@ -56,8 +57,7 @@ class User {
         return Leveling.LevelChart[this.nextlevel];
     }
     get progress() {
-        return ((this.experience - this.levelxp /
-            (this.nextlevelxp - this.levelxp))) * 100; // (xp - lxp / nxp - lxp) * 100 = n
+        return ((this.experience - this.levelxp) / (this.nextlevelxp - this.levelxp)) * 100; // (xp - lxp / nxp - lxp) * 100 = n
     }
     get progressbar() {
         return Leveling.ProgressBar(this.progress);
@@ -104,7 +104,7 @@ class User {
      */
     removeItem(item) {
         const cur = this.inventory.find((t) => t.item_id === item);
-        if (cur && cur.amount >= 1) return cur.amount--;
+        if (cur && cur.amount > 1) return cur.amount--;
         this.inventory = this.inventory.filter((t) => t.item_id !== item);
     }
     /**

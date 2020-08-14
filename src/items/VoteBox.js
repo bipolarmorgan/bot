@@ -70,12 +70,13 @@ module.exports = class VoteBox extends BaseItem {
         }
         await msg.edit(content.replace(/\[.*?\]/g, `[${client.shopitems.get(theItem.id).config.displayname}]`));
         await client.wait(3000);
-        await msg.edit(`:tada: You have received :tada:\n- **${coins}** Coins 💰\n- **${theItem.amount}** ${client.shopitems.get(theItem.id).config.displayname}`)
         for (let i = 0; i < theItem.amount; i++) {
-            await message.author.db.inventory.add(theItem.id);
+            stats.addItem(theItem.id);
         }
-        await message.author.db.coins.add(coins);
-        await message.author.db.levelup(client, message, 130);
-        await message.author.db.inventory.remove(this.config.id);
+        stats.balance += coins;
+        stats.removeItem(this.config.id);
+        await stats.addXP(client, message, 130).catch((e) => { throw e; });
+        await stats.save().catch((e) => { throw e; });
+        msg.edit(`:tada: You have received :tada:\n- **${coins}** Coins 💰\n- **${theItem.amount}** ${client.shopitems.get(theItem.id).config.displayname}`);
     }
 }

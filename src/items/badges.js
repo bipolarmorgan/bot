@@ -39,19 +39,22 @@ module.exports = class extends BaseItem {
         await msg.edit('WAIT WAIT WAIT');
         await msg.delete({ timeout: 3000 });
         const badge = this.badges[Math.floor(Math.random() * this.badges.length)];
-        const badges = await message.author.db.badges.fetch();
-        if (badges.length > 23) {
+        if (!stats.data) stats.data = { badges: [] };
+        if (!stats.data.badges) stats.data.badges = [];
+        if (stats.data.badges.length > 23) {
             return message.channel.send('Oh oh...it seems you already exceeded the maximum amount of badges ;(');
         }
-        if (await message.author.db.badges.has(badge)) {
+        if (stats.hasBadge(badge)) {
             const pp = Math.floor(this.options.price * .4);
-            await message.author.db.coins.add(pp);
-            await message.author.db.inventory.remove(this.config.id);
+            stats.balance += pp;
+            stats.removeItem(this.config.id);
+            await stats.save().catch((e) => { throw e; });
             return message.channel.send(`Oh oh... it seems you already have the ${await client.getEmoji(badge)} ${badge} badge, but you received **${pp}** coins!`);
         }
-        await message.author.db.badges.add(badge);
-        await message.author.db.levelup(client, message, 120);
-        await message.author.db.inventory.remove(this.config.id);
+        stats.addBadge(badge);
+        stats.addXP(client, message, 120).catch((e) => { throw e; });
+        stats.removeItem(this.config.id);
+        await stats.save().catch((e) => { throw e; });
         return message.channel.send(`Yay! you have gotten the ${await client.getEmoji(badge)} ${badge} badge!`);
     }
 }
