@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const GuildTickets = require('../../classes/GuildTickets');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -31,11 +32,19 @@ module.exports = class extends BaseCommand {
     async run(client, message, args, settings) {
         const stat = settings.ticketEnabled;
         const strat = settings.ticketCategory;
-        if (!stat || !strat || !message.guild.channels.cache.get(strat)) {
+        if (!stat || !strat) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this\nSetup Ticket System using `config` command!')
+                .setDescription('Sorry, the Ticket System for this server is currently disabled\nTry setting this up using `config` command or set this up through our dashboard https://unicron-bot.xyz/')
+            );
+        }
+        const category = message.guild.channels.cache.get(strat);
+        if (!category || !category.permissionsFor(client.user).has(['MANAGE_CHANNELS'])) {
+            return message.channel.send(new MessageEmbed()
+                .setColor('RED')
+                .setTimestamp()
+                .setDescription('Oh oh, it seems that the ticket category is deleted or i don\'t have access to it')
             );
         }
         if (message.channel.parentID === strat) {
@@ -45,11 +54,12 @@ module.exports = class extends BaseCommand {
                 .setDescription('Oi, you can\'t create a ticket inside a ticket ;p')
             );
         }
-        if (message.guild.channels.cache.find((ch) => { return ch.type === 'text' && new RegExp(`${message.author.id}`).test(ch.topic) })) {
+        const tickets = new GuildTickets(message.guild.id);
+        if (await tickets.find(message.author.id)) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Oi, you can\'t create a new ticket when you already have an open ticket ;p')
+                .setDescription('Oi, you can\'t create a new ticket when you already have a ticket :p')
             );
         }
         const channel = await message.guild.channels.create(`ticket-${client.utils.Random.string(6)}`, {
@@ -73,15 +83,16 @@ module.exports = class extends BaseCommand {
         }).catch((e) => {
             throw e;
         });
+        await tickets.new({id: message.author.id, issue: args.join(' '), channel: channel.id}).catch((e) => { throw e; });
         await message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setDescription(`Your ticket has been created! <#${channel.id}>\nWe will contact you in the ticket shortly!`)
             .setTimestamp()
             .setAuthor('Unicron Ticket System', client.user.displayAvatarURL({ dynamic: true }))
         );
-        const st = message.guild.roles.cache.find(r => r.name.toLowerCase() === 'support team');
+        const st = message.guild.roles.cache.find((r) => r.name.toLowerCase() === 'support team');
         if (st) {
-            channel.createOverwrite(st, {
+            await channel.createOverwrite(st, {
                 VIEW_CHANNEL: true,
                 SEND_MESSAGES: true,
             }).catch(() => { });

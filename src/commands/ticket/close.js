@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
+const GuildTickets = require('../../classes/GuildTickets');
 
 module.exports = class extends BaseCommand {
     constructor() {
@@ -31,34 +32,40 @@ module.exports = class extends BaseCommand {
     async run(client, message, args, settings) {
         const stat = settings.ticketEnabled;
         const strat = settings.ticketCategory;
-        if (!stat || !strat || !message.guild.channels.cache.get(strat)) {
+        if (!stat || !strat) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Ticket System is disabled or the Ticket Category cannot be found, contact server admins to enable/fix this\nSetup Ticket System using `config` command!')
+                .setDescription('Sorry, the Ticket System for this server is currently disabled\nTry setting this up using `config` command or set this up through our dashboard https://unicron-bot.xyz/')
             );
         }
-        if (message.channel.parentID !== strat) {
+        const category = message.guild.channels.cache.get(strat);
+        if (!category || !category.permissionsFor(client.user).has(['MANAGE_CHANNELS'])) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Oi, you can\'t close this ticket cuz it\'s not a ticket ;p')
+                .setDescription('Oh oh, it seems that the ticket category is deleted or i don\'t have access to it')
             );
         }
-        const response = await client.awaitReply(message, 'Are you sure to close this ticket? yes/no', 15000, true);
-        if (!response || response.content === 'no' || response.content !== 'yes') {
-            return message.channel.send('i guess not.')
-        }
-        const modchannel = message.guild.channels.cache.get(settings.modLogChannel);
-        if (modchannel) {
-            modchannel.send(new MessageEmbed()
-                .setColor('RANDOM')
-                .setTimestamp()
-                .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
-                .setTitle(`Ticket closed`)
-                .setDescription(`Ticket : \`${message.channel.name}\`\nReason : ${args.join(' ') || 'No reason provided'}`)
-            );
-        }
-        await message.channel.delete('Ticket closed.');
+        const db = new GuildTickets(message.guild.id);
+        const ticket = await db.find(id);
+        if (!ticket || message.channel.id !== ticket.channel) return message.channel.send('Oi, you can\'t close this ticket cuz its not a ticket');
+        const support_role = message.guild.roles.cache.find((r) => r.name.toLowerCase() === 'support team');
+        if (message.author.id === ticket.id || (support_role && message.member.roles.cache.has(support_role.id))) {
+            const response = await client.awaitReply(message, 'Are you sure to close this ticket? yes/no', 15000, true);
+            if (!response || response.content.toLowerCase() === 'no' || response.content.toLowerCase() !== 'yes') return message.channel.send('i guess not then');
+            const modchannel = message.guild.channels.cache.get(settings.modLogChannel);
+            if (modchannel) {
+                await modchannel.send(new MessageEmbed()
+                    .setColor('RANDOM')
+                    .setTimestamp()
+                    .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                    .setTitle(`Ticket closed`)
+                    .setDescription(`Ticket : \`${message.channel.name}\`\nReason : ${args.join(' ') || 'No reason provided'}`)
+                ).catch(() => { });
+            }
+            await db.close(ticket.id);
+            await message.channel.delete('Ticket closed.');
+        } else return message.channel.send('Sorry, you don\'t have the permission to close this ticket');
     }
 }

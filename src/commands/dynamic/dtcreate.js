@@ -1,7 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 const { Random } = require('../../utils/');
-
 module.exports = class extends BaseCommand {
     constructor() {
         super({
@@ -88,6 +87,7 @@ module.exports = class extends BaseCommand {
             channel.createOverwrite(st, {
                 VIEW_CHANNEL: true,
                 SEND_MESSAGES: true,
+                MANAGE_CHANNELS: true,
             }).catch(() => { });
         }
         await channel.send(new MessageEmbed()
