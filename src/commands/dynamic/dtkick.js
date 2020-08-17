@@ -5,8 +5,8 @@ module.exports = class extends BaseCommand {
     constructor() {
         super({
             config: {
-                name: 'dtinvite',
-                description: 'Invite a user to your private text channel!',
+                name: 'dtkick',
+                description: 'Kick a user from your private text channel!',
                 permission: 'User',
             },
             options: {
@@ -15,7 +15,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 3,
                 nsfwCommand: false,
                 args: true,
-                usage: 'dtinvite <...Mentions>',
+                usage: 'dtkick <...Mentions>',
                 donatorOnly: false,
                 premiumServer: false,
             }
@@ -42,14 +42,14 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
-                .setDescription('Hey, you can\'t invite users outside a private text channel')
+                .setDescription('Hey, you can\'t kicks users outside a private text channel')
             );
         }
         if (!message.channel.permissionsFor(message.member).has(['MANAGE_CHANNEL'])) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
-                .setDescription('Hey, you can\'t invite users to this private channel')
+                .setDescription('Hey, you can\'t kick users from this private channel')
             );
         }
         const users = message.mentions.users;
@@ -57,14 +57,14 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
-                .setDescription('Hey, you need to mention who you gonna invite to this channel.')
+                .setDescription('Hey, you need to mention who you gonna kick from this channel')
             );
         }
         for (const m of users) {
             await message.channel.createOverwrite(m[0], {
-                SEND_MESSAGES: true,
-                VIEW_CHANNEL: true,
-                READ_MESSAGE_HISTORY: true,
+                SEND_MESSAGES: false,
+                VIEW_CHANNEL: false,
+                READ_MESSAGE_HISTORY: false,
             }).catch(() => { });
         }
         message.channel.send(`Member(s) has been added to this channel`);
