@@ -9,6 +9,7 @@ const Manager = new ShardingManager('./src/Unicron.js', {
     respawn: true,
 });
 
+require('./server')(Manager);
 Manager.spawn();
 
 Manager.on('shardCreate', (shard) => {

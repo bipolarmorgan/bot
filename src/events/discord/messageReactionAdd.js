@@ -35,7 +35,7 @@ module.exports = class extends BaseEvent {
                     .setColor(0x00FF00)
                     .setTimestamp()
                     .setDescription(`You have been verified <@${user.id}>`)
-                ).then(async m => {
+                ).then(async (m) => {
                     m.delete({ timeout: 5000 }).catch(() => { });
                 });
             }

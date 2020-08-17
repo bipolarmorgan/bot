@@ -147,7 +147,7 @@ class Guild {
             warnActionDuration: this.warnActionDuration,
             welcomeChannel: this.welcomeChannel,
             welcomeMessage: this.welcomeMessage,
-            welcomeEnabled: this.farewellEnabled,
+            welcomeEnabled: this.welcomeEnabled,
             farewellChannel: this.farewellChannel,
             farewellMessage: this.farewellMessage,
             farewellEnabled: this.farewellEnabled,

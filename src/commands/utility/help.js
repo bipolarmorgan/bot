@@ -89,7 +89,7 @@ module.exports = class extends BaseCommand {
         return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTitle('Unicron\'s Commands')
-            .setDescription(`Join our [Support Server](${client.unicron.serverInviteURL}) for help and awesome updates!\n\nWebsite https://unicron-bot.xyz/ **(Coming soon)**\nDocumentation https://docs.unicron-bot.xyz/`)
+            .setDescription(`Join our [Support Server](${client.unicron.serverInviteURL}) for help and awesome updates!\n\nWebsite Dashboard https://unicron-bot.xyz/\nDocumentation https://docs.unicron-bot.xyz/`)
             .addField(`${await client.getEmoji('staff')} Moderation`, `\`${prefix}help moderation\``, true)
             .addField(`${await client.getEmoji('settings')} Settings`, `\`${prefix}help settings\``, true)
             .addField(`🎫 Ticket System`, `\`${prefix}help ticket\``, true)

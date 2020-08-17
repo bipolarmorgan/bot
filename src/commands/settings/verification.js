@@ -101,8 +101,8 @@ module.exports = class extends BaseCommand {
                 .setColor(0x00FF00)
                 .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
                 .setDescription(`This server is protected by [Unicron](${client.unicron.serverInviteURL} 'Unicron's Support Server'), a powerful bot that prevents servers from being raided, React ${await client.getEmoji('yes')} to get yourself verified!`)
-            ).then((m) => {
-                m.react(await client.getEmoji('yes'))
+            ).then(async (m) => {
+                m.react(await client.getEmoji('yes'));
             }).catch(() => { });
         }
         message.channel.send('Setup complete!');

@@ -18,6 +18,10 @@ module.exports = class extends BaseEvent {
         if (!channel_id || !enabled || !message) return;
         const channel = await client.channels.fetch(channel_id).catch(() => { });
         if (!channel || channel.type !== 'text') return;
-        channel.send(message.replace('{user}', member.user.tag)).catch(() => { });
+        channel.send(message
+            .replace('{user}', member.user.tag)
+            .replace(/@everyone/g, '@' + String.fromCharCode(8203) + 'everyone')
+            .replace(/@here/g, '@' + String.fromCharCode(8203) + 'here')
+        ).catch(() => { });
     }
 }

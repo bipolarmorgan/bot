@@ -35,7 +35,7 @@ module.exports = class extends BaseEvent {
                         permissionOverwrites: [
                             {
                                 id: newState.member.id,
-                                allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD']
+                                allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD', 'MANAGE_ROLES']
                             }
                         ]
                     }).then(channel => {
