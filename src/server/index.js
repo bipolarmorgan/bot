@@ -60,7 +60,7 @@ module.exports = (manager) => {
             const rolesCC = await manager.broadcastEval(`this.guilds.cache.get('${id}').roles`);
             const roles = rolesCC.find((c) => c);
             if (!roles) return res.status(404).send({ message: 'roles not found '});
-            const retval = roles.cache.filter((r) => !r.managed).map((c) => {
+            const retval = roles.cache.filter((r) => !r.managed && (roles.everyone !== r)).map((c) => {
                 return {
                     id: c.id,
                     name: c.name,
