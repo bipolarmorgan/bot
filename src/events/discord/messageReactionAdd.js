@@ -12,7 +12,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client, reaction, user) {
         try {
-            if (reaction.partial) await reaction.fetch();
+            if (reaction.partial) await reaction.fetch().catch(() => { });
             if (user.bot) return;
             if (!reaction.message.guild) return;
             let guild = await client.db.guilds.fetch(reaction.message.guild.id).catch(console.log);
@@ -37,7 +37,7 @@ module.exports = class extends BaseEvent {
                     .setDescription(`You have been verified <@${user.id}>`)
                 ).then(async (m) => {
                     m.delete({ timeout: 5000 }).catch(() => { });
-                });
+                }).catch(() => { });
             }
         } catch (e) {
             client.logger.error(e);

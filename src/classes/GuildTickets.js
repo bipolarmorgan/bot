@@ -9,7 +9,7 @@ class GuildTickets {
      * @param {{id:string,issue:string,channel:string}} opts
      */
     async new(opts) {
-        let tt = await Tickets.findOne({ where: { guild_id: this.id }});
+        let tt = await Tickets.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Tickets.create({ guild_id: this.id });
         const index = tt.sequence;
         const ticket = Object.assign({
@@ -17,8 +17,9 @@ class GuildTickets {
             case: index,
         }, opts);
         tt.sequence++;
+        if (!tt.data) tt.data = [];
         tt.data.push(ticket);
-        await tt.save();
+        await Tickets.update({ sequence: tt.sequence, data: tt.data }, { where: { guild_id: this.id } });
         return ticket.case;
     }
     /**
@@ -26,25 +27,24 @@ class GuildTickets {
      * @param {string} id 
      */
     async close(id) {
-        let tt = await Tickets.findOne({ where: { guild_id: this.id }});
+        let tt = await Tickets.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Tickets.create({ guild_id: this.id });
-        tt.data = tt.data.filter((ticket) => ticket.id !== id);
-        return tt.save();
+        await Tickets.update({ data: tt.data.filter((ticket) => ticket.id !== id) }, { where: { guild_id: this.id } });
     }
     /**
      * @returns {Promise<{id:string,issue:string,channel:string,case:number,date:string}>}
      * @param {string} id 
      */
-    async find(id){
-        let tt = await Tickets.findOne({ where: { guild_id: this.id }});
+    async find(id) {
+        let tt = await Tickets.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Tickets.create({ guild_id: this.id });
-        return tt.data.includes({id}) ? tt.data.find((t) => t.id === id) : null;
+        return tt.data.find((t) => t.id === id || t.channel === id);
     }
     /**
      * @returns {Promise<{id:string,issue:string,channel:string,case:number,date:string}[]>}
      */
     async list() {
-        let tt = await Tickets.findOne({ where: { guild_id: this.id }});
+        let tt = await Tickets.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Tickets.create({ guild_id: this.id });
         return tt.data;
     }

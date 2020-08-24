@@ -44,14 +44,17 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setDescription('Oh oh, it seems that the ticket category is deleted or i don\'t have access to it')
+                .setDescription('Oh oh, it seems that the ticket category is/was deleted or i don\'t have access to it')
             );
         }
         const db = new GuildTickets(message.guild.id);
-        const ticket = await db.find(id);
+        const ticket = await db.find(message.author.id);
         if (!ticket || message.channel.id !== ticket.channel) return message.channel.send('Oi, you can\'t close this ticket cuz its not a ticket');
         const support_role = message.guild.roles.cache.find((r) => r.name.toLowerCase() === 'support team');
-        if (message.author.id === ticket.id || (support_role && message.member.roles.cache.has(support_role.id))) {
+        if (message.author.id === ticket.id ||
+            (support_role && message.member.roles.cache.has(support_role.id)) ||
+            message.member.permissions.has('MANAGE_GUILD')
+        ) {
             const response = await client.awaitReply(message, 'Are you sure to close this ticket? yes/no', 15000, true);
             if (!response || response.content.toLowerCase() === 'no' || response.content.toLowerCase() !== 'yes') return message.channel.send('i guess not then');
             const modchannel = message.guild.channels.cache.get(settings.modLogChannel);

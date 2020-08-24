@@ -55,7 +55,8 @@ module.exports = class extends BaseCommand {
             );
         }
         const tickets = new GuildTickets(message.guild.id);
-        if (await tickets.find(message.author.id)) {
+        const cur = await tickets.find(message.author.id);
+        if (cur) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
@@ -83,7 +84,7 @@ module.exports = class extends BaseCommand {
         }).catch((e) => {
             throw e;
         });
-        await tickets.new({id: message.author.id, issue: args.join(' '), channel: channel.id}).catch((e) => { throw e; });
+        await tickets.new({ id: message.author.id, issue: args.join(' '), channel: channel.id }).catch((e) => { throw e; });
         await message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setDescription(`Your ticket has been created! <#${channel.id}>\nWe will contact you in the ticket shortly!`)

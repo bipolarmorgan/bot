@@ -5,8 +5,8 @@ module.exports = class extends BaseCommand {
     constructor() {
         super({
             config: {
-                name: 'dtinvite',
-                description: 'Invite a user to your private text channel!',
+                name: 'dtunmute',
+                description: 'Unmute a user from your private text channel!',
                 permission: 'User',
             },
             options: {
@@ -15,7 +15,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 3,
                 nsfwCommand: false,
                 args: true,
-                usage: 'dtinvite <User>',
+                usage: 'dtunmute <User>',
                 donatorOnly: false,
                 premiumServer: false,
             }
@@ -50,14 +50,14 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Hey, you can\'t invite users outside a private text channel')
+                .setDescription('Hey, you can\'t unmute users outside a private text channel')
             );
         }
         if (!message.channel.permissionsFor(message.member).has(['MANAGE_CHANNEL'])) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Hey, you can\'t invite users to this private channel')
+                .setDescription('Hey, you can\'t unmute users from this private channel')
             );
         }
         const target = message.mentions.users.first();
@@ -65,14 +65,12 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription('Hey, you need to mention who you gonna invite to this channel.')
+                .setDescription('Hey, you need to mention who you gonna unmute from this channel.')
             );
         }
-        await message.channel.createOverwrite(target, {
+        await message.channel.updateOverwrite(target, {
             SEND_MESSAGES: true,
-            VIEW_CHANNEL: true,
-            READ_MESSAGE_HISTORY: true,
         }).catch(() => { });
-        message.channel.send(`${target} has been invited to this channel`);
+        message.channel.send(`${target} has been unmuted from this channel`);
     }
 }

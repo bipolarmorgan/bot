@@ -26,8 +26,7 @@ module.exports = class extends BaseEvent {
         ) return;
 
         if (newState.channel) {
-            const dvlimit = newState.channel.parentID === category ? 11 : 10;
-            if (newState.channel.id === waitingRoom && newState.channel.parent.children.filter((c) => c.type === 'voice').size <= dvlimit) {
+            if (newState.channel.id === waitingRoom) {
                 newState.guild.channels.create(`${newState.member.displayName}'s channel`,
                     {
                         type: 'voice',
@@ -38,7 +37,7 @@ module.exports = class extends BaseEvent {
                                 allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD', 'MANAGE_ROLES']
                             }
                         ]
-                    }).then(channel => {
+                    }).then((channel) => {
                         newState.setChannel(channel).catch(() => { });
                     }).catch(() => { });
             }

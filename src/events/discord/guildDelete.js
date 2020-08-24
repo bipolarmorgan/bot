@@ -10,7 +10,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client, guild) {
         const channel = await client.channels.fetch(client.unicron.channel, false);
-        channel.send(`Unicron left \`${guild.name}\``);
+        channel.send(`Unicron left \`${guild.name}\` / \`${guild.id}\``);
         client.shard.broadcastEval(`
             this.user.setPresence({
                 activity: {
