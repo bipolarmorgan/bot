@@ -31,7 +31,7 @@ module.exports = class extends BaseItem {
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
-            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             .setDescription('Uh HUH! this cookieeeeeeeee!')
         );
     }

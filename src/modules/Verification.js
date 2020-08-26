@@ -23,8 +23,7 @@ module.exports = (client, message, settings) => {
                 /**
                  * @type {import('../classes/Member')}
                  */
-                let member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
-                if (!member) member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
+                const member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
                 verified = message.content === `>verify ${member.data.captcha}`;
             }
             if (!verified) return;
@@ -32,9 +31,9 @@ module.exports = (client, message, settings) => {
                 .setColor(0x00FF00)
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, you have been verified!`)
-            ).then((m) => {
-                m.delete({ timeout: 5000 }).catch(() => { });
-                if (!message.member.roles.cache.has(role)) message.member.roles.add(role).catch(() => { });
+            ).then(async (m) => {
+                await m.delete({ timeout: 5000 });
+                await message.member.roles.add(role);
             }).catch(() => { });
             resolve(true);
         } catch (e) {

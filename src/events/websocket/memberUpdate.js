@@ -15,7 +15,6 @@ class memberUpdate extends BaseEvent {
         if (!client.db.members.cache.has(payload.guild_id)) client.db.members.cache.set(payload.guild_id, new Collection());
         const members = client.db.members.cache.get(payload.guild_id);
         members.set(payload.member.id, new Member(client, payload));
-        client.db.members.cache.set(payload.guild_id, members);
     }
 }
 

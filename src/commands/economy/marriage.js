@@ -34,14 +34,14 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
-                .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }) || null)
+                .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))
                 .setDescription('Not married to someone else, kek')
             );
         }
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
-            .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }) || null)
+            .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))
             .setTitle('Marriage Certificate')
             .setDescription(`<@${target.id}> ❤️ <@${t.marriage_id}>`)
         );

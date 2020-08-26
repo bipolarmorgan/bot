@@ -16,7 +16,7 @@ class UserManager extends BaseManager {
         return new Promise(async (resolve, reject) => {
             if (this.cache.has(user_id)) return resolve(this.cache.get(user_id));
             await this.client.server.get(`/api/user/${user_id}`).catch(reject);
-            resolve(this.cache.get(user_id));
+            process.nextTick(() => resolve(this.cache.get(user_id)));
         });
     }
     /**

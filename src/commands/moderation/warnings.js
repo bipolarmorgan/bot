@@ -35,8 +35,7 @@ module.exports = class extends BaseCommand {
         /**
          * @type {import('../../classes/Member')}
          */
-        let mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
-        if (!mem) mem = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        const mem = await client.db.members.fetch(message.guild.id, target.id).catch((e) => { throw e; });
         if (!mem.data || !mem.data.warnings || !mem.data.warnings.length) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')

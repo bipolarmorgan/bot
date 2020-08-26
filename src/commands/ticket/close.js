@@ -67,7 +67,6 @@ module.exports = class extends BaseCommand {
                     .setDescription(`Ticket : \`${message.channel.name}\`\nReason : ${args.join(' ') || 'No reason provided'}`)
                 ).catch(() => { });
             }
-            await db.close(ticket.id);
             await message.channel.delete('Ticket closed.');
         } else return message.channel.send('Sorry, you don\'t have the permission to close this ticket');
     }

@@ -98,7 +98,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RANDOM')
                 .setAuthor(`${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || message.guild.iconURL())
                 .setTimestamp()
-                .setThumbnail(target.displayAvatarURL({ dynamic: true }) || null)
+                .setThumbnail(target.displayAvatarURL({ dynamic: true }))
                 .setDescription(`**Member** : ${target.tag} / ${target.id}\n**Action** : Kick\n**Reason** : ${_reason}`)
             ).catch(() => { });
         }

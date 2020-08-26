@@ -33,7 +33,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription('Error: Cannot show balance of a bot user.'));
         }
-        const user = await client.db.users.fetch(target.id);
+        const user = await client.db.users.fetch(target.id).catch((e) => { throw e; });
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))

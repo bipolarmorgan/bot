@@ -19,7 +19,18 @@ class MemberManager extends BaseManager {
         if (!this.cache.has(guild_id)) this.cache.set(guild_id, new Collection());
         return new Promise(async (resolve, reject) => {
             await this.client.server.get(`/api/member/${guild_id}/${member_id}`).catch(reject);
-            resolve(this.cache.get(guild_id).get(member_id));
+            process.nextTick(() => resolve(this.cache.get(guild_id).get(member_id)));
+        });
+    }
+    /**
+     * @returns {Promise<void>}
+     * @param {string} guild_id
+     * @param {string} member_id
+     */
+    delete(guild_id, member_id) {
+        return new Promise(async (resolve, reject) => {
+            await this.client.server.delete(`/api/member/${guild_id}/${member_id}`).catch(reject);
+            resolve();
         });
     }
     /**

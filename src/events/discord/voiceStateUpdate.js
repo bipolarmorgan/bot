@@ -10,8 +10,7 @@ module.exports = class extends BaseEvent {
      * @param {import('discord.js').VoiceState} newState
      */
     async run(client, oldState, newState) {
-        let db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
-        if (!db) db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
+        const db = await client.db.guilds.fetch(oldState.guild.id).catch(console.log);
         const enabled = db.dynamicEnabled;
         const waitingRoom = db.dynamicRoom;
         const category = db.dynamicCategory;
@@ -34,7 +33,11 @@ module.exports = class extends BaseEvent {
                         permissionOverwrites: [
                             {
                                 id: newState.member.id,
-                                allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD', 'MANAGE_ROLES']
+                                allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD', 'MANAGE_ROLES', 'CONNECT']
+                            },
+                            {
+                                id: client.user.id,
+                                allow: ['MANAGE_CHANNELS', 'MANAGE_ROLES', 'VIEW_CHANNEL', 'CONNECT']
                             }
                         ]
                     }).then((channel) => {

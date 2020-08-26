@@ -11,8 +11,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client, member) {
         if (member.user.bot) return;
-        let guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
-        if (!guild) guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
+        const guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         const verifier = guild.verificationType;
         if (['discrim', 'captcha'].includes(verifier)) {
             const enabled = guild.verificationEnabled;
@@ -20,10 +19,8 @@ module.exports = class extends BaseEvent {
             const role = guild.verificationRole;
             const vChannel = member.guild.channels.cache.get(channel);
             const vRole = member.guild.roles.cache.get(role);
-            const stat = enabled && channel && role && vChannel && vRole;
-            if (stat) {
-                let memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
-                if (!memberStats) memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
+            if (enabled && channel && role && vChannel && vRole) {
+                const memberStats = await client.db.members.fetch(member.guild.id, member.user.id).catch(console.log);
                 if (!memberStats.data) memberStats.data = {};
                 memberStats.data.captcha = client.utils.Random.string(8);
                 await memberStats.save().catch(console.log);
@@ -65,6 +62,7 @@ module.exports = class extends BaseEvent {
         if (!channel || channel.type !== 'text') return;
         channel.send(message
             .replace('{user}', member.user)
+            .replace('{userTag}', member.user.tag)
             .replace(/@everyone/g, '@' + String.fromCharCode(8203) + 'everyone')
             .replace(/@here/g, '@' + String.fromCharCode(8203) + 'here')
         ).catch(() => { });

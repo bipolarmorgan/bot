@@ -29,8 +29,7 @@ module.exports = class extends BaseCommand {
     async run(client, message, args) {
         const target = await client.resolveUser(args[0]);
         if (!target || target.bot) return message.channel.send(`I can't clear the warnings of an invalid user :/`);
-        let member = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
-        if (!member) member = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        const member = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
         if (member.data && member.data.warnings) {
             member.data.warnings = [];
             await member.save().catch((e) => { throw e; });

@@ -71,7 +71,7 @@ module.exports = class extends BaseCommand {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription('Sorry, You need to mention a valid user to rob\n\`steal [UserMention|UserID|UserTag]\`')
             );
             return false;
@@ -80,20 +80,19 @@ module.exports = class extends BaseCommand {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription('Sorry, you can\'t rob yourself, :P')
             );
             return false;
         }
-        let target = await client.db.users.fetch(utarget.id).catch(console.log);
-        if (!target) target = await client.db.users.fetch(utarget.id).catch(console.log);
+        const target = await client.db.users.fetch(utarget.id).catch(console.log);
         const tbal = userStats.balance;
         const ubal = target.balance;
         if (tbal < MINIMUM_COINS) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription(`Sorry, The victim must have atleast **${MINIMUM_COINS}** coins!`)
             );
             return false;
@@ -102,7 +101,7 @@ module.exports = class extends BaseCommand {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription(`Sorry, You must have atleast **${MINIMUM_COINS}** coins to steal from someone!`)
             );
             return false;
@@ -135,7 +134,7 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setTimestamp()
-                .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription(`You successfully robbed <@${utarget.id}> and your payout is **${payout}** coins!`)
             );
         }
@@ -161,7 +160,7 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RANDOM')
                 .setTimestamp()
-                .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription(`You got caught by the authorities and paid **${lmao}** coins to stay out of prison, OHHH.`)
             );
         }
@@ -172,7 +171,7 @@ module.exports = class extends BaseCommand {
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
-            .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }) || null)
+            .setFooter(`${chance}% Bonus Chance | ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
             .setDescription(`You got caught, and paid **${MINIMUM_COINS}** to the victim, OHHH`)
         );
     }

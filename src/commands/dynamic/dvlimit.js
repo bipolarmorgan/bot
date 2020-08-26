@@ -46,7 +46,7 @@ module.exports = class extends BaseCommand {
                 .setDescription('Oh oh, it seems that the dynamic category is deleted or i don\'t have access to it')
             );
         }
-        if (!message.member.voice) {
+        if (!message.member.voice.channel) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
@@ -65,8 +65,16 @@ module.exports = class extends BaseCommand {
          */
         const channel = message.guild.channels.cache.get(message.member.voice.channelID);
 
+        if (!channel.permissionsFor(message.author).has('MANAGE_CHANNELS')) {
+            return message.channel.send(new MessageEmbed()
+                .setColor('RED')
+                .setTimestamp()
+                .setDescription('Sorry you are not allowed to do that')
+            );
+        }
+
         const userLimit = Number(args[0]);
-        if (isNaN(limit) || userLimit < 1) {
+        if (isNaN(userLimit) || userLimit < 1) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()

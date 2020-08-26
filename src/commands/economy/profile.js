@@ -33,8 +33,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RED')
                 .setDescription('Sorry, i cannot show the profile of a bot user.'));
         }
-        let profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
-        if (!profile) profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        const profile = await client.db.users.fetch(target.id).catch((e) => { throw e; });
         const badges = profile.data.badges ? client.chunk(profile.data.badges, 8) : [];
         const balance = profile.balance;
         const inventory = profile.inventory;
@@ -54,7 +53,7 @@ module.exports = class extends BaseCommand {
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
-            .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }) || null)
+            .setAuthor(target.tag, target.displayAvatarURL({ dynamic: true }))
             .addField('**Progress**', `**${level}** [${progress}](${client.unicron.serverInviteURL}) **${level + 1}**\n**${req}** - remaining`, true)
             .addField('**Badges**', badgeText, true)
             .addField('\u200b', '\u200b', true)

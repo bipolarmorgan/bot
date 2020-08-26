@@ -74,7 +74,6 @@ module.exports = class extends BaseCommand {
          * @type {import('../../classes/Member')}
          */
         let instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
-        if (!instance) instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
         const index = instance.addWarn(_reason, message.author);
         if (duration && !isNaN(duration)) {
             setTimeout(() => {
@@ -90,7 +89,7 @@ module.exports = class extends BaseCommand {
                 .setColor('RANDOM')
                 .setAuthor(`${message.author.tag} / ${message.author.id}`, message.author.displayAvatarURL({ dynamic: true }))
                 .setTimestamp()
-                .setThumbnail(target.displayAvatarURL({ dynamic: true }) || null)
+                .setThumbnail(target.displayAvatarURL({ dynamic: true }))
                 .setDescription(`**Member** : ${target.tag} / ${target.id}\n**Action** : Warn\n**Reason** : ${_reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
             );
         }

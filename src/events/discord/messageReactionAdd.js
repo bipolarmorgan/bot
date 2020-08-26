@@ -15,8 +15,7 @@ module.exports = class extends BaseEvent {
             if (reaction.partial) await reaction.fetch().catch(() => { });
             if (user.bot) return;
             if (!reaction.message.guild) return;
-            let guild = await client.db.guilds.fetch(reaction.message.guild.id).catch(console.log);
-            if (!guild) guild = await client.db.guilds.fetch(reaction.message.guild.id).catch(console.log);
+            const guild = await client.db.guilds.fetch(reaction.message.guild.id).catch(console.log);
             const isReact = guild.verificationType;
             const channel_id = guild.verificationChannel;
             const status = guild.verificationEnabled;

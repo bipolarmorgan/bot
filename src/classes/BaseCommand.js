@@ -6,7 +6,7 @@ class Command {
      * @param {Object} props.config
      * @param {string} props.config.name Command Name
      * @param {string} props.config.description Command Description
-     * @param {"User"|"Server Moderator"|"Server Administrator"|"Server Owner"|"Bot Staff"|"Bot Owner"} props.config.permission Command Permission Level
+     * @param {'User'|'Server Moderator'|'Server Administrator'|'Server Owner'|'Bot Staff'|'Bot Owner'} props.config.permission Command Permission Level
      * 
      * @param {Object} props.options
      * @param {Array<string>} props.options.aliases

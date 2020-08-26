@@ -1,14 +1,10 @@
 const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
 
 /**
  * @param {import('discord.js').ShardingManager} manager
  */
 module.exports = (manager) => {
     const app = express();
-    app.use(cors());
-    app.use(helmet());
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     app.get('/api/guilds', async (req, res) => {
@@ -21,7 +17,7 @@ module.exports = (manager) => {
             guildCC.map((gc) => {
                 gc.map((g) => {
                     guilds.push(g.id);
-                })
+                });
             })
             res.status(200).json(guilds);
         } catch (e) {
@@ -60,7 +56,7 @@ module.exports = (manager) => {
             const rolesCC = await manager.broadcastEval(`this.guilds.cache.get('${id}').roles`);
             const roles = rolesCC.find((c) => c);
             if (!roles) return res.status(404).send({ message: 'roles not found '});
-            const retval = roles.cache.filter((r) => !r.managed && (roles.everyone !== r)).map((c) => {
+            const retval = roles.cache.filter((r) => !r.managed && r.name !== '@everyone').map((c) => {
                 return {
                     id: c.id,
                     name: c.name,

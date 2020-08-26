@@ -28,7 +28,8 @@ class GuildTexts {
     async close(id) {
         let tt = await Texts.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Texts.create({ guild_id: this.id });
-        await Texts.update({ data: tt.data.filter((text) => text.id !== id) }, { where: { guild_id: this.id } });
+        tt.data = tt.data.filter((text) => text.channel !== id);
+        await Texts.update({ data: tt.data }, { where: { guild_id: this.id } });
     }
     /**
      * @returns {Promise<{id:string,channel:string,sequence:number,date:string}>}

@@ -33,8 +33,7 @@ module.exports = class extends BaseCommand {
         /**
          * @type {import('../../classes/User')}
          */
-        let userp = await client.db.users.fetch(target.id).catch(console.log);
-        if (!userp) userp = await client.db.users.fetch(target.id).catch(console.log);
+        const userp = await client.db.users.fetch(target.id).catch((e) => { throw e; });
         const items = userp.inventory;
         if (!items.length) {
             message.channel.send(new MessageEmbed()

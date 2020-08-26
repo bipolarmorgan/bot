@@ -83,8 +83,7 @@ module.exports = class extends BaseCommand {
                 .setDescription('Sorry, please enter an amount greater than **100**')
             );
         }
-        let transferTarget = await client.db.users.fetch(target.id).catch((e) => { throw e; });
-        if (!transferTarget) transferTarget = await client.db.users.fetch(target.id).catch((e) => { throw e; });
+        const transferTarget = await client.db.users.fetch(target.id).catch((e) => { throw e; });
         userStats.balance -= transferAmount;
         transferTarget.balance += transferAmount;
         await userStats.save().catch((e) => { throw e; });

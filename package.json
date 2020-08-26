@@ -6,12 +6,10 @@
     "dependencies": {
         "bufferutil": "^4.0.1",
         "chalk": "^4.1.0",
-        "cors": "^2.8.5",
         "dbots": "^5.0.4",
         "discord.js": "^12.3.1",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
-        "helmet": "^4.0.0",
         "mathjs": "^7.1.0",
         "minimist": "^1.2.5",
         "minimist-options": "^4.1.0",

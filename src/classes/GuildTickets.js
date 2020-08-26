@@ -29,7 +29,8 @@ class GuildTickets {
     async close(id) {
         let tt = await Tickets.findOne({ where: { guild_id: this.id } });
         if (!tt) tt = await Tickets.create({ guild_id: this.id });
-        await Tickets.update({ data: tt.data.filter((ticket) => ticket.id !== id) }, { where: { guild_id: this.id } });
+        tt.data = tt.data.filter((ticket) => ticket.channel !== id);
+        await Tickets.update({ data: tt.data }, { where: { guild_id: this.id } });
     }
     /**
      * @returns {Promise<{id:string,issue:string,channel:string,case:number,date:string}>}

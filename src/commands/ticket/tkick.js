@@ -6,8 +6,8 @@ module.exports = class extends BaseCommand {
     constructor() {
         super({
             config: {
-                name: 'tinvite',
-                description: 'Invite a user to a ticket using this command!',
+                name: 'tkick',
+                description: 'Kick a user from a ticket using this command!',
                 permission: 'User',
             },
             options: {
@@ -16,7 +16,7 @@ module.exports = class extends BaseCommand {
                 cooldown: 10,
                 nsfwCommand: false,
                 args: true,
-                usage: 'tinvite <User>',
+                usage: 'tkick <User>',
                 donatorOnly: false,
                 premiumServer: false,
             }

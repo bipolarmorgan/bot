@@ -46,7 +46,7 @@ module.exports = class extends BaseCommand {
                 .setDescription('Oh oh, it seems that the dynamic category is deleted or i don\'t have access to it')
             );
         }
-        if (!message.member.voice) {
+        if (!message.member.voice.channel) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
@@ -64,10 +64,24 @@ module.exports = class extends BaseCommand {
          * @type {import('discord.js').VoiceChannel}
          */
         const channel = message.guild.channels.cache.get(message.member.voice.channelID);
+        if (!channel.permissionsFor(message.author).has('MANAGE_CHANNELS')) {
+            return message.channel.send(new MessageEmbed()
+                .setColor('RED')
+                .setTimestamp()
+                .setDescription('Sorry you are not allowed to do that')
+            );
+        }
         try {
-            await channel.updateOverwrite(message.guild.roles.everyone, {
-                CONNECT: true,
-            }).catch((e) => { throw e });
+            await channel.overwritePermissions([
+                {
+                    id: message.author.id,
+                    allow: ['MANAGE_CHANNELS', 'MOVE_MEMBERS', 'USE_VAD', 'MANAGE_ROLES', 'CONNECT'],
+                },
+                {
+                    id: client.user.id,
+                    allow: ['MANAGE_CHANNELS', 'MANAGE_ROLES', 'VIEW_CHANNEL', 'CONNECT']
+                },
+            ]);
             message.channel.send('Your voice channel has been unlocked!');
         } catch (error) {
             message.channel.send(`Oh oh, something went wrong setting the unlocking the voice channel\n${error.message}`);

@@ -50,7 +50,7 @@ module.exports = class extends BaseCommand {
         if (message.channel.parentID === category) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null)
+                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                 .setDescription('Hey, you can\'t create a dynamic text inside a dynamic text channel')
             );
         }
@@ -82,6 +82,7 @@ module.exports = class extends BaseCommand {
                 }
             ],
         }).catch((e) => { throw e });
+        await texts.open({id: message.author.id, channel: channel.id });
         await message.channel.send(new MessageEmbed()
             .setColor(0x00FF00)
             .setDescription(`Your private text channel has been created! <#${channel.id}>`)
@@ -102,12 +103,18 @@ module.exports = class extends BaseCommand {
             .setDescription(`Hello ${message.author.tag}, welcome to your own private text channel!\n
 Private Text Channel Commands!
 \`\`\`bash
-dtinvite <User> # to invite users to this text channel
-dtkick <User> # to kick users from this text channel
-dtmute <User> # to mute a user from this text channel
-dtunmute <User> # to unmute a user from this text channel
-dtname <Name> # to rename this channel's name
-dtclose # to delete/close this text channel
+dtinvite <User> 
+# to invite users to this text channel
+dtkick <User> 
+# to kick users from this text channel
+dtmute <User> [Duration] 
+# to mute a user from this text channel
+dtunmute <User> 
+# to unmute a user from this text channel
+dtname <Name> 
+# to rename this channel's name
+dtclose 
+# to delete/close this text channel
 \`\`\`
             `)
         );

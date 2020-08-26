@@ -85,7 +85,7 @@ module.exports = (client, message, member, settings) => {
                     .setColor('RANDOM')
                     .setAuthor(`${client.user.tag} / ${client.user.id}`, client.user.displayAvatarURL({ dynamic: true }))
                     .setTimestamp()
-                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }) || null)
+                    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
                     .setDescription(`**Member** : ${message.author.tag} / ${message.author.id}\n**Action** : ${action}\n**Reason** : ${reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
                 ).catch(() => { });
             }

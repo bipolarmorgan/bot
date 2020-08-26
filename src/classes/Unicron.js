@@ -14,6 +14,7 @@ const API = require('../api/');
 const UserManager = require('../managers/UserManager');
 const GuildManager = require('../managers/GuildManager');
 const MemberManager = require('../managers/MemberManager');
+const CooldownManager = require('../managers/CooldownManager');
 
 class Client extends DiscordClient {
     constructor() {
@@ -46,11 +47,12 @@ class Client extends DiscordClient {
             users: new UserManager(this),
             guilds: new GuildManager(this),
             members: new MemberManager(this),
+            cooldowns: new CooldownManager(this),
         }
     }
     async superlogin() {
         this.server.connect();
-        await this.login(process.env.BOT_TOKEN);
+        await this.login(process.env.DISCORD_TOKEN);
     }
     async register() {
         await this.registerItems();
@@ -112,6 +114,7 @@ class Client extends DiscordClient {
      * @param {string} name 
      */
     getEmoji(name) {
+        if (this.emojis.cache.has(Emotes[name])) return this.emojis.cache.get(Emotes[name]);
         if (this.botEmojis.has(name)) return this.botEmojis.get(name);
         function findEmoji(id) {
             const temp = this.emojis.cache.get(id);
@@ -125,7 +128,7 @@ class Client extends DiscordClient {
             return resolve(
                 await this.shard.broadcastEval(`(${findEmoji}).call(this, '${Emotes[name]}')`)
                     .then((arr) => {
-                        const femoji = arr.find(emoji => emoji);
+                        const femoji = arr.find((emoji) => emoji);
                         if (!femoji) return null;
                         return this.api.guilds(femoji.guild)
                             .get()
@@ -248,7 +251,7 @@ class Client extends DiscordClient {
     }
     /**
      * @returns {Promise<number>}
-     * @param {"users"|"guilds"} props 
+     * @param {'users'|'guilds'} props 
      */
     async getCount(props) {
         if (props === 'users') {
@@ -293,7 +296,7 @@ class Client extends DiscordClient {
     /**
      * 
      * @param {string} text 
-     * @param {"encode"|"decode"} mode 
+     * @param {'encode'|'decode'} mode 
      */
     base64(text, mode = 'encode') {
         if (mode === 'encode') return Buffer.from(text).toString('base64');
@@ -307,12 +310,12 @@ class Client extends DiscordClient {
      * @param {string} display 
      */
     embedURL(title, url, display) {
-        return `[${title}](${url.replace(/\)/g, '%27')}${display ? ` "${display}"` : ''})`;
+        return `[${title}](${url.replace(/\)/g, '%27')}${display ? ` '${display}'` : ''})`;
     }
     /**
      * 
      * @param {string} text 
-     * @param {"sha256"|"md5"|"sha1"|"sha512"} algorithm 
+     * @param {'sha256'|'md5'|'sha1'|'sha512'} algorithm 
      */
     hash(text, algorithm) {
         return crypto.createHash(algorithm).update(text).digest('hex');

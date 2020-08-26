@@ -10,7 +10,7 @@ const ms = require('ms');
 module.exports = (client, message, member, settings) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const db = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+            const db = await client.db.members.fetch(message.guild.id, member.user.id).catch((e) => { throw e; });
             const maxTreshold = settings.warnThreshold;
             const action = settings.warnThresholdAction;
             const duration = settings.warnActionDuration;
@@ -85,7 +85,7 @@ module.exports = (client, message, member, settings) => {
                     .setColor('RANDOM')
                     .setAuthor(`${client.user.tag} / ${client.user.id}`, client.user.displayAvatarURL({ dynamic: true }))
                     .setTimestamp()
-                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }) || null)
+                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
                     .setDescription(`**Member** : ${member.user.tag} / ${member.user.id}\n**Action** : ${faction}\n**Reason** : ${reason}\n${duration ? `**Length** : ${ms(duration)}` : ''}`)
                 ).catch(() => { });
             }

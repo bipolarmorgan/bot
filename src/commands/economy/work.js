@@ -55,7 +55,7 @@ module.exports = class extends BaseCommand {
         let embed = new MessageEmbed()
             .setColor('RANDOM')
             .setTimestamp()
-            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || null);
+            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
         let status = true;
         const job = args[0].toLowerCase();
         if (!job || !['mailman', 'developer', 'carpenter', 'mechanic', 'police'].includes(job)) {

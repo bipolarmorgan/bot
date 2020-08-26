@@ -9,7 +9,8 @@ class DiscordEvent {
      *      'messageReactionAdd'|'messageReactionRemove'|'messageReactionRemoveAll'|'userUpdate'|'presenceUpdate'|
      *      'voiceStateUpdate'|'subscribe'|'unsubscribe'|'typingStart'|'webhookUpdate'|
      *      'disconnect'|'reconnecting'|'error'|'warn'|'debug'|
-     *      'shardDisconnect'|'shardError'|'shardReconnecting'|'shardReady'|'shardResume'|'invalidated'|'raw'} eventName 
+     *      'shardDisconnect'|'shardError'|'shardReconnecting'|'shardReady'|'shardResume'|'invalidated'|'raw'|
+     *      'directMessage'} eventName 
      */
     constructor(eventName) {
         this.eventName = eventName;
