@@ -28,7 +28,6 @@ module.exports = class extends BaseEvent {
     async run(client, message) {
 
         if (!message || message.author.bot) return;
-        if (message.partial) await message.fetch().catch(() => { });
         if (message.channel.type === 'dm') return client.emit('directMessage', client, message);
         if (message.channel.type !== 'text' || !message.guild) return;
         if (!message.channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) return;
@@ -58,7 +57,7 @@ module.exports = class extends BaseEvent {
 
         const userStats = await client.db.users.fetch(message.author.id).catch(console.log);
 
-        if (await client.db.cooldowns.checkCommand(message, command, userStats)) return;
+        if (await client.db.cooldowns.commandThrottle(message, command, userStats)) return;
 
         try {
             if (!xpcooldown.has(message.author.id)) {
@@ -66,7 +65,7 @@ module.exports = class extends BaseEvent {
                 xpcooldown.set(message.author.id, true);
                 client.setTimeout(() => xpcooldown.delete(message.author.id), 30000);
             }
-            client.logger.info(`Shard[${message.guild.shardID}][${message.guild.id}] (${message.author.tag}/${message.author.id}) ${commandName} ${args.join(' ')}`);
+            client.logger.info(`Shard[${message.guild.shardID}] [${message.guild.name}/${message.guild.id}] (${message.author.tag}/${message.author.id}) ${command.config.name} ${args.join(' ')}`);
             const argv = command.argsDefinitions ? client.utils.Parse(args, command.argsDefinitions) : args;
             const success = await command.run(client, message, argv, guildSettings, userStats).catch((e) => { throw e; });
             if (success !== false) await client.db.cooldowns.throttle(command.config.name, message.author.id);

@@ -3,6 +3,73 @@ const { Poster } = require('dbots');
 module.exports = class extends BaseEvent {
     constructor() {
         super('ready');
+        this.status = [
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `${await client.getCount('guilds')} guilds!`,
+                        type: 'LISTENING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `${await client.getCount('users')} users!`,
+                        type: 'WATCHING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `https://unicron-bot.xyz/`,
+                        type: 'PLAYING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `to Discord`,
+                        type: 'STREAMING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `-help`,
+                        type: 'PLAYING',
+                    },
+                    status: 'online',
+                });
+            },
+        ]
     }
     /**
      * 
@@ -27,5 +94,8 @@ module.exports = class extends BaseEvent {
             clientLibrary: 'discord.js'
         });
         poster.startInterval();
+        client.setInterval(async () => {
+            await this.status[Math.floor(Math.random() * this.status.length)](client).catch(() => { });
+        }, 60000 * 8);
     }
 }

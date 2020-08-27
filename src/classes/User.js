@@ -80,7 +80,7 @@ class User {
             const prize = Leveling.RequiredLevelChart[current_level] * 2;
             this.balance += prize;
             await this.save().catch((e) => { throw e; });
-            message.channel.send(new MessageEmbed()
+            await message.channel.send(new MessageEmbed()
                 .setColor('0x00FFFF')
                 .setTitle(':arrow_up:   **LEVELUP**   :arrow_up:')
                 .setDescription(`GG, You levelup from **${current_level - 1}** ${await client.getEmoji('join_arrow')} **${current_level}**\nAnd received **${prize}**💰 coins!`)

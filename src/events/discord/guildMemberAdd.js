@@ -25,7 +25,6 @@ module.exports = class extends BaseEvent {
                 memberStats.data.captcha = client.utils.Random.string(8);
                 await memberStats.save().catch(console.log);
                 const dm = await member.user.createDM().catch(() => { });
-                if (!dm) return;
                 switch (verifier) {
                     case 'discrim': {
                         await dm.send(new MessageEmbed()

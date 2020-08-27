@@ -27,7 +27,7 @@ module.exports = (client, message, settings) => {
                 verified = message.content === `>verify ${member.data.captcha}`;
             }
             if (!verified) return;
-            message.channel.send(new MessageEmbed()
+            await message.channel.send(new MessageEmbed()
                 .setColor(0x00FF00)
                 .setTimestamp()
                 .setDescription(`<@${message.author.id}>, you have been verified!`)
