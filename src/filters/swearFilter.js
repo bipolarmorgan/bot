@@ -3,6 +3,8 @@ const AutoModeration = require('../modules/AutoModeration');
 const fs = require('fs');
 const swearWords = fs.readFileSync('assets/swearWords.txt').toString().split('\r\n');
 
+const regex = new RegExp(swearWords.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
+
 /**
  * @param {import('../classes/Unicron')} client
  * @param {import('discord.js').Message} message
@@ -14,20 +16,20 @@ module.exports = (client, message, settings) => {
             const status = settings.swearFilter;
             const strat = (status && !message.channel.nsfw && message.author.permLevel < 3 &&
                 (
-                    message.content.match(new RegExp(swearWords.map(client.escapeRegex).join('|'), 'gi'))
+                    message.content.match(regex)
                 )
             ) ? true : false;
             if (!strat) return resolve(false);
-            if (message.deletable) message.delete().catch(() => { });
-            message.channel.send(`No Swearing! ${message.author}.`)
-                .then(msg => msg.delete({ timeout: 5000 })).catch(() => { });
+            if (message.deletable) await message.delete().catch(() => { });
+            await message.channel.send(`No Swearing! ${message.author}.`)
+                .then((msg) => msg.delete({ timeout: 5000 })).catch(() => { });
             const mChannel = message.guild.channels.cache.get(settings.modLogChannel);
             if (mChannel) {
-                mChannel.send(new MessageEmbed()
+                await mChannel.send(new MessageEmbed()
                     .setTimestamp()
                     .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))
                     .setTitle('Swear Blocker')
-                    .setDescription(`Member: ${message.author.tag} / ${message.author.id}`)
+                    .setDescription(`Member: ${message.author.tag} / ${message.author.id}\nContent: ||${message.content}||`)
                 ).catch(() => { });
             }
             await AutoModeration(client, message, message.member, settings).catch(() => { });

@@ -5,7 +5,7 @@ module.exports = class extends BaseCommand {
         super({
             config: {
                 name: 'automod',
-                description: 'Toggles AutoModeration on the server!',
+                description: 'Toggles Auto-Moderation on the server!',
                 permission: 'Server Administrator',
             },
             options: {

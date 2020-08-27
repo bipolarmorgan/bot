@@ -12,9 +12,9 @@ module.exports = (client, message, settings) => {
             const status = settings.inviteFilter;
             const strat = (status && (message.author.permLevel < 2) && message.content.match(client.utils.Regex.discord.invite)) ? true : false;
             if (!strat) return resolve(false);
-            if (message.deletable) message.delete().catch(() => { });
-            message.channel.send(`No Advertising! ${message.author}.`)
-                .then(msg => msg.delete({ timeout: 5000 }).catch(() => { }));
+            if (message.deletable) await message.delete().catch(() => { });
+            await message.channel.send(`No Advertising! ${message.author}.`)
+                .then((msg) => msg.delete({ timeout: 5000 }).catch(() => { }));
             const mChannel = message.guild.channels.cache.get(settings.modLogChannel);
             if (mChannel) {
                 await mChannel.send(new MessageEmbed()

@@ -4,9 +4,9 @@ const { MessageEmbed } = require('discord.js');
  * @param {import('../classes/BaseCommand')} command
  * @param {string[]} args
  */
-module.exports = (message, command, args) => {
+module.exports = async (message, command, args) => {
     if (command.options.args && !args.length && command.options.usage) {
-        message.channel.send(new MessageEmbed()
+        await message.channel.send(new MessageEmbed()
             .setColor('RED')
             .setTimestamp()
             .setDescription(`You didn't provide any arguments, ${message.author}!\nThe proper usage would be:

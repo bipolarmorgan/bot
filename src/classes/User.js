@@ -65,7 +65,6 @@ class User {
     get progressXP() {
         return this.nextlevelxp - this.experience;
     }
-
     /**
      * 
      * @param {import('./Unicron')} client 
@@ -119,6 +118,8 @@ class User {
      * @param {string} item 
      */
     addBadge(badge) {
+        if (!this.data) this.data = {};
+        if (!this.data.badges) this.data.badges = [];
         if (!this.data.badges.includes(badge)) this.data.badges.push(badge);
     }
     /**
@@ -126,6 +127,8 @@ class User {
      * @param {string} item 
      */
     removeBadge(badge) {
+        if (!this.data) this.data = {};
+        if (!this.data.badges) this.data.badges = [];
         if (this.data.badges.includes(badge)) this.data.badges = this.data.badges.filter((b) => b !== badge);
     }
     /**
@@ -133,6 +136,8 @@ class User {
      * @param {string} item 
      */
     hasBadge(badge) {
+        if (!this.data) this.data = {};
+        if (!this.data.badges) this.data.badges = [];
         return this.data.badges.includes(badge);
     }
     /**

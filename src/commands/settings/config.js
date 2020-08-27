@@ -71,83 +71,23 @@ module.exports = class extends BaseCommand {
                 new MessageEmbed()
                     .setColor('RANDOM')
                     .setTimestamp()
-                    .addField('Key', `
-                    \`prefix\`
-                    \`modLogChannel\`
-                    \`autoModeration\`
-                    \`autoModAction\`
-                    \`autoModDuration\`
-                    \`warnThreshold\`
-                    \`warnThresholdAction\`
-                    \`warnActionDuration\`
-                    `, true)
-                    .addField('Value', `
-                    \`${prefix}\`
-                    ${modLogChannel}
-                    \`${autoModeration}\`
-                    \`${autoModAction}\`
-                    \`${autoModDuration}\`
-                    \`${warnThreshold}\`
-                    \`${warnThresholdAction}\`
-                    \`${warnActionDuration}\`
-                    `, true),
+                    .addField('Key', `\n\`prefix\`\n\`modLogChannel\`\n\`autoModeration\`\n\`autoModAction\`\n\`autoModDuration\`\n\`warnThreshold\`\n\`warnThresholdAction\`\n\`warnActionDuration\``, true)
+                    .addField('Value', `\n\`${prefix}\`\n${modLogChannel}\n\`${autoModeration}\`\n\`${autoModAction}\`\n\`${autoModDuration}\`\n\`${warnThreshold}\`\n\`${warnThresholdAction}\`\n\`${warnActionDuration}\``, true),
                 new MessageEmbed()
                     .setColor('RANDOM')
                     .setTimestamp()
-                    .addField('Key', `
-                    \`inviteFilter\`
-                    \`swearFilter\`
-                    \`mentionSpamFilter\`
-                    \`dynamicCategory\`
-                    \`dynamicRoom\`
-                    \`dynamicEnabled\`
-                    `, true)
-                    .addField('Value', `
-                    \`${inviteFilter}\`
-                    \`${swearFilter}\`
-                    \`${mentionSpamFilter}\`
-                    ${dynamicCategory}
-                    ${dynamicRoom}
-                    \`${dynamicEnabled}\`
-                    `, true),
+                    .addField('Key', `\n\`inviteFilter\`\n\`swearFilter\`\n\`mentionSpamFilter\`\n\`dynamicCategory\`\n\`dynamicRoom\`\n\`dynamicEnabled\``, true)
+                    .addField('Value', `\n\`${inviteFilter}\`\n\`${swearFilter}\`\n\`${mentionSpamFilter}\`\n${dynamicCategory}\n${dynamicRoom}\n\`${dynamicEnabled}\``, true),
                 new MessageEmbed()
                     .setColor('RANDOM')
                     .setTimestamp()
-                    .addField('Key', `
-                    \`welcomerEnabled\`
-                    \`welcomeChannel\`
-                    \`welcomeMessage\`
-                    \`farewellEnabled\`
-                    \`farewellChannel\`
-                    \`farewellMessage\`
-                    `, true)
-                    .addField('Value', `
-                    \`${welcomer}\`
-                    ${welcomeChannel}
-                    \`${welcomeMessage}\`
-                    \`${farewell}\`
-                    ${farewellChannel}
-                    \`${farewellMessage}\`
-                    `, true),
+                    .addField('Key', `\n\`welcomerEnabled\`\n\`welcomeChannel\`\n\`welcomeMessage\`\n\`farewellEnabled\`\n\`farewellChannel\`\n\`farewellMessage\``, true)
+                    .addField('Value', `\n\`${welcomer}\`\n${welcomeChannel}\n\`${welcomeMessage}\`\n\`${farewell}\`\n${farewellChannel}\n\`${farewellMessage}\``, true),
                 new MessageEmbed()
                     .setColor('RANDOM')
                     .setTimestamp()
-                    .addField('Key', `
-                    \`verificationEnabled\`
-                    \`verificationChannel\`
-                    \`verificationRole\`
-                    \`verificationType\`
-                    \`ticketEnabled\`
-                    \`ticketCategory\`
-                    `, true)
-                    .addField('Value', `
-                    \`${memberVerification}\`
-                    ${verificationChannel}
-                    ${verifiedRole}
-                    \`${verificationType}\`
-                    \`${ticketSystem}\`
-                    ${ticketCategory}
-                    `, true),
+                    .addField('Key', `\n\`verificationEnabled\`\n\`verificationChannel\`\n\`verificationRole\`\n\`verificationType\`\n\`ticketEnabled\`\n\`ticketCategory\``, true)
+                    .addField('Value', `\n\`${memberVerification}\`\n${verificationChannel}\n${verifiedRole}\n\`${verificationType}\`\n\`${ticketSystem}\`\n${ticketCategory}`, true),
             ];
             Pagination(message, embeds);
         } else if (action === 'reset') {

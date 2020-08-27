@@ -27,10 +27,10 @@ module.exports = class extends BaseEvent {
      */
     async run(client, message) {
 
-        if (!message) return;
+        if (!message || message.author.bot) return;
         if (message.partial) await message.fetch().catch(() => { });
         if (message.channel.type === 'dm') return client.emit('directMessage', client, message);
-        if (message.author.bot || message.channel.type !== 'text' || !message.guild) return;
+        if (message.channel.type !== 'text' || !message.guild) return;
         if (!message.channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) return;
         if (!message.member) await message.member.fetch().catch(() => { });
 
@@ -50,11 +50,11 @@ module.exports = class extends BaseEvent {
         const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.options.aliases && cmd.options.aliases.includes(commandName));
         if (!command) return;
 
-        if (PremiumServer(message, command, guildSettings.premium)) return;
-        if (Permission(client, message, command)) return;
-        if (ClientPermission(message, command)) return;
-        if (CommandArgs(message, command, args)) return;
-        if (NSFWCommand(message, command)) return;
+        if (await PremiumServer(message, command, guildSettings.premium)) return;
+        if (await Permission(client, message, command)) return;
+        if (await ClientPermission(message, command)) return;
+        if (await CommandArgs(message, command, args)) return;
+        if (await NSFWCommand(message, command)) return;
 
         const userStats = await client.db.users.fetch(message.author.id).catch(console.log);
 

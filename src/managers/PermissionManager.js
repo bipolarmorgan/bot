@@ -25,7 +25,7 @@ const Levels = [
          * @param {import('discord.js').Message} message 
          */
         check: function (client, message) {
-            return message.member.permissions.has(['MANAGE_GUILD']);
+            return message.member.permissions.has(['MANAGE_GUILD']) || message.member.permissions.has(['ADMINISTRATOR']);
         }
     }, {
         name: 'Server Owner',
