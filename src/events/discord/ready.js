@@ -37,7 +37,7 @@ module.exports = class extends BaseEvent {
             async (client) => {
                 await client.user.setPresence({
                     activity: {
-                        name: `https://unicron-bot.xyz/`,
+                        name: `unicron-bot.xyz`,
                         type: 'PLAYING',
                     },
                     status: 'online',
@@ -64,6 +64,32 @@ module.exports = class extends BaseEvent {
                 await client.user.setPresence({
                     activity: {
                         name: `-help`,
+                        type: 'PLAYING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `DMs`,
+                        type: 'LISTENING',
+                    },
+                    status: 'online',
+                });
+            },
+            /**
+             * 
+             * @param {import('../../classes/Unicron')} client 
+             */
+            async (client) => {
+                await client.user.setPresence({
+                    activity: {
+                        name: `DM me for help!`,
                         type: 'PLAYING',
                     },
                     status: 'online',
@@ -96,6 +122,6 @@ module.exports = class extends BaseEvent {
         poster.startInterval();
         client.setInterval(async () => {
             await this.status[Math.floor(Math.random() * this.status.length)](client).catch(() => { });
-        }, 60000 * 8);
+        }, 60000 * 6);
     }
 }

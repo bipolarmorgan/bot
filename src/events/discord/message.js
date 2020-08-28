@@ -28,8 +28,9 @@ module.exports = class extends BaseEvent {
     async run(client, message) {
 
         if (!message || message.author.bot) return;
-        if (message.channel.type === 'dm') return client.emit('directMessage', client, message);
+        if (message.channel.type === 'dm') return client.emit('directMessage', message);
         if (message.channel.type !== 'text' || !message.guild) return;
+        if (message.channel.parentID === '748855168308609024') return client.emit('directMessage', message, true);
         if (!message.channel.permissionsFor(message.guild.me).has(['SEND_MESSAGES'])) return;
         if (!message.member) await message.member.fetch().catch(() => { });
 
