@@ -14,8 +14,8 @@ module.exports = class extends Event {
      * @param {import('discord.js').Message} message
      */
     async run(client, oldMessage, message) {
-        if (newMessage.partial) await newMessage.fetch().catch(() => { });
-        if (!newMessage) return;
+        if (message.partial) await message.fetch().catch(() => { });
+        if (!message) return;
         const guildSettings = await client.db.guilds.fetch(message.guild.id).catch(console.log);
         message.author.permLevel = client.permission.level(message);
         if (await swearFilter(client, message, guildSettings)) return;

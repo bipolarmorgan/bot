@@ -41,7 +41,7 @@ class CooldownManager extends BaseManager {
             }
             if (donator) cooldownAmount = Math.floor(cooldownAmount - (cooldownAmount * 0.35));
             if (!ccs.data) ccs.data = [];
-            if (ccs.data.includes({ id: message.author.id })) {
+            if (ccs.data.find((u) => u.id === message.author.id)) {
                 const expirationTime = ccs.data.find((u) => u.id === message.author.id).timestamp + cooldownAmount;
                 if (now < expirationTime) {
                     const timeLeft = Math.floor(expirationTime - now);
@@ -49,11 +49,10 @@ class CooldownManager extends BaseManager {
                     return resolve(message.channel.send(new MessageEmbed()
                         .setColor('RED')
                         .setTimestamp()
-                        .setDescription(` ${await client.getEmoji('slowmode')} Please wait **${ms(timeLeft)}** before reusing the command again.\n[Donators](${this.client.unicron.serverInviteURL}) will only have to wait **${ms(donCD)}**!`)
+                        .setDescription(` ${await this.client.getEmoji('slowmode')} Please wait **${ms(timeLeft)}** before reusing the command again.\n[Donators](${this.client.unicron.serverInviteURL}) will only have to wait **${ms(donCD)}**!`)
                     ));
                 } else {
-                    ccs.data = ccs.data.filter((i) => i.id !== message.author.id);
-                    await Cooldowns.update({ data: ccs.data }, { where: { name: command.config.name } });
+                    await Cooldowns.update({ data: ccs.data.filter((i) => i.id !== message.author.id) }, { where: { name: command.config.name } });
                 }
             }
             return resolve(false);
@@ -62,6 +61,7 @@ class CooldownManager extends BaseManager {
     async throttle(name, id) {
         const ccs = await this.findOrCreate(name);
         const timestamp = Date.now();
+        if (!ccs.data) ccs.data = [];
         ccs.data.push({ id, timestamp });
         await Cooldowns.update({ data: ccs.data }, { where: { name } });
     }
