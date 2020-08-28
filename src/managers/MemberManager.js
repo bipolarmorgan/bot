@@ -18,8 +18,10 @@ class MemberManager extends BaseManager {
     fetch(guild_id, member_id) {
         if (!this.cache.has(guild_id)) this.cache.set(guild_id, new Collection());
         return new Promise(async (resolve, reject) => {
-            await this.client.server.get(`/api/member/${guild_id}/${member_id}`).catch(reject);
-            process.nextTick(() => resolve(this.cache.get(guild_id).get(member_id)));
+            await this.client.server.get(`/api/member/${guild_id}/${member_id}`).then(async () => {
+                await this.client.wait(300);
+                return resolve(this.cache.get(guild_id).get(member_id));
+            }).catch(reject);
         });
     }
     /**

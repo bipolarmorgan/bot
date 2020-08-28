@@ -10,7 +10,6 @@ module.exports = class extends BaseEvent {
      */
     async run(client, member) {
         if (member.user.bot) return;
-        await client.db.members.delete(member.guild.id, member.user.id).catch(console.log);
         const guild = await client.db.guilds.fetch(member.guild.id).catch(console.log);
         const channel_id = guild.farewellChannel;
         const message = guild.farewellMessage;

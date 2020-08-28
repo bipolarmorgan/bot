@@ -15,8 +15,10 @@ class GuildManager extends BaseManager {
     fetch(guild_id) {
         return new Promise(async (resolve, reject) => {
             if (this.cache.has(guild_id)) return resolve(this.cache.get(guild_id));
-            await this.client.server.get(`/api/guild/${guild_id}`).catch(reject);
-            process.nextTick(() => resolve(this.cache.get(guild_id)));
+            await this.client.server.get(`/api/guild/${guild_id}`).then(async () => {
+                await this.client.wait(300);
+                return resolve(this.cache.get(guild_id));
+            }).catch(reject);
         });
     }
     /**

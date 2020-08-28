@@ -49,7 +49,7 @@ class CooldownManager extends BaseManager {
                     return resolve(message.channel.send(new MessageEmbed()
                         .setColor('RED')
                         .setTimestamp()
-                        .setDescription(` ${await this.client.getEmoji('slowmode')} Please wait **${ms(timeLeft)}** before reusing the command again.\n[Donators](${this.client.unicron.serverInviteURL}) will only have to wait **${ms(donCD)}**!`)
+                        .setDescription(` ${await this.client.getEmoji('slowmode')} Please wait **${ms(timeLeft)}** before reusing the command again.\nDefault Cooldown is **${ms(bcd)}**\nWhile [Donators](${this.client.unicron.serverInviteURL}) will only have to wait **${ms(donCD)}**!`)
                     ));
                 } else {
                     await Cooldowns.update({ data: ccs.data.filter((i) => i.id !== message.author.id) }, { where: { name: command.config.name } });
