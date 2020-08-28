@@ -66,7 +66,7 @@ module.exports = class extends BaseCommand {
      * @param {import('../../classes/User')} userStats
      */
     async run(client, message, args, g, userStats) {
-        const utarget = await client.resolveUser(args.join(' '));
+        const utarget = await client.resolveUser(args[0]);
         if (!utarget || utarget.bot) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
