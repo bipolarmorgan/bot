@@ -42,9 +42,7 @@ module.exports = class extends BaseEvent {
                     }
                     default: {
                         const hasAttachments = message.attachments.size ? true : false;
-                        await user.send(this.prefix(message.author.tag) + message.content, {
-                            attachFiles: hasAttachments && message.attachments.array(),
-                        });
+                        await user.send(this.prefix(message.author.tag) + message.content, hasAttachments ? message.attachments.array() : {});
                         break;
                     }
                 }
@@ -68,9 +66,7 @@ module.exports = class extends BaseEvent {
             }
             if (!channel) return;
             const hasAttachments = message.attachments.size ? true : false;
-            channel.send(`**User** | ${message.author.tag} : ${message.content.replace(/@/g, '@' + String.fromCharCode(8203))}`, {
-                attachFiles: hasAttachments && message.attachments.array(),
-            });
+            channel.send(`**User** | ${message.author.tag} : ${message.content.replace(/@/g, '@' + String.fromCharCode(8203))}`, hasAttachments ? message.attachments.array() : {});
         }
     }
 }
