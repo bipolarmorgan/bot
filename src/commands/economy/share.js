@@ -10,11 +10,11 @@ module.exports = class extends BaseCommand {
                 permission: 'User',
             },
             options: {
-                aliases: ['transfer', 'give', 'pay'],
-                cooldown: 180,
+                aliases: ['pay'],
+                cooldown: 10,
                 nsfwCommand: false,
                 args: true,
-                usage: 'share <Amount> <User>\nshare <User> <Amount>',
+                usage: 'share <User> <Amount>',
                 donatorOnly: false,
             }
         });
@@ -28,8 +28,8 @@ module.exports = class extends BaseCommand {
      */
     async run(client, message, args, _g, userStats) {
         const currentAmount = userStats.balance;
-        const target = await client.resolveUser(args[0]) || await client.resolveUser(args[1]);
-        let transferAmount = await client.resolveUser(args[0]) ? args[1] : args[0];
+        const target = await client.resolveUser(args[0]);
+        let transferAmount = args[1];
         if (isNaN(transferAmount)) {
             if (transferAmount === 'all') { transferAmount = currentAmount; }
             else if (transferAmount === 'half') { transferAmount = Math.floor(currentAmount / 2); }
@@ -43,6 +43,7 @@ module.exports = class extends BaseCommand {
                 );
             }
         }
+        transferAmount = Number(transferAmount);
         if (target.bot) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
@@ -51,20 +52,12 @@ module.exports = class extends BaseCommand {
                 .setDescription('Sorry, cannot send coins to this bot user')
             );
         }
-        if (!target) {
-            return message.channel.send(new MessageEmbed()
-                .setColor('RED')
-                .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setTimestamp()
-                .setDescription(`Sorry, that's an invalid user`)
-            );
-        }
         if (target.id === message.author.id) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-                .setDescription(`Sorry, uou cannot send coins to yourself, lmao`)
+                .setDescription(`Sorry, you cannot send coins to yourself, lmao`)
             );
         }
         if (transferAmount > currentAmount) {

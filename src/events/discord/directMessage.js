@@ -12,7 +12,7 @@ module.exports = class extends BaseEvent {
      */
     async run(client, message, isMod = false) {
         if (isMod) {
-            const user = client.users.cache.find((c) => c.id === message.channel.topic);
+            const user = await client.users.fetch(message.channel.topic).catch(() => { });
             if (!user) return message.channel.send('Message not sent');
             try {
                 switch (message.content) {
@@ -34,6 +34,11 @@ module.exports = class extends BaseEvent {
                     }
                     case '!!close': {
                         await user.send(this.prefix(message.author.tag) + `I'm going to close this thread now. If you have any further questions, feel free to reach out`);
+                        await message.channel.delete().catch(() => { });
+                        break;
+                    }
+                    case '!!invite': {
+                        await user.send(`Invite the bot using https://unicron-bot.xyz/invite !`);
                         break;
                     }
                     case '!!unicron': {
@@ -50,7 +55,8 @@ module.exports = class extends BaseEvent {
                 message.channel.send('Message not sent');
             }
         } else {
-            const guild = client.guilds.cache.get('603558917087428618');
+            const guild = await client.guilds.fetch('603558917087428618').catch(() => { });
+            if (!guild) return;
             /**
              * @type {import('discord.js').TextChannel}
              */

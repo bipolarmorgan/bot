@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const BaseCommand = require('../../classes/BaseCommand');
 const MINIMUM_COINS = 500;
+
 const Offense = {
     car: 30,
     motorcycle: 25,
@@ -86,8 +87,8 @@ module.exports = class extends BaseCommand {
             return false;
         }
         const target = await client.db.users.fetch(utarget.id).catch(console.log);
-        const tbal = userStats.balance;
-        const ubal = target.balance;
+        const tbal = target.balance;
+        const ubal = userStats.balance;
         if (tbal < MINIMUM_COINS) {
             message.channel.send(new MessageEmbed()
                 .setColor('RED')
@@ -116,12 +117,12 @@ module.exports = class extends BaseCommand {
                     tbal * (
                         client.utils.Random.nextInt({
                             max: client.utils.Random.nextInt({
-                                max: 95,
-                                min: 75,
+                                max: 80,
+                                min: 56,
                             }),
                             min: client.utils.Random.nextInt({
-                                max: 74,
-                                min: 50
+                                max: 55,
+                                min: 40
                             })
                         }) * 0.01
                     )
@@ -144,12 +145,12 @@ module.exports = class extends BaseCommand {
                     ubal * (
                         client.utils.Random.nextInt({
                             max: client.utils.Random.nextInt({
-                                max: 95,
-                                min: 85,
+                                max: 80,
+                                min: 56,
                             }),
                             min: client.utils.Random.nextInt({
-                                max: 84,
-                                min: 75,
+                                max: 55,
+                                min: 40
                             })
                         }) * 0.01
                     )
