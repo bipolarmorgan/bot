@@ -1,139 +1,75 @@
-class Guild {
-    /**
-     * 
-     * @param {import('./Unicron')} client 
-     * @param {{any}} raw 
-     */
-    constructor(client, raw = {}) {
+import Client from './Unicron';
+
+export default class Guild {
+    private client: Client;
+    public id: string;
+    public prefix: string;
+    public premium: boolean;
+    public modLogChannel: string;
+    public autoModeration: boolean;
+    public autoModAction: string;
+    public autoModDuration: number;
+    public warnThreshold: number;
+    public warnThresholdAction: string;
+    public warnActionDuration: number;
+    public welcomeChannel: string;
+    public welcomeMessage: string;
+    public welcomeEnabled: boolean;
+    public farewellChannel: string;
+    public farewellMessage: string;
+    public farewellEnabled: string;
+    public verificationChannel: string;
+    public verificationType: string;
+    public verificationRole: string;
+    public verificationEnabled: boolean;
+    public ticketCategory: string;
+    public ticketEnabled: boolean;
+    public dynamicCategory: string;
+    public dynamicRoom: string;
+    public dynamicEnabled: boolean;
+    public inviteFilter: boolean;
+    public swearFilter: boolean;
+    public mentionSpamFilter: boolean;
+    public data: object;
+    constructor(client: Client, raw: GuildSettings) {
         this.client = client;
-        /**
-         * @type {string}
-         */
         this.id = raw.id;
-        /**
-         * @type {string}
-         */
         this.prefix = raw.prefix;
-        /**
-         * @type {boolean}
-         */
-        this.premium = raw.premium;
-        /**
-         * @type {string}
-         */
         this.modLogChannel = raw.modLogChannel;
-        /**
-         * @type {boolean}
-         */
         this.autoModeration = raw.autoModeration;
-        /**
-         * @type {string}
-         */
         this.autoModAction = raw.autoModAction;
-        /**
-         * @type {number}
-         */
         this.autoModDuration = raw.autoModDuration;
-        /**
-         * @type {number}
-         */
         this.warnThreshold = raw.warnThreshold;
-        /**
-         * @type {string}
-         */
         this.warnThresholdAction = raw.warnThresholdAction;
-        /**
-         * @type {number}
-         */
         this.warnActionDuration = raw.warnActionDuration;
-        /**
-         * @type {string}
-         */
         this.welcomeChannel = raw.welcomeChannel;
-        /**
-         * @type {string}
-         */
         this.welcomeMessage = raw.welcomeMessage;
-        /**
-         * @type {boolean}
-         */
         this.welcomeEnabled = raw.welcomeEnabled;
-        /**
-         * @type {string}
-         */
         this.farewellChannel = raw.farewellChannel;
-        /**
-         * @type {string}
-         */
         this.farewellMessage = raw.farewellMessage;
-        /**
-         * @type {boolean}
-         */
         this.farewellEnabled = raw.farewellEnabled;
-        /**
-         * @type {string}
-         */
         this.verificationChannel = raw.verificationChannel;
-        /**
-         * @type {string}
-         */
         this.verificationType = raw.verificationType;
-        /**
-         * @type {string}
-         */
         this.verificationRole = raw.verificationRole;
-        /**
-         * @type {boolean}
-         */
         this.verificationEnabled = raw.verificationEnabled;
-        /**
-         * @type {string}
-         */
         this.ticketCategory = raw.ticketCategory;
-        /**
-         * @type {boolean}
-         */
         this.ticketEnabled = raw.ticketEnabled;
-        /**
-         * @type {string}
-         */
         this.dynamicCategory = raw.dynamicCategory;
-        /**
-         * @type {string}
-         */
         this.dynamicRoom = raw.dynamicRoom;
-        /**
-         * @type {boolean}
-         */
         this.dynamicEnabled = raw.dynamicEnabled;
-        /**
-         * @type {boolean}
-         */
         this.inviteFilter = raw.inviteFilter;
-        /**
-         * @type {boolean}
-         */
         this.swearFilter = raw.swearFilter;
-        /**
-         * @type {boolean}
-         */
         this.mentionSpamFilter = raw.mentionSpamFilter;
-        /**
-         * @type {{}}
-         */
         this.data = raw.data;
     }
-    /**
-     * @returns {Promise<void>}
-     */
-    save() {
+    save(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const payload = this.toJSON();
             await this.client.server.post(`/api/guild/${payload.id}`, payload).catch(reject);
             resolve();
         });
     }
-    toJSON() {
+    toJSON(): GuildSettings {
         return {
             id: this.id,
             prefix: this.prefix,
@@ -168,4 +104,34 @@ class Guild {
     }
 }
 
-module.exports = Guild;
+interface GuildSettings {
+    id: string;
+    prefix: string;
+    premium: boolean;
+    modLogChannel: string;
+    autoModeration: boolean;
+    autoModAction: string;
+    autoModDuration: number;
+    warnThreshold: number;
+    warnThresholdAction: string;
+    warnActionDuration: number;
+    welcomeChannel: string;
+    welcomeMessage: string;
+    welcomeEnabled: boolean;
+    farewellChannel: string;
+    farewellMessage: string;
+    farewellEnabled: string;
+    verificationChannel: string;
+    verificationType: string;
+    verificationRole: string;
+    verificationEnabled: boolean;
+    ticketCategory: string;
+    ticketEnabled: boolean;
+    dynamicCategory: string;
+    dynamicRoom: string;
+    dynamicEnabled: boolean;
+    inviteFilter: boolean;
+    swearFilter: boolean;
+    mentionSpamFilter: boolean;
+    data: object;
+}

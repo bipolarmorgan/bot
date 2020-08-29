@@ -1,44 +1,33 @@
-const Leveling = require('../modules/Leveling');
-const { MessageEmbed } = require('discord.js');
+import Client from './Unicron';
+import Leveling from '../modules/Leveling';
+import { MessageEmbed, Message } from 'discord.js';
 
-class User {
-    /**
-     * 
-     * @param {import('./Unicron')} client 
-     * @param {{any}} raw 
-     */
-    constructor(client, raw = {}) {
+export default class User {
+    private client: Client;
+    public id: string;
+    public balance: number;
+    public experience: number;
+    public multiplier: number;
+    public marriage_id: number;
+    public inventory: {
+        item_id: string;
+        amount: number;
+    }[];
+    public data: {
+        badges: string[];
+        premium: boolean;
+    }
+    constructor(client: Client, raw: UserData) {
         this.client = client;
-        /**
-         * @type {string}
-         */
         this.id = raw.id;
-        /**
-         * @type {number}
-         */
         this.balance = raw.balance;
-        /**
-         * @type {number}
-         */
         this.experience = raw.experience;
-        /**
-         * @type {number}
-         */
         this.multiplier = raw.multiplier;
-        /**
-         * @type {string}
-         */
         this.marriage_id = raw.marriage_id;
-        /**
-         * @type {Array<{item_id:string, amount:number}>}
-         */
         this.inventory = raw.inventory;
-        /**
-         * @type {{badges: Array<string>, premium: boolean}}
-         */
         this.data = raw.data;
     }
-    get level() {
+    get level(): number {
         let lvl = 0;
         const cur = this.experience;
         for (let i = 0; i < 101; i++) {
@@ -47,34 +36,28 @@ class User {
         }
         return lvl;
     }
-    get levelxp() {
+    get levelxp(): number {
         return Leveling.LevelChart[this.level];
     }
-    get nextlevel() {
+    get nextlevel(): number {
         return this.level + 1;
     }
-    get nextlevelxp() {
+    get nextlevelxp(): number {
         return Leveling.LevelChart[this.nextlevel];
     }
-    get progress() {
+    get progress(): number {
         return ((this.experience - this.levelxp) / (this.nextlevelxp - this.levelxp)) * 100; // (xp - lxp / nxp - lxp) * 100 = n
     }
-    get progressbar() {
+    get progressbar(): string {
         return Leveling.ProgressBar(this.progress);
     }
-    get progressXP() {
+    get progressXP(): number {
         return this.nextlevelxp - this.experience;
     }
-    /**
-     * 
-     * @param {import('./Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {number} amount 
-     */
-    async addXP(client, message, amount) {
+    async addXP(message: Message, amount: number): Promise<void> {
         const next_level = this.nextlevel;
         let current_level = this.level;
-        this.experience += amount || client.utils.Random.nextInt({ max: 25, min: 15 });
+        this.experience += amount || this.client.utils.Random.nextInt({ max: 25, min: 15 });
         current_level = this.level;
         if (current_level === next_level) {
             const prize = Leveling.RequiredLevelChart[current_level] * 2;
@@ -83,74 +66,47 @@ class User {
             await message.channel.send(new MessageEmbed()
                 .setColor('0x00FFFF')
                 .setTitle(':arrow_up:   **LEVELUP**   :arrow_up:')
-                .setDescription(`GG, You levelup from **${current_level - 1}** ${await client.getEmoji('join_arrow')} **${current_level}**\nAnd received **${prize}**💰 coins!`)
+                .setDescription(`GG, You levelup from **${current_level - 1}** ${await this.client.getEmoji('join_arrow')} **${current_level}**\nAnd received **${prize}**💰 coins!`)
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    addItem(item) {
+    addItem(item: string): number | void {
         const cur = this.inventory.find((t) => t.item_id === item);
         if (cur) return cur.amount++;
         this.inventory.push({ item_id: item, amount: 1 });
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    removeItem(item) {
+    removeItem(item: string): number | void {
         const cur = this.inventory.find((t) => t.item_id === item);
         if (cur && cur.amount > 1) return cur.amount--;
         this.inventory = this.inventory.filter((t) => t.item_id !== item);
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    hasItem(item) {
+    hasItem(item: string): boolean {
         return !!this.inventory.find((t) => t.item_id === item);
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    addBadge(badge) {
-        if (!this.data) this.data = {};
+    addBadge(badge: string): void {
+        if (!this.data) this.data = { badges: [], premium: false };
         if (!this.data.badges) this.data.badges = [];
         if (!this.data.badges.includes(badge)) this.data.badges.push(badge);
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    removeBadge(badge) {
-        if (!this.data) this.data = {};
+    removeBadge(badge: string): void {
+        if (!this.data) this.data = { badges: [], premium: false };
         if (!this.data.badges) this.data.badges = [];
         if (this.data.badges.includes(badge)) this.data.badges = this.data.badges.filter((b) => b !== badge);
     }
-    /**
-     * 
-     * @param {string} item 
-     */
-    hasBadge(badge) {
-        if (!this.data) this.data = {};
+    hasBadge(badge: string): boolean {
+        if (!this.data) this.data = { badges: [], premium: false };
         if (!this.data.badges) this.data.badges = [];
         return this.data.badges.includes(badge);
     }
-    /**
-     * @returns {Promise<void>}
-     */
-    save() {
+    save(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const payload = this.toJSON();
             await this.client.server.post(`/api/user/${payload.id}`, payload).catch(reject);
             resolve();
         });
     }
-    toJSON() {
+    toJSON(): UserData {
         return {
             id: this.id,
             balance: this.balance,
@@ -163,4 +119,18 @@ class User {
     }
 }
 
-module.exports = User;
+interface UserData {
+    id: string;
+    balance: number;
+    experience: number;
+    multiplier: number;
+    marriage_id: number;
+    inventory: {
+        item_id: string;
+        amount: number;
+    }[];
+    data: {
+        badges: string[];
+        premium: boolean;
+    }
+}

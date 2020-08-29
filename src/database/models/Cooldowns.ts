@@ -1,10 +1,6 @@
-const { DataTypes } = require('sequelize');
+import { Sequelize, DataTypes } from 'sequelize';
 
-/**
- * 
- * @param {import('sequelize').Sequelize} sq 
- */
-function Cooldowns(sq) {
+export default function Cooldowns(sq: Sequelize) {
     return sq.define('cooldowns', {
         name: {
             type: DataTypes.STRING,
@@ -20,5 +16,3 @@ function Cooldowns(sq) {
         timestamps: false,
     });
 }
-
-module.exports = Cooldowns;

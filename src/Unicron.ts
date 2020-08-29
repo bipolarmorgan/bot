@@ -1,6 +1,7 @@
-require('dotenv').config();
+import { config } from 'dotenv';
+config();
 
-const Unicron = require('./classes/Unicron');
+import Unicron from './classes/Unicron';
 const client = new Unicron();
 
 (async function () {

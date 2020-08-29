@@ -1,18 +1,12 @@
-const BaseManager = require('../classes/BaseManager');
+import BaseManager from '../classes/BaseManager';
+import Client from '../classes/Unicron';
+import Guild from '../classes/Guild';
 
-class GuildManager extends BaseManager {
-    constructor(client) {
+export default class GuildManager extends BaseManager<Guild> {
+    constructor(client: Client) {
         super(client);
-        /**
-         * @type {import('discord.js').Collection<string, import('../classes/Guild')>}
-         */
-        this.cache;
     }
-    /**
-     * @returns {Promise<import('../classes/Guild')>}
-     * @param {string} guild_id
-     */
-    fetch(guild_id) {
+    fetch(guild_id: string): Promise<Guild> {
         return new Promise(async (resolve, reject) => {
             if (this.cache.has(guild_id)) return resolve(this.cache.get(guild_id));
             await this.client.server.get(`/api/guild/${guild_id}`).then(async () => {
@@ -21,16 +15,10 @@ class GuildManager extends BaseManager {
             }).catch(reject);
         });
     }
-    /**
-     * @returns {Promise<void>}
-     * @param {string} guild_id
-     */
-    delete(guild_id) {
+    delete(guild_id: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             await this.client.server.delete(`/api/guild/${guild_id}`).catch(reject);
             resolve();
         });
     }
 }
-
-module.exports = GuildManager;

@@ -1,7 +1,9 @@
-require('dotenv').config();
+import { config } from 'dotenv';
+config();
 
-const { Logger } = require('./utils');
-const { ShardingManager } = require('discord.js');
+import Logger from './utils/Logger';
+import { ShardingManager } from 'discord.js';
+import Server from './server';
 
 const Manager = new ShardingManager('./src/Unicron.js', {
     totalShards: 'auto',
@@ -9,7 +11,8 @@ const Manager = new ShardingManager('./src/Unicron.js', {
     respawn: true,
 });
 
-require('./server')(Manager);
+Server(Manager);
+
 Manager.spawn();
 
 Manager.on('shardCreate', (shard) => {

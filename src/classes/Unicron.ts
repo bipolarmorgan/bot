@@ -1,44 +1,56 @@
-const { Client: DiscordClient, Collection, Guild, GuildEmoji } = require('discord.js');
-const { promisify } = require('util');
-const fs = require('fs').promises;
-const path = require('path');
-const crypto = require('crypto');
-const Emotes = require('../../assets/Emotes.json');
-const BaseCommand = require('./BaseCommand');
-const BaseItem = require('./BaseItem');
-const DiscordEvent = require('./DiscordEvent');
-const WebSocketEvent = require('./WebSocketEvent');
-const PermissionManager = require('../managers/PermissionManager');
-const API = require('../api/');
+import { Client as DiscordClient, Collection, Guild, GuildEmoji, Emoji, 
+    Channel, Role, Message, MessageEmbed 
+} from 'discord.js';
 
-const UserManager = require('../managers/UserManager');
-const GuildManager = require('../managers/GuildManager');
-const MemberManager = require('../managers/MemberManager');
-const CooldownManager = require('../managers/CooldownManager');
+import { promisify } from 'util';
+import { promises as fs } from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import Emotes from '../../assets/Emotes.json';
+import BaseCommand from './BaseCommand';
+import BaseItem from './BaseItem';
+import DiscordEvent from './DiscordEvent';
+import WebSocketEvent from './WebSocketEvent';
+import PermissionManager from '../managers/PermissionManager';
+import API from '../api/';
+import utils from '../utils/';
 
-class Client extends DiscordClient {
+import UserManager from '../managers/UserManager';
+import GuildManager from '../managers/GuildManager';
+import MemberManager from '../managers/MemberManager';
+import CooldownManager from '../managers/CooldownManager';
+
+export default class Client extends DiscordClient {
+    public commands: Collection<string, BaseCommand>;
+    public shopitems: Collection<string, BaseItem>;
+    public botEmojis: Collection<string, Emoji>;
+    public unicron: {
+        owner: string;
+        serverInviteURL: string;
+        channel: string;
+    }
+    public utils: typeof utils;
+    public logger: typeof utils.Logger;
+    public wait: (ms: number) => Promise<void>;
+    public server: API;
+    public permission: PermissionManager;
+    public db: {
+        users: UserManager;
+        guilds: GuildManager;
+        members: MemberManager;
+        cooldowns: CooldownManager;
+    }
     constructor() {
-        super({
-            partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
-        });
-        /**
-         * @type {Collection<string, BaseCommand}
-         */
+        super({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
         this.commands = new Collection();
-        /**
-         * @type {Collection<string, BaseItem}
-         */
         this.shopitems = new Collection();
-        /**
-         * @type {Collection<string, import('discord.js').Emoji>}
-         */
         this.botEmojis = new Collection();
         this.unicron = {
             owner: process.env.BOT_OWNER_ID,
             serverInviteURL: process.env.BOT_SERVER_URL,
             channel: process.env.BOT_CHANNEL_ID,
         }
-        this.utils = require('../utils/');
+        this.utils = utils;
         this.logger = this.utils.Logger;
         this.wait = promisify(setTimeout);
         this.server = new API();
@@ -60,11 +72,7 @@ class Client extends DiscordClient {
         await this.registerDiscordEvents();
         await this.registerWebSocketEvents();
     }
-    /**
-     * @returns {Promise<import('discord.js').User>|null}
-     * @param {string} search
-     */
-    async resolveUser(search) {
+    async resolveUser(search: string) {
         if (!search || typeof search !== 'string') return null;
         let user = null;
         if (search.match(/^<@!?(\d+)>$/)) user = await this.users.fetch(search.match(/^<@!?(\d+)>$/)[1]).catch(() => { });
@@ -72,23 +80,13 @@ class Client extends DiscordClient {
         if (!user) user = await this.users.fetch(search).catch(() => { });
         return user;
     }
-    /**
-     * @returns {Promise<import('discord.js').GuildMember>|null}
-     * @param {string} search 
-     * @param {Guild} guild 
-     */
-    async resolveMember(search, guild) {
+    async resolveMember(search: string, guild: Guild) {
         if (!search || typeof search !== 'string') return null;
         const user = await this.resolveUser(search);
         if (!user) return null;
         return await guild.members.fetch(user).catch(() => { });
     }
-    /**
-     * @returns {import('discord.js').Role|null}
-     * @param {string} search
-     * @param {import('discord.js').Guild} guild 
-     */
-    resolveRole(search, guild) {
+    resolveRole(search: string, guild: Guild): Role | null {
         if (!search || typeof search !== 'string') return null;
         let role = null;
         if (search.match(/^<@&!?(\d+)>$/)) role = guild.roles.cache.get(search.match(/^<@&!?(\d+)>$/)[1]);
@@ -96,12 +94,7 @@ class Client extends DiscordClient {
         if (!role) role = guild.roles.cache.get(search);
         return role;
     }
-    /**
-     * @returns {import('discord.js').Channel|null}
-     * @param {string} search
-     * @param {import('discord.js').Guild} guild
-     */
-    resolveChannel(search, guild) {
+    resolveChannel(search: string, guild: Guild): Channel | null {
         if (!search || typeof search !== 'string') return null;
         let channel = null;
         if (search.match(/^<@#!?(\d+)>$/)) channel = guild.channels.cache.get(search.match(/^<@#!?(\d+)>$/)[1]);
@@ -109,14 +102,10 @@ class Client extends DiscordClient {
         if (!channel) channel = guild.channels.cache.get(search);
         return channel;
     }
-    /**
-     * @returns {Promise<import('discord.js').Emoji>}
-     * @param {string} name 
-     */
-    getEmoji(name) {
+    async getEmoji(name: string): Promise<Emoji> {
         if (this.emojis.cache.has(Emotes[name])) return this.emojis.cache.get(Emotes[name]);
         if (this.botEmojis.has(name)) return this.botEmojis.get(name);
-        function findEmoji(id) {
+        function findEmoji(id: string) {
             const temp = this.emojis.cache.get(id);
             if (!temp) return null;
             const emoji = Object.assign({}, temp);
@@ -124,15 +113,15 @@ class Client extends DiscordClient {
             emoji.require_colons = emoji.requiresColons;
             return emoji;
         }
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             return resolve(
                 await this.shard.broadcastEval(`(${findEmoji}).call(this, '${Emotes[name]}')`)
-                    .then((arr) => {
-                        const femoji = arr.find((emoji) => emoji);
+                    .then((arr: any) => {
+                        const femoji = arr.find((emoji: any) => emoji);
                         if (!femoji) return null;
                         return this.api.guilds(femoji.guild)
                             .get()
-                            .then(raw => {
+                            .then((raw: any) => {
                                 const guild = new Guild(this, raw);
                                 const emoji = new GuildEmoji(this, femoji, guild);
                                 this.botEmojis.set(name, emoji);
@@ -142,17 +131,8 @@ class Client extends DiscordClient {
             );
         });
     }
-    /**
-     * 
-     * @param {import('discord.js').Message} message 
-     * @param {string|import('discord.js').MessageEmbed} question 
-     * @param {number} [limit=60000] millieseconds
-     * @param {boolean} [obj=false] Put `true` to return the message class instead of returning the message content
-     * 
-     * @returns {Promise<boolean|string|import('discord.js').MessageEmbed>}
-     */
-    async awaitReply(message, question, limit = 60000, obj = false) {
-        const filter = m => m.author.id === message.author.id;
+    async awaitReply(message: Message, question: string | MessageEmbed, limit: number = 60000, obj: boolean = false): Promise<boolean | string | Message> {
+        const filter = (m: Message) => m.author.id === message.author.id;
         await message.channel.send(question);
         try {
             const collected = await message.channel.awaitMessages(filter, { max: 1, time: limit, errors: ['time'] });
@@ -162,16 +142,11 @@ class Client extends DiscordClient {
             return false;
         }
     }
-    /**
-     * @private
-     * @returns {boolean|string} if an error occured
-     * @param {string} itemName 
-     */
-    registerItem(dir) {
+    private registerItem(dir: string): boolean | string {
         try {
             const Item = require(dir);
-            if (Item.prototype instanceof BaseItem) {
-                const props = new Item();
+            if (Item.default.prototype instanceof BaseItem) {
+                const props = new Item.default();
                 this.shopitems.set(props.config.id, props);
             }
             return false;
@@ -179,7 +154,7 @@ class Client extends DiscordClient {
             return `Unable to load item ${dir}: ${e}`;
         }
     }
-    async registerItems() {
+    private async registerItems() {
         const filePath = path.join(__dirname, '../items/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
@@ -189,16 +164,11 @@ class Client extends DiscordClient {
             }
         }
     }
-    /**
-     * @private
-     * @returns {string|boolean}
-     * @param {string} dir
-     */
-    registerCommand(dir, category) {
+    private registerCommand(dir: string, category: string): string | boolean {
         try {
             const Command = require(dir);
-            if (Command.prototype instanceof BaseCommand) {
-                const props = new Command();
+            if (Command.default.prototype instanceof BaseCommand) {
+                const props = new Command.default();
                 props.config.category = category;
                 this.commands.set(props.config.name, props);
             }
@@ -207,7 +177,7 @@ class Client extends DiscordClient {
             return `Unable to load command ${dir}: ${e}`;
         }
     }
-    async registerCommands() {
+    private async registerCommands() {
         const filePath = path.join(__dirname, '../commands/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
@@ -221,39 +191,35 @@ class Client extends DiscordClient {
             }
         }
     }
-    async registerWebSocketEvents() {
+    private async registerWebSocketEvents() {
         const filePath = path.join(__dirname, '../events/websocket/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
             if (file.endsWith('.js')) {
                 const Event = require(path.join(filePath, file));
-                if (Event.prototype instanceof WebSocketEvent) {
-                    const instance = new Event();
+                if (Event.default.prototype instanceof WebSocketEvent) {
+                    const instance = new Event.default();
                     this.server.on(instance.eventName, instance.run.bind(instance, this));
                 }
                 delete require.cache[require.resolve(path.join(filePath, file))];
             }
         }
     }
-    async registerDiscordEvents() {
+    private async registerDiscordEvents() {
         const filePath = path.join(__dirname, '../events/discord/');
         const files = await fs.readdir(filePath);
         for (const file of files) {
             if (file.endsWith('.js')) {
                 const Event = require(path.join(filePath, file));
-                if (Event.prototype instanceof DiscordEvent) {
-                    const instance = new Event();
+                if (Event.default.prototype instanceof DiscordEvent) {
+                    const instance = new Event.default();
                     this.on(instance.eventName, instance.run.bind(instance, this));
                 }
                 delete require.cache[require.resolve(path.join(filePath, file))];
             }
         }
     }
-    /**
-     * @returns {Promise<number>}
-     * @param {'users'|'guilds'} props 
-     */
-    async getCount(props) {
+    async getCount(props: 'users' | 'guilds'): Promise<number> {
         if (props === 'users') {
             const raw = await this.shard.broadcastEval(`this.guilds.cache.reduce((acc, cur) => acc + cur.memberCount, 0)`);
             return raw.reduce((acc, cur) => acc + cur, 0);
@@ -262,78 +228,39 @@ class Client extends DiscordClient {
             return raw.reduce((acc, cur) => acc + cur, 0);
         } return 0;
     }
-    /**
-     * @returns {Array<any>}
-     * @param {Array<any>} arr 
-     * @param {number} maxLen 
-     */
-    trimArray(arr, maxLen = 10) {
+    trimArray(arr: Array<any>, maxLen: number = 10): any[] {
         if (arr.length > maxLen) {
             arr = arr.slice(0, maxLen);
             arr.push(`${arr.length - maxLen} more...`);
         }
         return arr;
     }
-    /**
-     * 
-     * @param {string} text 
-     * @param {number} [maxLen=2000]
-     */
-    shorten(text, maxLen = 2000) {
+    shorten(text: string, maxLen: number = 2000) {
         return text.length > maxLen ? `${text.substr(0, maxLen - 3)}...` : text;
     }
-    /**
-     * 
-     * @param {number} number 
-     * @param {number} [minimumFractionDigits=0] 
-     */
-    formatNumber(number, minimumFractionDigits = 0) {
-        return Number.parseFloat(number).toLocaleString(undefined, {
+    formatNumber(n: number, minimumFractionDigits: number = 0) {
+        return Number.parseFloat(n.toString()).toLocaleString(undefined, {
             minimumFractionDigits,
             maximumFractionDigits: 2
         });
     }
-    /**
-     * 
-     * @param {string} text 
-     * @param {'encode'|'decode'} mode 
-     */
-    base64(text, mode = 'encode') {
+    base64(text: string, mode: 'encode' | 'decode' = 'encode') {
         if (mode === 'encode') return Buffer.from(text).toString('base64');
         if (mode === 'decode') return Buffer.from(text, 'base64').toString('utf8') || null;
         return null;
     }
-    /**
-     * 
-     * @param {string} title 
-     * @param {string} url 
-     * @param {string} display 
-     */
-    embedURL(title, url, display) {
+    embedURL(title: string, url: string, display: string) {
         return `[${title}](${url.replace(/\)/g, '%27')}${display ? ` '${display}'` : ''})`;
     }
-    /**
-     * 
-     * @param {string} text 
-     * @param {'sha256'|'md5'|'sha1'|'sha512'} algorithm 
-     */
-    hash(text, algorithm) {
+    hash(text: string, algorithm: 'sha256' | 'md5' | 'sha1' | 'sha512') {
         return crypto.createHash(algorithm).update(text).digest('hex');
     }
-    /**
-     * 
-     * @param {string} str 
-     */
-    escapeRegex(str) {
+    escapeRegex(str: string) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-    /**
-     * @param {Array} array 
-     * @param {number} [chunkSize=0] 
-     */
-    chunk(array, chunkSize = 0) {
+    chunk(array: any[], chunkSize: number = 0) {
         return array.reduce((previous, current) => {
-            let chunk;
+            let chunk: any[] = [];
             if (previous.length === 0 || previous[previous.length - 1].length === chunkSize) {
                 chunk = [];
                 previous.push(chunk);
@@ -344,11 +271,7 @@ class Client extends DiscordClient {
             return previous;
         }, []);
     }
-    /**
-     * @returns {string|Array<any>|null}
-     * @param {string|Array<any>} obj 
-     */
-    shuffle(obj) {
+    shuffle(obj: string | any[]): any {
         if (!obj) return null;
         if (Array.isArray(obj)) {
             let i = obj.length;
@@ -364,5 +287,3 @@ class Client extends DiscordClient {
         return obj;
     }
 }
-
-module.exports = Client;

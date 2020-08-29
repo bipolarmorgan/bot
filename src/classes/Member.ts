@@ -1,31 +1,19 @@
-class Member {
-    /**
-     * 
-     * @param {import('./Unicron')} client 
-     * @param {{any}} raw 
-     */
-    constructor(client, raw = {}) {
+import Client from './Unicron';
+import { User } from 'discord.js';
+
+export default class Member {
+    private client: Client;
+    public guild_id: string;
+    public member_id: string;
+    public data: MemberData;
+    constructor(client: Client, raw: MemberDataS) {
         this.client = client;
-        /**
-         * @type {string}
-         */
         this.guild_id = raw.guild_id;
-        /**
-         * @type {string}
-         */
         this.member_id = raw.member.id;
-        /**
-         * @type {{ warnings: [{reason:string, moderator:string, date:string, case:number}], captcha:string, cases:number}}
-         */
         this.data = raw.member.data;
     }
-    /**
-     * 
-     * @param {string} reason 
-     * @param {import('discord.js').User} moderator 
-     */
-    addWarn(reason, moderator) {
-        if (!this.data) this.data = {};
+    addWarn(reason: string, moderator: User): number {
+        if (!this.data) this.data = { captcha: null, warnings: [], cases: 1 };
         if (!this.data.warnings) this.data.warnings = [];
         if (!this.data.cases) this.data.cases = 1;
         const index = this.data.cases;
@@ -38,24 +26,17 @@ class Member {
         this.data.cases++;
         return index;
     }
-    /**
-     * 
-     * @param {number} index 
-     */
-    removeWarn(index) {
+    removeWarn(index: number): void {
         this.data.warnings = this.data.warnings.filter((w) => w.case !== index);
     }
-    /**
-     * @returns {Promise<void>}
-     */
-    save() {
+    save(): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const payload = this.toJSON();
             await this.client.server.post(`/api/member/${payload.guild_id}/${payload.member_id}`, payload).catch(reject);
             resolve();
         });
     }
-    toJSON() {
+    toJSON(): MemberDataD {
         return {
             guild_id: this.guild_id,
             member_id: this.member_id,
@@ -63,4 +44,28 @@ class Member {
         }
     }
 }
-module.exports = Member;
+
+interface MemberData {
+    captcha: string;
+    cases: number;
+    warnings: {
+        case: number;
+        reason: string;
+        moderator: string;
+        date: string;
+    }[];
+}
+
+interface MemberDataS {
+    guild_id: string;
+    member: {
+        id: string;
+        data: MemberData;
+    }
+}
+
+interface MemberDataD {
+    guild_id: string;
+    member_id: string;
+    data: MemberData;
+}

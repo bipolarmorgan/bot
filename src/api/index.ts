@@ -1,8 +1,10 @@
-const { EventEmitter } = require('events');
-const fetch = require('node-fetch');
-const io = require('socket.io-client');
+import { EventEmitter } from 'events';
+import fetch from 'node-fetch';
+import io from 'socket.io-client';
 
-class API extends EventEmitter {
+export default class API extends EventEmitter {
+    private uri: string;
+    private ws: SocketIOClient.Socket;
     constructor() {
         super();
         this.uri = process.env.DATABASE_URI;
@@ -10,22 +12,22 @@ class API extends EventEmitter {
     connect() {
         this.emit('connecting');
         this.ws = io(this.uri);
-        this.ws.on('raw', (event, payload) => {
+        this.ws.on('raw', (event: string, payload: {}) => {
             this.emit('raw', event, payload);
         });
         this.ws.on('disconnect', () => {
             this.emit('disconnect');
         });
-        this.ws.on('error', (err) => {
+        this.ws.on('error', (err: any) => {
             this.emit('error', err);
         })
-        this.ws.on('connect_error', (err) => {
+        this.ws.on('connect_error', (err: any) => {
             this.emit('connect_error', err);
         });
-        this.ws.on('reconnecting', (n) => {
+        this.ws.on('reconnecting', (n: any) => {
             this.emit('reconnecting', n);
         });
-        this.ws.on('reconnect_error', (err) => {
+        this.ws.on('reconnect_error', (err: any) => {
             this.emit('reconnect_error', (err));
         });
         this.ws.on('reconnect_failed', () => {
@@ -34,12 +36,12 @@ class API extends EventEmitter {
     }
     /**
      * 
-     * @returns {Promise<{any}>}
+     * @returns {Promise<{}>}
      * @param {string} path 
      */
-    get(path) {
+    get(path: string): Promise<{}> {
         return new Promise(async (resolve, reject) => {
-            const response = await fetch.default(`${this.uri}${path}`).catch(reject);
+            const response: any = await fetch(`${this.uri}${path}`).catch(reject);
             if (response.status !== 200) return reject(response);
             const body = await response.json().catch(reject);
             resolve(body);
@@ -47,13 +49,13 @@ class API extends EventEmitter {
     }
     /**
      * 
-     * @returns {Promise<{any}>}
+     * @returns {Promise<{}>}
      * @param {string} path
-     * @param {{any}} partial 
+     * @param {{}} partial 
      */
-    post(path, partial) {
+    post(path: string, partial: {}): Promise<{}> {
         return new Promise(async (resolve, reject) => {
-            const response = await fetch.default(`${this.uri}${path}`, {
+            const response: any = await fetch(`${this.uri}${path}`, {
                 method: 'post',
                 headers: {
                     'Content-type': 'application/json',
@@ -67,12 +69,12 @@ class API extends EventEmitter {
     }
     /**
      * 
-     * @returns {Promise<{any}>}
+     * @returns {Promise<{}>}
      * @param {string} path
      */
-    delete(path) {
+    delete(path: string): Promise<{}> {
         return new Promise(async (resolve, reject) => {
-            const response = await fetch.default(`${this.uri}${path}`, {
+            const response: any = await fetch(`${this.uri}${path}`, {
                 method: 'delete',
             }).catch(reject);
             if (response.status !== 200) return reject(response);
@@ -81,5 +83,3 @@ class API extends EventEmitter {
         });
     }
 }
-
-module.exports = API;

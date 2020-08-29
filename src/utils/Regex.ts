@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     discord: {
         invite: /\b(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|(discordapp|discord)\.com\/invite)\/\w+[a-z]/gi,
         userOrMember: /^(?:<@!?)?(\d{17,19})>?/,

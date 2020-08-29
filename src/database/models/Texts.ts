@@ -1,10 +1,6 @@
-const { DataTypes } = require('sequelize');
+import { Sequelize, DataTypes } from 'sequelize';
 
-/**
- * 
- * @param {import('sequelize').Sequelize} sq 
- */
-function Texts(sq) {
+export default function Texts(sq: Sequelize) {
     return sq.define('texts', {
         guild_id: {
             type: DataTypes.STRING,
@@ -25,5 +21,3 @@ function Texts(sq) {
         timestamps: false,
     });
 }
-
-module.exports = Texts;

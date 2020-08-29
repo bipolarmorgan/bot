@@ -1,18 +1,12 @@
-const BaseManager = require('../classes/BaseManager');
+import BaseManager from '../classes/BaseManager';
+import Client from '../classes/Unicron';
+import User from '../classes/User';
 
-class UserManager extends BaseManager {
-    constructor(client) {
+export default class UserManager extends BaseManager<User> {
+    constructor(client: Client) {
         super(client);
-        /**
-         * @type {import('discord.js').Collection<string, import('../classes/User')>}
-         */
-        this.cache;
     }
-    /**
-     * @returns {Promise<import('../classes/User')>}
-     * @param {string} user_id
-     */
-    fetch(user_id) {
+    fetch(user_id: string): Promise<User> {
         return new Promise(async (resolve, reject) => {
             if (this.cache.has(user_id)) return resolve(this.cache.get(user_id));
             await this.client.server.get(`/api/user/${user_id}`).then(async () => {
@@ -21,16 +15,10 @@ class UserManager extends BaseManager {
             }).catch(reject);
         });
     }
-    /**
-     * @returns {Promise<void>}
-     * @param {string} user_id
-     */
-    delete(user_id) {
+    delete(user_id: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             await this.client.server.delete(`/api/user/${user_id}`).catch(reject);
             resolve();
         });
     }
 }
-
-module.exports = UserManager;

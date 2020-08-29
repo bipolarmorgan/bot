@@ -1,17 +1,8 @@
-const { Collection } = require('discord.js');
+import { Collection } from 'discord.js';
 
-/**
- * @type {number[]}
- */
-const LvlChart = [];
-/**
- * @type {number[]}
- */
-const ReqLvlChart = [];
-/**
- * @type {Collection<string, string>}
- */
-const graph = new Collection();
+const LvlChart: number[] = [];
+const ReqLvlChart: number[] = [];
+const graph: Collection<number, string> = new Collection();
 
 for (let i = 0; i < 101; i++) {
     ReqLvlChart.push(10 * (i * i) + (50 * i) + 100);
@@ -31,6 +22,7 @@ for (let i = 0; i < 101; i++) {
     const cur = LvlChart[i - 1] + ReqLvlChart[i - 1];
     LvlChart.push(cur);
 };
+
 graph.set(0, '□□□□□□□□□□');
 graph.set(1, '■□□□□□□□□□');
 graph.set(2, '■■□□□□□□□□');
@@ -42,10 +34,10 @@ graph.set(7, '■■■■■■■□□□');
 graph.set(8, '■■■■■■■■□□');
 graph.set(9, '■■■■■■■■■□');
 
-module.exports = {
+export default {
     LevelChart: LvlChart,
     RequiredLevelChart: ReqLvlChart,
-    ProgressBar: function (percent) {
+    ProgressBar: function (percent: number) {
         if (percent < 10) return graph.get(0);
         else if (percent < 20) return graph.get(1);
         else if (percent < 30) return graph.get(2);

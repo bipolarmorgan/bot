@@ -1,4 +1,7 @@
-const { Sequelize, Transaction } = require('sequelize');
+import { Sequelize, Transaction } from 'sequelize';
+import tickets from './models/Tickets';
+import texts from './models/Texts';
+import cooldowns from './models/Cooldowns';
 
 const db = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
@@ -22,9 +25,9 @@ const cd = new Sequelize('database', 'username', 'password', {
     }
 });
 
-const Tickets = require('./models/Tickets')(db);
-const Texts = require('./models/Texts')(db);
-const Cooldowns = require('./models/Cooldowns')(cd);
+const Tickets = tickets(db);
+const Texts = texts(db);
+const Cooldowns = cooldowns(cd);
 
 (async function(){
     if (process.argv.includes('--dbInit')) {
@@ -44,4 +47,8 @@ const Cooldowns = require('./models/Cooldowns')(cd);
     }
 })();
 
-module.exports = { Tickets, Texts, Cooldowns };
+export default { 
+    Tickets,
+    Texts,
+    Cooldowns
+};
