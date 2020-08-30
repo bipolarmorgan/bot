@@ -1,22 +1,19 @@
-const { MessageEmbed } = require('discord.js');
-const AutoModeration = require('../modules/AutoModeration');
+import Client from '../classes/Unicron';
+import { Message, MessageEmbed } from 'discord.js';
+import Guild from '../classes/Guild';
+import AutoModeration from '../modules/AutoModeration';
 
-/**
- * @param {import('../classes/Unicron')} client
- * @param {import('discord.js').Message} message
- * @param {import('../classes/Guild')} settings
- */
-module.exports = (client, message, settings) => {
+export default function (client: Client, message: Message, settings: Guild) {
     return new Promise(async (resolve, reject) => {
         try {
             const status = settings.inviteFilter;
-            const strat = (status && (message.author.permLevel < 2) && message.content.match(client.utils.Regex.discord.invite)) ? true : false;
+            const strat = (status && (client.permission.level(message) < 2) && message.content.match(client.utils.Regex.discord.invite)) ? true : false;
             if (!strat) return resolve(false);
             if (message.deletable) await message.delete().catch(() => { });
             await message.channel.send(`No Advertising! ${message.author}.`)
                 .then((msg) => msg.delete({ timeout: 5000 }).catch(() => { }));
-            const mChannel = message.guild.channels.cache.get(settings.modLogChannel);
-            if (mChannel) {
+            const mChannel: any = message.guild.channels.cache.get(settings.modLogChannel);
+            if (mChannel && mChannel.type === 'text') {
                 await mChannel.send(new MessageEmbed()
                     .setTimestamp()
                     .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))

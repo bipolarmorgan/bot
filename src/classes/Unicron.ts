@@ -1,12 +1,13 @@
-import { Client as DiscordClient, Collection, Guild, GuildEmoji, Emoji, 
-    Channel, Role, Message, MessageEmbed 
+import {
+    Client as DiscordClient, Collection, Guild, GuildEmoji, Emoji,
+    Channel, Role, Message, MessageEmbed
 } from 'discord.js';
 
 import { promisify } from 'util';
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import Emotes from '../../assets/Emotes.json';
+import Emotes from '../assets/Emotes';
 import BaseCommand from './BaseCommand';
 import BaseItem from './BaseItem';
 import DiscordEvent from './DiscordEvent';
@@ -103,7 +104,7 @@ export default class Client extends DiscordClient {
         return channel;
     }
     async getEmoji(name: string): Promise<Emoji> {
-        if (this.emojis.cache.has(Emotes[name])) return this.emojis.cache.get(Emotes[name]);
+        if (this.emojis.cache.has(Emotes.get(name))) return this.emojis.cache.get(Emotes.get(name));
         if (this.botEmojis.has(name)) return this.botEmojis.get(name);
         function findEmoji(id: string) {
             const temp = this.emojis.cache.get(id);
@@ -115,11 +116,12 @@ export default class Client extends DiscordClient {
         }
         return new Promise(async (resolve) => {
             return resolve(
-                await this.shard.broadcastEval(`(${findEmoji}).call(this, '${Emotes[name]}')`)
+                await this.shard.broadcastEval(`(${findEmoji}).call(this, '${Emotes.get(name)}')`)
                     .then((arr: any) => {
                         const femoji = arr.find((emoji: any) => emoji);
                         if (!femoji) return null;
-                        return this.api.guilds(femoji.guild)
+                        const client: any = this;
+                        return client.api.guilds(femoji.guild)
                             .get()
                             .then((raw: any) => {
                                 const guild = new Guild(this, raw);

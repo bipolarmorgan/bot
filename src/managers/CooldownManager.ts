@@ -6,11 +6,16 @@ import ms from 'ms';
 import { MessageEmbed, Message } from 'discord.js';
 import db from '../database/';
 
+interface Cooldown {
+    id: string;
+    timestamp: number;
+}
+
 export default class CooldownManager extends BaseManager<null> {
     constructor(client: Client) {
         super(client);
     }
-    private async findOrCreate(name: string) {
+    private async findOrCreate(name: string): Promise<Cooldown[]> {
         let cc = await db.Cooldowns.findOne({ where: { name } });
         if (!cc) cc = await db.Cooldowns.create({ name });
         return cc.getDataValue('data');
@@ -31,8 +36,8 @@ export default class CooldownManager extends BaseManager<null> {
             }
             if (donator) cooldownAmount = Math.floor(cooldownAmount - (cooldownAmount * 0.35));
             if (!ccs) ccs = [];
-            if (ccs.find((u: any) => u.id === message.author.id)) {
-                const expirationTime = ccs.find((u: any) => u.id === message.author.id).timestamp + cooldownAmount;
+            if (ccs.find((u) => u.id === message.author.id)) {
+                const expirationTime = ccs.find((u) => u.id === message.author.id).timestamp + cooldownAmount;
                 if (now < expirationTime) {
                     const timeLeft = Math.floor(expirationTime - now);
                     const donCD = Math.floor(bcd - (bcd * 0.35));
@@ -42,7 +47,7 @@ export default class CooldownManager extends BaseManager<null> {
                         .setDescription(` ${await this.client.getEmoji('slowmode')} Please wait **${ms(timeLeft)}** before reusing the command again.\nDefault Cooldown for this command is **${ms(bcd)}**\nWhile [Donators](${this.client.unicron.serverInviteURL}) will only have to wait **${ms(donCD)}**!`)
                     ));
                 } else {
-                    await db.Cooldowns.update({ data: ccs.filter((i: any) => i.id !== message.author.id) }, { where: { name: command.config.name } });
+                    await db.Cooldowns.update({ data: ccs.filter((i) => i.id !== message.author.id) }, { where: { name: command.config.name } });
                 }
             }
             return resolve(false);

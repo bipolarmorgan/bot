@@ -1,4 +1,4 @@
-[
+export default [
     {
         "quote": "The best way to predict The future is to create it, now.",
         "author": "Abharam Lincon"

@@ -1,15 +1,9 @@
-const { MessageEmbed } = require('discord.js');
-const ms = require('ms');
+import Client from '../classes/Unicron';
+import Guild from '../classes/Guild';
+import ms from 'ms';
+import { Message, MessageEmbed, GuildMember, GuildChannel, Role } from 'discord.js';
 
-/**
- * 
- * @param {import('../classes/Unicron')} client
- * @param {import('discord.js').Message} message
- * @param {import('discord.js').GuildMember} member
- * @param {import('../classes/Guild')} settings
- * 
- */
-module.exports = (client, message, member, settings) => {
+export default function (client: Client, message: Message, member: GuildMember, settings: Guild) {
     return new Promise(async (resolve, reject) => {
         try {
             const strat = settings.autoModeration;
@@ -18,8 +12,7 @@ module.exports = (client, message, member, settings) => {
             if (!strat) return resolve(false);
             const duration = settings.autoModDuration;
             const reason = 'Auto Moderation';
-            const dm = await member.user.createDM();
-            await dm.send(new MessageEmbed()
+            await member.user.send(new MessageEmbed()
                 .setTimestamp()
                 .setTitle(`You have been ${action} from ${message.guild.name}`)
                 .setDescription(`Reason : ${reason}`)
@@ -27,12 +20,11 @@ module.exports = (client, message, member, settings) => {
             ).catch(() => { });
             switch (act) {
                 case 'MUTE': {
-                    let role = message.guild.roles.cache.find((r) => { return r.name === 'Muted' });
-                    if (!role) role = await message.guild.roles.create({ name: 'Muted' }).catch(() => { });
+                    let role: Role | void = message.guild.roles.cache.find((r) => { return r.name === 'Muted' }) || await message.guild.roles.create({ data: { name: 'Muted' } }).then((r) => r).catch(() => { });
+                    if (!role) role = await message.guild.roles.create({ data: { name: 'Muted' } }).catch(() => { });
                     if (!role) return resolve(false);
                     await member.roles.add(role, reason).catch(() => { });
-                    for (let channel of message.guild.channels.cache.filter(channel => channel.type === 'text')) {
-                        channel = channel[1];
+                    for (const channel of message.guild.channels.cache.filter((channel: GuildChannel) => channel.type === 'text').array()) {
                         if (!channel.permissionOverwrites.get(role.id)) {
                             await channel.createOverwrite(role, {
                                 SEND_MESSAGES: false,
@@ -42,7 +34,7 @@ module.exports = (client, message, member, settings) => {
                     }
                     if (duration && !isNaN(duration)) {
                         setTimeout(() => {
-                            member.roles.remove(role, 'Mute Duration expired').catch(() => { });
+                            if (role) member.roles.remove(role, 'Mute Duration expired').catch(() => { });
                         }, Number(duration));
                     }
                     break;
@@ -79,8 +71,8 @@ module.exports = (client, message, member, settings) => {
                 default:
                     return resolve(false);
             }
-            const modchannel = await client.channels.fetch(settings.modLogChannel).catch(() => { });
-            if (modchannel && modchannel.type === 'text') {
+            const modchannel: any = message.guild.channels.cache.get(settings.modLogChannel);
+            if (modchannel && modchannel.type === 'text') { 
                 modchannel.send(new MessageEmbed()
                     .setColor('RANDOM')
                     .setAuthor(`${client.user.tag} / ${client.user.id}`, client.user.displayAvatarURL({ dynamic: true }))

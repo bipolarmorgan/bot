@@ -1,30 +1,27 @@
-const { MessageEmbed } = require('discord.js');
-const AutoModeration = require('../modules/AutoModeration');
-const fs = require('fs');
+import fs from 'fs';
+import Client from '../classes/Unicron';
+import Guild from '../classes/Guild';
+import AutoModeration from '../modules/AutoModeration';
+import { Message, MessageEmbed } from 'discord.js';
+
 const swearWords = fs.readFileSync('assets/swearWords.txt').toString().split('\r\n');
+const regex = new RegExp(swearWords.map((s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
 
-const regex = new RegExp(swearWords.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gi');
-
-/**
- * @param {import('../classes/Unicron')} client
- * @param {import('discord.js').Message} message
- * @param {import('../classes/Guild')} settings
- */
-module.exports = (client, message, settings) => {
+export default function (client: Client, message: Message, settings: Guild) {
     return new Promise(async (resolve, reject) => {
         try {
             const status = settings.swearFilter;
-            const strat = (status && !message.channel.nsfw && message.author.permLevel < 3 &&
-                (
-                    message.content.match(regex)
-                )
+            const strat = (
+                status && message.channel.type === 'text' && 
+                !message.channel.nsfw && client.permission.level(message) < 3 
+                && message.content.match(regex)
             ) ? true : false;
             if (!strat) return resolve(false);
             if (message.deletable) await message.delete().catch(() => { });
             await message.channel.send(`No Swearing! ${message.author}.`)
                 .then((msg) => msg.delete({ timeout: 5000 })).catch(() => { });
-            const mChannel = message.guild.channels.cache.get(settings.modLogChannel);
-            if (mChannel) {
+            const mChannel: any = message.guild.channels.cache.get(settings.modLogChannel);
+            if (mChannel && mChannel.type === 'text') {
                 await mChannel.send(new MessageEmbed()
                     .setTimestamp()
                     .setAuthor(client.user.tag, client.user.displayAvatarURL({ dynamic: true }))

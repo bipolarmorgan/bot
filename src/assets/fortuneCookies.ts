@@ -1,4 +1,4 @@
-[
+export default [
     "With integrity and consistency -- your credits are piling up.",
     "Reach out your hand today to support others who need you.",
     "It is not the outside riches bit the inside ones that produce happiness.",

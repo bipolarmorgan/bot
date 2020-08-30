@@ -35,7 +35,7 @@
     "scripts": {
         "start": "node .",
         "nodemon": "nodemon dist/index.js",
-        "build": "tsc --build"
+        "build": "tsc --build --downlevelIteration"
     },
     "keywords": [],
     "author": "oadpoaw",

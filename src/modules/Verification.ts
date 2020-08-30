@@ -1,11 +1,9 @@
-const { MessageEmbed } = require('discord.js');
+import Client from '../classes/Unicron';
+import Guild from '../classes/Guild';
+import Member from '../classes/Member';
+import { Message, MessageEmbed } from 'discord.js';
 
-/**
- * @param {import('../classes/Unicron')} client
- * @param {import('discord.js').Message} message
- * @param {import('../classes/Guild')} settings
- */
-module.exports = (client, message, settings) => {
+export default function (client: Client, message: Message, settings: Guild) {
     return new Promise(async (resolve, reject) => {
         try {
             const channel_id = settings.verificationChannel;
@@ -20,11 +18,8 @@ module.exports = (client, message, settings) => {
             if (type === 'discrim') {
                 verified = message.content === `I am ${message.author.discriminator}`;
             } else if (type === 'captcha') {
-                /**
-                 * @type {import('../classes/Member')}
-                 */
-                const member = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
-                verified = message.content === `>verify ${member.data.captcha}`;
+                const member: Member | void = await client.db.members.fetch(message.guild.id, message.author.id).catch(console.log);
+                if (member) verified = message.content === `>verify ${member.data.captcha}`;
             }
             if (!verified) return;
             await message.channel.send(new MessageEmbed()
