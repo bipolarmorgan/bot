@@ -14,7 +14,7 @@ export default {
     },
 }
 
-interface RandomOption {
+export interface RandomOption {
     max: number;
     min: number;
 }

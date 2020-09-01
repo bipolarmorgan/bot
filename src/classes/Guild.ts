@@ -104,7 +104,7 @@ export default class Guild {
     }
 }
 
-interface GuildSettings {
+export interface GuildSettings {
     id: string;
     prefix: string;
     premium: boolean;

@@ -45,7 +45,7 @@ export default class Member {
     }
 }
 
-interface MemberData {
+export interface MemberData {
     captcha: string;
     cases: number;
     warnings: {
@@ -56,7 +56,7 @@ interface MemberData {
     }[];
 }
 
-interface MemberDataS {
+export interface MemberDataS {
     guild_id: string;
     member: {
         id: string;
@@ -64,7 +64,7 @@ interface MemberDataS {
     }
 }
 
-interface MemberDataD {
+export interface MemberDataD {
     guild_id: string;
     member_id: string;
     data: MemberData;

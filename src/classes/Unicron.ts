@@ -260,7 +260,7 @@ export default class Client extends DiscordClient {
     escapeRegex(str: string) {
         return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-    chunk(array: any[], chunkSize: number = 0) {
+    chunk<T>(array: Array<T>, chunkSize: number = 0): Array<Array<T>> {
         return array.reduce((previous, current) => {
             let chunk: any[] = [];
             if (previous.length === 0 || previous[previous.length - 1].length === chunkSize) {

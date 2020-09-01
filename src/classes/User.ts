@@ -8,7 +8,7 @@ export default class User {
     public balance: number;
     public experience: number;
     public multiplier: number;
-    public marriage_id: number;
+    public marriage_id: string;
     public inventory: {
         item_id: string;
         amount: number;
@@ -54,7 +54,7 @@ export default class User {
     get progressXP(): number {
         return this.nextlevelxp - this.experience;
     }
-    async addXP(message: Message, amount: number): Promise<void> {
+    async addXP(message: Message, amount?: number): Promise<void> {
         const next_level = this.nextlevel;
         let current_level = this.level;
         this.experience += amount || this.client.utils.Random.nextInt({ max: 25, min: 15 });
@@ -119,12 +119,12 @@ export default class User {
     }
 }
 
-interface UserData {
+export interface UserData {
     id: string;
     balance: number;
     experience: number;
     multiplier: number;
-    marriage_id: number;
+    marriage_id: string;
     inventory: {
         item_id: string;
         amount: number;
