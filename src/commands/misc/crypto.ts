@@ -1,8 +1,10 @@
-const BaseCommand = require('../../classes/BaseCommand');
-const Util = require('util');
-const fetch = require('node-fetch')
+import Command from '../../classes/BaseCommand';
+import { Message } from 'discord.js';
+import Client from '../../classes/Unicron';
+import Util from 'util';
+import fetch from 'node-fetch';
 
-module.exports = class extends BaseCommand {
+export default class Crypto extends Command {
     constructor() {
         super({
             config: {
@@ -22,13 +24,7 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * Return the exchange rate for one crypto currency in terms of other currencies.
-     * @param {string} fsym
-     * @param {Array<string>} tsyms
-     * @param {import('discord.js').Message} message
-     */
-    CrytpoComparePrice(fsym, tsyms, message) {
+    CrytpoComparePrice(fsym: string, tsyms: string[], message: Message) {
         fetch(`https://min-api.cryptocompare.com/data/price?fsym=${fsym}&tsyms=${tsyms}`).then(async (response) => {
             let finalMessage = '**~~------~~** __Current exchange rates for 1 ' + fsym + '__ **~~------~~**\n```c++\n';
             try {
@@ -48,24 +44,12 @@ module.exports = class extends BaseCommand {
             message.channel.send('Not a valid crypto currency, try BTC or ETH.');
         });
     }
-    /**
-     * Pad a string on the left or right for better alignment.
-     * @param {string} pad
-     * @param {string} str
-     * @param {boolean} padLeft
-     */
-    pad(pad, str, padLeft) {
+    pad(pad: string, str: string, padLeft: boolean) {
         if (typeof str === 'undefined') return pad;
         if (padLeft) return (pad + str).slice(-pad.length);
         else return (str + pad).substring(0, pad.length);
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         const symbols = args.map((str) => str.toUpperCase());
         const fromSymbol = symbols.shift();
         if (symbols.length === 0) symbols.push('USD');

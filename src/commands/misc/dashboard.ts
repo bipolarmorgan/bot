@@ -1,11 +1,13 @@
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class Dashboard extends Command {
     constructor() {
         super({
             config: {
                 name: 'dashboard',
-                description: 'Sends Bot\'s Web Dashboard',
+                description: 'Sends Bot\'s Web Dashboard link',
                 permission: 'User',
             },
             options: {
@@ -20,13 +22,7 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         return message.channel.send('https://unicron-bot.xyz/');
     }
 }

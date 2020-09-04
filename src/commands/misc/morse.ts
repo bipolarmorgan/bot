@@ -1,9 +1,10 @@
-const { MessageEmbed } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
 
 const dit = '.';
 const dah = '–';
-function morse(char) {
+function morse(char: string): string {
     switch (char) {
         case 'a': return dit + dah;
         case 'b': return dah + dit + dit + dit;
@@ -93,7 +94,7 @@ function morse(char) {
         default: return '\u2007'
     }
 };
-module.exports = class extends BaseCommand {
+export default class Morse extends Command {
     constructor() {
         super({
             config: {
@@ -113,18 +114,10 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
-        args = args.join(' ').toLowerCase();
-        args = args.replace(/./g, x => `${morse(x)}\u2001`).trim();
+    async run(client: Client, message: Message, args: string[]) {
         message.channel.send(new MessageEmbed()
-            .setColor('RANDOM')
-            .setDescription(`\`${client.shorten(args, 2024)}\``)
+            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+            .setDescription(`\`${client.shorten(args.join(' ').toLowerCase().replace(/./g, x => `${morse(x)}\u2001`).trim(), 2024)}\``)
         );
     }
 }

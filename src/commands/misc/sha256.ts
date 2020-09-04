@@ -1,11 +1,13 @@
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class SHA256 extends Command {
     constructor() {
         super({
             config: {
                 name: 'sha256',
-                description: 'SHA256 Encryption',
+                description: 'SHA256 Hash Encryption.',
                 permission: 'User',
             },
             options: {
@@ -20,13 +22,7 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         return message.channel.send(client.hash(args.join(' '), 'sha256'));
     }
 }

@@ -1,7 +1,8 @@
-const BaseCommand = require('../../classes/BaseCommand');
-const { MessageEmbed } = require('discord.js');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class Terms extends Command {
     constructor() {
         super({
             config: {
@@ -18,13 +19,7 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         return message.channel.send(new MessageEmbed()
             .setColor(0x00FFFF)
             .setTitle(`Unicron Bot - Terms of Service`)

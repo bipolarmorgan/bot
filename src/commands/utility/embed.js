@@ -46,7 +46,7 @@ $ embed -json {"fields": [{"name": "My field name", "value": "My field value"}, 
             }
         }
         return message.channel.send(new MessageEmbed()
-            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+            .setAuthor(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             .setDescription(client.shorten(args.join(' '), 2048))
         );
     }

@@ -1,7 +1,8 @@
-const { MessageEmbed } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed, PresenceStatus } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class UserInfo extends Command {
     constructor() {
         super({
             config: {
@@ -21,20 +22,13 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         let user = await client.resolveUser(args.join(' ')) || message.author;
         if (!user) user = message.author;
         let member = message.guild.member(user);
-        if (!member) member = message.member;
         let nick = member.nickname;
         if (!nick) nick = '-';
-        let status = user.presence.status;
+        let status: PresenceStatus | string = user.presence.status;
         switch (status) {
             case 'online': {
                 status = `${await client.getEmoji('online')} Online`;
@@ -53,7 +47,10 @@ module.exports = class extends BaseCommand {
                 break;
             }
         }
-        let roles = member.roles.cache.map(r => `<@&${r.id}>`).join(', ').replace(new RegExp(`<@&${message.guild.id}>`, 'g'), '');
+        let roles = member.roles.cache
+            .filter((r) => r.name !== '@everyone')
+            .sort((a, b) => b.position - a.position)
+            .map(r => `<@&${r.id}>`).join(', ');
         if (roles.length === 0) roles = '-';
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
@@ -64,8 +61,7 @@ module.exports = class extends BaseCommand {
             .addField('\u200b', '\u200b', true)
             .addField(`Status`, status, true)
             .addField(`Nickname`, nick, true)
-            .addField(`Roles`, roles)
-            .setTimestamp()
+            .addField(`Roles`, client.shorten(roles, 1024))
         );
     }
 }

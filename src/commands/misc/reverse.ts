@@ -1,6 +1,8 @@
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class Reverse extends Command {
     constructor() {
         super({
             config: {
@@ -20,20 +22,14 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
-        const content = args
+    async run(client: Client, message: Message, args: string[]) {
+        message.channel.send(client.shorten(args
             .join(' ')
             .split('')
             .reverse()
             .join('')
-            .replace(/`/g, '`' + String.fromCharCode(8203))
             .replace(/@/g, '@' + String.fromCharCode(8203))
-        message.channel.send(content);
+            , 2040)
+        );
     }
 }

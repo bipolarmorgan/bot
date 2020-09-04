@@ -1,9 +1,12 @@
-const ms = require('ms');
-const Warning = require('../../modules/Warning');
-const { MessageEmbed } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
+import ms from 'ms';
+import Guild from '../../classes/Guild';
+import Warning from '../../modules/Warning';
+import Member from '../../classes/Member';
 
-module.exports = class extends BaseCommand {
+export default class Warn extends Command {
     constructor() {
         super({
             config: {
@@ -23,21 +26,13 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     * @param {import('../../classes/Guild')} guildSettings
-     */
-    async run(client, message, args, guildSettings) {
+    async run(client: Client, message: Message, args: string[], guildSettings: Guild) {
         const [user, ...reason] = args;
         const target = await client.resolveUser(user);
         if (!target || target.bot) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Incorrect Usage, the correct usages are:\n\`${this.options.usage}\``)
-                .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
@@ -45,7 +40,6 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`Hey there, You can't warn yourself :P`)
-                .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
@@ -54,7 +48,6 @@ module.exports = class extends BaseCommand {
             if (message.author.id !== message.guild.ownerID && message.member.roles.highest.comparePositionTo(member.roles.highest) <= 0) {
                 return message.channel.send(new MessageEmbed()
                     .setColor('RED')
-                    .setTimestamp()
                     .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                     .setDescription('You can\'t warn a member who has a higher or equal to your highest role.')
                 );
@@ -63,17 +56,16 @@ module.exports = class extends BaseCommand {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')
                 .setDescription(`You can't warn a user that is not on this server.`)
-                .setTimestamp()
                 .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
             );
         }
         const duration = reason[0] ? ms(reason[0]) : false;
         if (duration) reason.shift();
-        const _reason = reason ? reason.join(' ') : 'No reason provided.';
-        /**
-         * @type {import('../../classes/Member')}
-         */
-        let instance = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+        const _reason = reason.Length ? reason.join(' ') : 'No reason provided.';
+        let instance: Member | void = await client.db.members.fetch(message.guild.id, member.user.id).catch(console.log);
+        if (!instance) {
+            return message.channel.send('Oh oh, something went wrong warning the user, please try again');
+        }
         const index = instance.addWarn(_reason, message.author);
         if (duration && !isNaN(duration)) {
             setTimeout(() => {

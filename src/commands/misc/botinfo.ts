@@ -1,9 +1,10 @@
-const ms = require('pretty-ms');
+import ms from 'pretty-ms';
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed, version as discordjsVersion } from 'discord.js';
+import Client from '../../classes/Unicron';
 const { version } = require('../../../package.json');
-const { MessageEmbed, version: discordjsVersion } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
 
-module.exports = class extends BaseCommand {
+export default class BotInfo extends Command {
     constructor() {
         super({
             config: {
@@ -20,13 +21,7 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setTitle(`Unicron v${version}`)

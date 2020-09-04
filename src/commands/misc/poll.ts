@@ -1,6 +1,8 @@
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class Poll extends Command {
     constructor() {
         super({
             config: {
@@ -14,19 +16,13 @@ module.exports = class extends BaseCommand {
                 cooldown: 3,
                 nsfwCommand: false,
                 args: true,
-                usage: 'poll <Poll Question>',
+                usage: 'poll <Poll>',
                 donatorOnly: false,
                 premiumServer: false,
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         try {
             await message.react(await client.getEmoji('yes'));
             await message.react(await client.getEmoji('no'));

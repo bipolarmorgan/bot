@@ -77,7 +77,7 @@ module.exports = class extends BaseCommand {
                 return message.channel.send(new MessageEmbed()
                     .setColor('RED')
                     .setTimestamp()
-                    .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }) || client.user.displayAvatarURL({ dynamic: true }))
+                    .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
                     .setDescription('Sorry, invalid parameters, Please try again.')
                 );
         }

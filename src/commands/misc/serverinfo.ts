@@ -1,7 +1,8 @@
-const { MessageEmbed } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
 
-module.exports = class extends BaseCommand {
+export default class ServerInfo extends Command {
     constructor() {
         super({
             config: {
@@ -15,19 +16,13 @@ module.exports = class extends BaseCommand {
                 cooldown: 10,
                 nsfwCommand: false,
                 args: false,
-                usage: '',
+                usage: 'serverinfo',
                 donatorOnly: false,
                 premiumServer: false,
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         return message.channel.send(new MessageEmbed()
             .setColor('RANDOM')
             .setAuthor(`${message.guild.name} / ${message.guild.id}`)
@@ -38,7 +33,7 @@ module.exports = class extends BaseCommand {
             .addField('Region', message.guild.region.toUpperCase(), true)
             .addField('Members', message.guild.memberCount, true)
             .addField('Emojis', message.guild.emojis.cache.size, true)
-            .addField('Channel Categories', message.guild.channels.cache.filter(channel => channel.type === 'category').size, true)
+            .addField('Category Channels', message.guild.channels.cache.filter(channel => channel.type === 'category').size, true)
             .addField('Text Channels', message.guild.channels.cache.filter(channel => channel.type === 'text').size, true)
             .addField('Voice Channels', message.guild.channels.cache.filter(channel => channel.type === 'voice').size, true)
             .addField('Shard ID', message.guild.shardID, true)

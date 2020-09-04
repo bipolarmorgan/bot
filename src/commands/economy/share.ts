@@ -40,7 +40,7 @@ export default class Share extends Command {
                 );
             }
         }
-        transferAmount = Number(transferAmount);
+        transferAmount = Math.floor(Number(transferAmount));
         if (!target) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')

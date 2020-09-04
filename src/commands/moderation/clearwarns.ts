@@ -1,6 +1,10 @@
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
+import ms from 'ms';
+import Guild from '../../classes/Guild';
 
-module.exports = class extends BaseCommand {
+export default class Clearwarns extends Command {
     constructor() {
         super({
             config: {
@@ -20,16 +24,11 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         const target = await client.resolveUser(args[0]);
         if (!target || target.bot) return message.channel.send(`I can't clear the warnings of an invalid user :/`);
         const member = await client.db.members.fetch(message.guild.id, target.id).catch(console.log);
+        if (!member) return message.channel.send(`${target}'s warnings was not cleared, please try again`);
         if (member.data && member.data.warnings) {
             member.data.warnings = [];
             await member.save().catch((e) => { throw e; });

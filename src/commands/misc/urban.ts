@@ -1,8 +1,9 @@
-const fetch = require('node-fetch');
-const { MessageEmbed } = require('discord.js');
-const BaseCommand = require('../../classes/BaseCommand');
+import Command from '../../classes/BaseCommand';
+import { Message, MessageEmbed } from 'discord.js';
+import Client from '../../classes/Unicron';
+import fetch from 'node-fetch';
 
-module.exports = class extends BaseCommand {
+export default class Urban extends Command {
     constructor() {
         super({
             config: {
@@ -20,15 +21,9 @@ module.exports = class extends BaseCommand {
             }
         });
     }
-    /**
-     * @returns {Promise<import('discord.js').Message|boolean>}
-     * @param {import('../../classes/Unicron')} client 
-     * @param {import('discord.js').Message} message 
-     * @param {Array<string>} args 
-     */
-    async run(client, message, args) {
+    async run(client: Client, message: Message, args: string[]) {
         const query = `?term=${encodeURIComponent(args.join(' '))}`;
-        const { list } = await fetch(`https://api.urbandictionary.com/v0/define?${query}`).then(response => response.json());
+        const { list } = await fetch(`https://api.urbandictionary.com/v0/define?${query}`).then((response) => response.json());
         if (!list.length) {
             return message.channel.send(new MessageEmbed()
                 .setColor('RED')

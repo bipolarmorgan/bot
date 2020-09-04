@@ -1,5 +1,5 @@
 import {
-    Client as DiscordClient, Collection, Guild, GuildEmoji, Emoji,
+    Client as DiscordClient, Collection, Guild, GuildEmoji,
     Channel, Role, Message, MessageEmbed
 } from 'discord.js';
 
@@ -24,7 +24,7 @@ import CooldownManager from '../managers/CooldownManager';
 export default class Client extends DiscordClient {
     public commands: Collection<string, BaseCommand>;
     public shopitems: Collection<string, BaseItem>;
-    public botEmojis: Collection<string, Emoji>;
+    public botEmojis: Collection<string, GuildEmoji>;
     public unicron: {
         owner: string;
         serverInviteURL: string;
@@ -103,7 +103,7 @@ export default class Client extends DiscordClient {
         if (!channel) channel = guild.channels.cache.get(search);
         return channel;
     }
-    async getEmoji(name: string): Promise<Emoji> {
+    async getEmoji(name: string): Promise<GuildEmoji> {
         if (this.emojis.cache.has(Emotes.get(name))) return this.emojis.cache.get(Emotes.get(name));
         if (this.botEmojis.has(name)) return this.botEmojis.get(name);
         function findEmoji(id: string) {
